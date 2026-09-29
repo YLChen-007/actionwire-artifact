@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawgap-runtime-trigger-oracle-v1.schema.json",
+  "title": "ClawGap runtime trigger oracle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project",
+    "report_name",
+    "ground_truth",
+    "source_binding",
+    "runner",
+    "handler",
+    "gate",
+    "trigger",
+    "sink",
+    "success_events"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "clawgap-runtime-trigger-oracle/v1"
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ground_truth": {
+      "$ref": "#/$defs/hashedFile"
+    },
+    "source_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["analysis_revision", "files"],
+      "properties": {
+        "analysis_revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/hashedFile"
+          }
+        }
+      }
+    },
+    "runner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "toolsets", "max_iterations"],
+      "properties": {
+        "adapter": {
+          "const": "hermes-one-shot/v1"
+        },
+        "toolsets": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50
+        }
+      }
+    },
+    "handler": {
+      "unevaluatedProperties": false,
+      "allOf": [
+        {"$ref": "#/$defs/functionMatcher"},
+        {
+          "type": "object",
+          "required": ["argument_path"],
+          "properties": {
+            "argument_path": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "gate": {
+      "unevaluatedProperties": false,
+      "allOf": [
+        {"$ref": "#/$defs/functionMatcher"},
+        {
+          "type": "object",
+          "required": ["argument_name", "expected_return"],
+          "properties": {
+            "argument_name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "expected_return": {
+              "type": "boolean"
+            }
+          }
+        }
+      ]
+    },
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["predicate", "transforms", "targets", "require_changed"],
+      "properties": {
+        "predicate": {
+          "const": "normalized-path-in"
+        },
+        "transforms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["expanduser", "normpath"]
+          }
+        },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        },
+        "require_changed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "sink": {
+      "unevaluatedProperties": false,
+      "allOf": [
+        {"$ref": "#/$defs/functionMatcher"},
+        {
+          "type": "object",
+          "required": ["primitive", "line", "payload_relation", "intercept"],
+          "properties": {
+            "primitive": {
+              "const": "subprocess.Popen"
+            },
+            "line": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "payload_relation": {
+              "const": "contains-raw-argument"
+            },
+            "intercept": {
+              "const": true
+            }
+          }
+        }
+      ]
+    },
+    "success_events": {
+      "const": [
+        "handler_argument_matched",
+        "gate_returned_expected",
+        "sink_reached",
+        "effect_intercepted"
+      ]
+    }
+  },
+  "$defs": {
+    "hashedFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "functionMatcher": {
+      "type": "object",
+      "required": ["file", "function"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "function": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

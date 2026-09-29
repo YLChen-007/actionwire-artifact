@@ -1,0 +1,16 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "openclaw-cn",
+  "revision": "558f272e6c90e7e0c37644e505e161b91ef738f0",
+  "runtime": "pnpm",
+  "setup_command": "CI=true pnpm install --frozen-lockfile && pnpm run build",
+  "launch_command": "mkdir -p .clawgap-state && cat > .clawgap-state/openclaw.json <<EOF\n{\"gateway\":{\"mode\":\"local\",\"auth\":{\"mode\":\"token\",\"token\":\"clawgap-loopback-mock\"}},\"agents\":{\"defaults\":{\"model\":{\"primary\":\"clawgap/clawgap-environment-probe\"},\"skipBootstrap\":true}},\"models\":{\"providers\":{\"clawgap\":{\"baseUrl\":\"http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}/v1\",\"apiKey\":\"clawgap-loopback-mock\",\"api\":\"openai-completions\",\"models\":[{\"id\":\"clawgap-environment-probe\",\"name\":\"ClawGap Environment Probe\",\"reasoning\":false,\"input\":[\"text\"],\"cost\":{\"input\":0,\"output\":0,\"cacheRead\":0,\"cacheWrite\":0},\"contextWindow\":128000,\"maxTokens\":128}]}}}}\nEOF\nOPENCLAW_STATE_DIR=\"$PWD/.clawgap-state\" OPENCLAW_CONFIG_PATH=\"$PWD/.clawgap-state/openclaw.json\" node dist/entry.js agent --agent main --message 'environment probe' --json --timeout 30",
+  "readiness_pattern": "__provider_request__",
+  "source_files": ["package.json", "src/cli/gateway-cli/register.ts", "src/gateway/server.ts"],
+  "dependency_files": ["pnpm-lock.yaml"],
+  "fixture_files": [],
+  "provider": {"protocol": "openai-chat-completions/v1", "response_mode": "json", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock"},
+  "input": {"kind": "cli-argument", "native_channel": true},
+  "instrumentation": {"loader": "node-import", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/agents/bash-tools.exec.ts:1"}, {"kind": "pre-effect", "anchor": "src/agents/tools/message-tool.ts:1"}]},
+  "effect_interceptors": ["process", "filesystem", "browser", "messaging"]
+}

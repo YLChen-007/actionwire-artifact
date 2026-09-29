@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "seed_project", "criteria", "types"],
+  "properties": {
+    "schema_version": {"const": "handler-type-catalog/v4"},
+    "seed_project": {"const": "nanobot"},
+    "criteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "handler_criterion_id", "canonical_label", "operation_family",
+          "resource_family", "effect", "child_type_ids",
+          "representative_handler", "members"
+        ],
+        "properties": {
+          "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+          "canonical_label": {"type": "string", "minLength": 1},
+          "operation_family": {"type": "string", "minLength": 1},
+          "resource_family": {"type": "string", "minLength": 1},
+          "effect": {"type": "string", "minLength": 1},
+          "child_type_ids": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^HT-[0-9a-f]{16}$"},
+            "uniqueItems": true,
+            "minItems": 1
+          },
+          "representative_handler": {"type": "string", "minLength": 1},
+          "members": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true,
+            "minItems": 1
+          }
+        }
+      }
+    },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "handler_type_id", "handler_criterion_id", "origin", "criterion",
+          "representative_handler", "members"
+        ],
+        "properties": {
+          "handler_type_id": {"type": "string", "pattern": "^HT-[0-9a-f]{16}$"},
+          "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+          "origin": {"enum": ["nanobot-seed", "external-global"]},
+          "criterion": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "intent_family", "canonical_label", "operation_family", "resource_family",
+              "effect", "compatibility_rule", "distinguishing_rule", "role_signatures"
+            ],
+            "properties": {
+              "intent_family": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+              "canonical_label": {"type": "string", "minLength": 1},
+              "operation_family": {"type": "string", "minLength": 1},
+              "resource_family": {"type": "string", "minLength": 1},
+              "effect": {"type": "string", "minLength": 1},
+              "compatibility_rule": {"type": "string", "minLength": 1},
+              "distinguishing_rule": {"type": "string", "minLength": 1},
+              "role_signatures": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["core_roles", "optional_roles", "members"],
+                  "properties": {
+                    "core_roles": {
+                      "type": "array",
+                      "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+                      "uniqueItems": true
+                    },
+                    "optional_roles": {
+                      "type": "array",
+                      "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+                      "uniqueItems": true
+                    },
+                    "members": {
+                      "type": "array",
+                      "items": {"type": "string", "minLength": 1},
+                      "uniqueItems": true,
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "representative_handler": {"type": "string", "minLength": 1},
+          "members": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true,
+            "minItems": 1
+          }
+        }
+      }
+    }
+  }
+}

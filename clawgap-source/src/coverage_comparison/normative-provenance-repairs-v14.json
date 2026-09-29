@@ -1,0 +1,54 @@
+{
+  "schema_version": "coverage-normativity-repair-registry/v1",
+  "evaluation_partition": "training",
+  "entries": [
+    {
+      "candidate_id": "CAND-2bb4433b7deba02c",
+      "group_id": "HSG-37648f29cbc2bb74",
+      "legacy_requirement_id": "R-cfb5cb4ded525caa",
+      "project": "hermes-agent",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "chain_id": "C-47c880044323",
+      "evidence_kind": "explicit-source-policy",
+      "evidence_ids": ["SVAL-e4a8f2311e86be37"],
+      "allowed_validation_policy_bases": ["explicit-source-policy"],
+      "reason": "Revision-bound source policy and regression tests require skill paths to remain within trusted directories."
+    },
+    {
+      "candidate_id": "CAND-34bd5e2a040b5664",
+      "group_id": "HSG-098bb0ce30ef20a0",
+      "legacy_requirement_id": "R-2dbb17628d22e648",
+      "project": "chatgpt-on-wechat",
+      "revision": "55aaf60a57ea6e9f4b8a54797572d98f65e88d2f",
+      "chain_id": "C-5dc10e8ecc95",
+      "evidence_kind": "fixed-delta",
+      "evidence_ids": ["SVAL-f3c0bb8f766f9409"],
+      "allowed_validation_policy_bases": ["fixed-delta"],
+      "reason": "Revision-bound post-fix destination validation supplies a narrower normative delta than the ordinary HTTP capability card."
+    },
+    {
+      "candidate_id": "CAND-0e7d7aea6fed1ab0",
+      "group_id": "HSG-3209832c56152666",
+      "legacy_requirement_id": "R-a2a0f84ef9e93f17",
+      "project": "chatgpt-on-wechat",
+      "revision": "55aaf60a57ea6e9f4b8a54797572d98f65e88d2f",
+      "chain_id": "C-cc8199b82f91",
+      "evidence_kind": "fixed-delta",
+      "evidence_ids": ["SVAL-665af033b3ba6482"],
+      "allowed_validation_policy_bases": ["fixed-delta"],
+      "reason": "Revision-bound Vision URL destination validation supplies the normative delta for this exact member chain."
+    },
+    {
+      "candidate_id": "CAND-b49cfc884f2168f1",
+      "group_id": "HSG-b1ae1652ac484199",
+      "legacy_requirement_id": "R-94b98277dc10991f",
+      "project": "chatgpt-on-wechat",
+      "revision": "55aaf60a57ea6e9f4b8a54797572d98f65e88d2f",
+      "chain_id": "C-b306b289af8c",
+      "evidence_kind": "fixed-delta",
+      "evidence_ids": ["SVAL-612f3c4b41a7c1da"],
+      "allowed_validation_policy_bases": ["fixed-delta"],
+      "reason": "Revision-bound browser protocol validation supplies the normative delta for this exact member chain."
+    }
+  ]
+}

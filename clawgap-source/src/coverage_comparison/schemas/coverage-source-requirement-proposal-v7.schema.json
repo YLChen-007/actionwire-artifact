@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "requirement_source", "group_id", "handler_criterion_id",
+    "sink_type_id", "project", "revision", "chain_id", "handler_id", "sink_id",
+    "requirement_id", "action", "dimension", "rule", "applicability",
+    "controlled_facet", "enforcement_stage", "state_lifetime", "policy_basis",
+    "protected_asset", "security_effect", "failure_mode", "gate_ids",
+    "covered_semantics", "gap", "refines_requirement_ids", "preconditions",
+    "source_evidence"
+  ],
+  "properties": {
+    "schema_version": {"const": "coverage-source-requirement-proposal/v7"},
+    "requirement_source": {"const": "source-derived"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "handler_id": {"type": "string", "pattern": "^H-[0-9a-f]{16}$"},
+    "sink_id": {"type": "string", "pattern": "^S-[0-9a-f]{16}$"},
+    "requirement_id": {"type": "string", "pattern": "^SR-[0-9a-f]{16}$"},
+    "action": {"enum": ["add", "refine", "reassess"]},
+    "dimension": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+    "rule": {"type": "string", "minLength": 1},
+    "applicability": {"type": "string", "minLength": 1},
+    "controlled_facet": {"type": "string", "minLength": 1},
+    "enforcement_stage": {"enum": ["pre-transform", "post-transform", "pre-persist", "post-action", "cross-call"]},
+    "state_lifetime": {"enum": ["single-call", "cross-call", "persistent"]},
+    "policy_basis": {"enum": ["explicit-source-policy", "fixed-delta", "inherent-security-boundary"]},
+    "protected_asset": {"type": "string", "minLength": 1},
+    "security_effect": {"type": "string", "minLength": 1},
+    "failure_mode": {"enum": ["wrong-check", "missing-check"]},
+    "gate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"}},
+    "covered_semantics": {"type": ["string", "null"], "minLength": 1},
+    "gap": {"type": "string", "minLength": 1},
+    "refines_requirement_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^R-[0-9a-f]{16}$"}},
+    "preconditions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "source_evidence": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/source_evidence"}}
+  },
+  "$defs": {
+    "source_evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "file", "line_start", "line_end", "claim", "sha256", "excerpt"],
+      "properties": {
+        "role": {"enum": ["handler", "controlled-value", "gate", "sink", "policy", "impact"]},
+        "file": {"type": "string", "minLength": 1},
+        "line_start": {"type": "integer", "minimum": 1},
+        "line_end": {"type": "integer", "minimum": 1},
+        "claim": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "excerpt": {"type": "string"}
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "AstrBot",
+  "revision": "0e973bd4d483d18e1672c4dfa2eb7aae31bc1f83",
+  "runtime": "python",
+  "entrypoint": {"command": ["astrbot", "run", "--port", "${CLAWGAP_L2_PROVIDER_PORT}"], "cwd": ".", "readiness": {"kind": "tcp-port", "timeout_seconds": 30}},
+  "provider": {"mode": "native-openai-compatible", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock", "config_path": "data/cmd_config.json"},
+  "input_transport": {"kind": "native-test-channel", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["pyproject.toml", "astrbot/cli/__main__.py"], "dependency_files": ["pyproject.toml"], "disposable_roots": ["data"], "environment": {}},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "astrbot/core/provider/provider.py:1"}, {"kind": "dispatch", "anchor": "astrbot/core/astr_agent_tool_exec.py:1"}, {"kind": "handler", "anchor": "astrbot/core/tools/computer_tools/fs.py:1"}, {"kind": "sink", "anchor": "astrbot/core/tools/computer_tools/fs.py:1"}, {"kind": "pre-effect", "anchor": "astrbot/core/tools/computer_tools/fs.py:1"}]},
+  "effect_interceptors": ["filesystem", "process"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["AstrBot native test-channel/config renderer is not yet implemented"]}
+}

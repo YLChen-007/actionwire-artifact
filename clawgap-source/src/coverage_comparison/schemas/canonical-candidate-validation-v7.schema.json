@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "validation_id", "validation_input_sha256", "group_id",
+    "project", "revision", "chain_id", "provisional_candidate_id",
+    "requirement_id", "primary_failure_mode", "verdict", "disposition",
+    "primary_assessment", "final_assessment", "review_priority", "policy_basis",
+    "controlled_flow", "sink_reachability", "gate_coverage", "covering_gate_ids",
+    "impact", "impact_severity", "source_research_complete", "source_evidence",
+    "preconditions", "security_effect", "uncertainties", "reason",
+    "operational_error"
+  ],
+  "properties": {
+    "schema_version": {"const": "canonical-candidate-validation/v7"},
+    "validation_id": {"type": "string", "pattern": "^SVAL-[0-9a-f]{16}$"},
+    "validation_input_sha256": {"$ref": "#/$defs/digest"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "provisional_candidate_id": {"type": "string", "pattern": "^CAND-[0-9a-f]{16}$"},
+    "requirement_id": {"type": "string", "pattern": "^CR-[0-9a-f]{16}$"},
+    "primary_failure_mode": {"enum": ["wrong-check", "missing-check"]},
+    "verdict": {"enum": ["confirmed-uncovered", "not-applicable", "covered", "upstream-inconsistent", "unknown"]},
+    "disposition": {"enum": ["confirmed", "refuted", "unknown"]},
+    "primary_assessment": {"$ref": "#/$defs/assessment"},
+    "final_assessment": {"$ref": "#/$defs/assessment"},
+    "review_priority": {"enum": ["high", "medium", "low", null]},
+    "policy_basis": {"enum": ["explicit-source-policy", "fixed-delta", "inherent-security-boundary", "learned-security-invariant", "capability-only", "none", "unknown"]},
+    "controlled_flow": {"enum": ["confirmed", "refuted", "unknown"]},
+    "sink_reachability": {"enum": ["confirmed", "refuted", "unknown"]},
+    "gate_coverage": {"enum": ["uncovered", "covered", "uncatalogued-check", "unknown"]},
+    "covering_gate_ids": {"$ref": "#/$defs/gates"},
+    "impact": {"enum": ["concrete", "none", "unknown"]},
+    "impact_severity": {"enum": ["high", "medium", "low", "unknown"]},
+    "source_research_complete": {"type": "boolean"},
+    "source_evidence": {"type": "array", "items": {"type": "object"}},
+    "preconditions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "security_effect": {"type": ["string", "null"], "minLength": 1},
+    "uncertainties": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "reason": {"type": "string", "minLength": 1},
+    "operational_error": {"type": ["string", "null"], "minLength": 1}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gates": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"}},
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "applicability", "decision", "capability_evidence", "call_shape_facts", "gate_ids", "covered_semantics", "gap", "uncertainty"],
+      "properties": {
+        "requirement_id": {"type": "string", "pattern": "^CR-[0-9a-f]{16}$"},
+        "applicability": {"enum": ["applicable", "not-applicable", "unknown"]},
+        "decision": {"enum": ["covered", "wrong-check", "missing-check", "not-applicable", "unknown"]},
+        "capability_evidence": {"type": "array", "items": {"type": "object"}},
+        "call_shape_facts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "gate_ids": {"$ref": "#/$defs/gates"},
+        "covered_semantics": {"type": ["string", "null"], "minLength": 1},
+        "gap": {"type": ["string", "null"], "minLength": 1},
+        "uncertainty": {"type": ["string", "null"], "minLength": 1}
+      }
+    }
+  }
+}

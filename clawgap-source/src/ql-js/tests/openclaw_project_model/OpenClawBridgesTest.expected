@@ -1,0 +1,6 @@
+| bridge-chain | node.invoke | child_process.spawn:node-host |
+| decision-gate | evaluateExecAllowlist | branch-confirmed |
+| decision-gate | evaluateSegments | branch-confirmed |
+| decision-gate | evaluateShellAllowlist | branch-confirmed |
+| decision-gate | isSafeBinUsage | branch-confirmed |
+| second-order-chain | image | Response.text |

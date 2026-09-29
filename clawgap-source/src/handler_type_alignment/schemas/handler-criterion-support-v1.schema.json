@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "handler_criterion_id", "handler_count", "leaf_type_count",
+    "project_count", "projects", "members", "support"
+  ],
+  "properties": {
+    "schema_version": {"const": "handler-criterion-support/v1"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "handler_count": {"type": "integer", "minimum": 1},
+    "leaf_type_count": {"type": "integer", "minimum": 1},
+    "project_count": {"type": "integer", "minimum": 1},
+    "projects": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "members": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "support": {"enum": ["singleton", "multi"]}
+  }
+}

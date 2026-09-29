@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClawGap Auto L2 Plan v1",
+  "type": "object",
+  "required": ["schema_version", "project", "revision", "candidate_id", "case_id", "tool_or_action_name", "provider_plan", "input_plan", "instrumentation_plan", "interceptor_plan"],
+  "properties": {
+    "schema_version": {"const": "clawgap-auto-l2-plan/v1"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "candidate_id": {"type": "string", "pattern": "^CAND-"},
+    "case_id": {"type": "string", "minLength": 1},
+    "tool_or_action_name": {"type": "string", "minLength": 1},
+    "provider_plan": {"type": "object"},
+    "input_plan": {"type": "object"},
+    "instrumentation_plan": {"type": "object"},
+    "interceptor_plan": {"type": "object"}
+  }
+}

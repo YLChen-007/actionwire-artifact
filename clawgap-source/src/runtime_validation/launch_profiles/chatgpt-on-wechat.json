@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "chatgpt-on-wechat",
+  "revision": "55aaf60a57ea6e9f4b8a54797572d98f65e88d2f",
+  "runtime": "python",
+  "entrypoint": {"command": ["python", "app.py"], "cwd": ".", "readiness": {"kind": "stdio-line", "timeout_seconds": 30, "pattern": "started"}},
+  "provider": {"mode": "native-openai-compatible", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock", "config_path": "config.json"},
+  "input_transport": {"kind": "native-test-channel", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["app.py", "config.py", "cli/cli.py"], "dependency_files": ["pyproject.toml", "requirements-optional.txt"], "disposable_roots": ["data", "logs", "tmp"], "environment": {}},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "bridge/bridge.py:1"}, {"kind": "dispatch", "anchor": "agent/tools/base_tool.py:1"}, {"kind": "handler", "anchor": "agent/tools/bash/bash.py:1"}, {"kind": "sink", "anchor": "agent/tools/bash/bash.py:1"}, {"kind": "pre-effect", "anchor": "agent/tools/bash/bash.py:1"}]},
+  "effect_interceptors": ["process", "filesystem", "http", "browser"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["CowAgent local test-channel/config renderer is not yet implemented"]}
+}

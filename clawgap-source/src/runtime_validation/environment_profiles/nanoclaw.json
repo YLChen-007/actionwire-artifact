@@ -1,0 +1,17 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "nanoclaw",
+  "revision": "36cbf17e107fd0f8daea4ceb2ac523d9f0d88915",
+  "runtime": "pnpm",
+  "setup_command": "CI=true pnpm install --frozen-lockfile && pnpm rebuild better-sqlite3 && pnpm run build",
+  "launch_command": "node --import tsx scripts/upgrade-state.ts set && node dist/index.js",
+  "probe_command": "node --input-type=module -e \"const {OneCLI}=await import('@onecli-sh/sdk'); const client=new OneCLI({url:'http://127.0.0.1:' + process.env.CLAWGAP_PROVIDER_PORT, apiKey:'clawgap-loopback-mock'}); const config=await client.getContainerConfig(); if (!config.env || config.env.CLAWGAP_ENVIRONMENT !== 'ready') process.exit(1);\"",
+  "readiness_pattern": "NanoClaw running",
+  "source_files": ["package.json", "src/index.ts", "src/db/connection.ts"],
+  "dependency_files": ["pnpm-lock.yaml"],
+  "fixture_files": [],
+  "provider": {"protocol": "project-custom/v1", "response_mode": "json", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "path": "/api/container-config"},
+  "input": {"kind": "unix-socket", "native_channel": true},
+  "instrumentation": {"loader": "node-import", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "container/agent-runner/src/providers/factory.ts:1"}, {"kind": "pre-effect", "anchor": "container/agent-runner/src/mcp-tools/core.ts:1"}]},
+  "effect_interceptors": ["process", "filesystem", "database"]
+}

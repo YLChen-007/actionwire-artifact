@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "group_id", "handler_criterion_id", "sink_type_id", "status", "seed", "member_chain_refs", "requirements", "rejected_proposal_ids"],
+  "properties": {
+    "schema_version": {"const": "group-oracle/v1"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+    "status": {"enum": ["complete", "partial"]},
+    "seed": {"type": "object", "additionalProperties": false, "required": ["project", "revision", "chain_id", "selection_policy"], "properties": {
+      "project": {"type": "string", "minLength": 1}, "revision": {"type": "string", "minLength": 1}, "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+      "selection_policy": {"enum": ["nanobot-complete-lexicographic", "complete-lexicographic", "partial-lexicographic"]}
+    }},
+    "member_chain_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/ref"}},
+    "requirements": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["requirement_id", "dimension", "rule", "applicability", "evidence_ids", "source_proposal_ids", "origin_chain_refs", "origin_gate_ids"],
+      "properties": {
+        "requirement_id": {"type": "string", "pattern": "^R-[0-9a-f]{16}$"}, "dimension": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "rule": {"type": "string", "minLength": 1}, "applicability": {"type": "string", "minLength": 1},
+        "evidence_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^EV-[0-9a-f]{16}$"}},
+        "source_proposal_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^RP-[0-9a-f]{16}$"}},
+        "origin_chain_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/ref"}},
+        "origin_gate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"}}
+      }}},
+    "rejected_proposal_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^RP-[0-9a-f]{16}$"}}
+  },
+  "$defs": {"ref": {"type": "object", "additionalProperties": false, "required": ["project", "revision", "chain_id"], "properties": {"project": {"type": "string", "minLength": 1}, "revision": {"type": "string", "minLength": 1}, "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"}}}}
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawgap.local/schemas/call-chain-slice-v2.schema.json",
+  "title": "CallChainSliceV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_revision",
+    "chain_id",
+    "call_chain",
+    "calls",
+    "handler",
+    "sink",
+    "values",
+    "selected_gates",
+    "gate_semantics",
+    "unresolved",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "call-chain-slice/v2"},
+    "project_revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{10}$"},
+    "call_chain": {"type": "string", "minLength": 1},
+    "calls": {
+      "type": "array",
+      "minItems": 2,
+      "items": {"type": "object"}
+    },
+    "handler": {"type": "object"},
+    "sink": {"type": "object"},
+    "values": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "object"}
+    },
+    "selected_gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "object"}
+    },
+    "gate_semantics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "object"}
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "status": {"enum": ["complete", "partial"]}
+  }
+}

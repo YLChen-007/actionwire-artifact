@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_id", "project", "report_name", "action", "group_ids", "chain_ids", "corrected_requirement_ids", "primary_decisions", "challenge_decisions", "final_decisions", "candidate_ids", "matched_candidate_ids", "disposition", "reason"],
+  "properties": {
+    "schema_version": {"const": "coverage-correction-disposition/v7"},
+    "report_id": {"type": "string", "pattern": "^GT-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "report_name": {"type": "string", "minLength": 1},
+    "action": {"enum": ["add", "refine", "reassess"]},
+    "group_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"}},
+    "chain_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"}},
+    "corrected_requirement_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^R-[0-9a-f]{16}$"}},
+    "primary_decisions": {"type": "array", "items": {"type": "string"}},
+    "challenge_decisions": {"type": "array", "items": {"type": "string"}},
+    "final_decisions": {"type": "array", "items": {"type": "string"}},
+    "candidate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^CAND-[0-9a-f]{16}$"}},
+    "matched_candidate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^CAND-[0-9a-f]{16}$"}},
+    "disposition": {"enum": ["corrected-match", "evidence-insufficient", "unresolved-error"]},
+    "reason": {"type": "string", "minLength": 1}
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "sample_ordinal", "candidate_id", "project", "chain_id",
+    "requirement_id", "requirement_source", "failure_mode", "blind_adjudication",
+    "adjudication_reason", "source_evidence"
+  ],
+  "properties": {
+    "schema_version": {"const": "coverage-precision-audit-sample/v7"},
+    "sample_ordinal": {"type": "integer", "minimum": 1},
+    "candidate_id": {"type": "string", "pattern": "^CAND-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "requirement_id": {"type": "string", "pattern": "^(R|CAPR|SR|LIR)-[0-9a-f]{16}$"},
+    "requirement_source": {"enum": ["group-oracle", "capability-card", "source-derived", "learned-invariant"]},
+    "failure_mode": {"enum": ["wrong-check", "missing-check"]},
+    "blind_adjudication": {"enum": ["valid", "false-positive", "unknown", null]},
+    "adjudication_reason": {"type": ["string", "null"], "minLength": 1},
+    "source_evidence": {"type": "array", "items": {"type": "object"}}
+  }
+}

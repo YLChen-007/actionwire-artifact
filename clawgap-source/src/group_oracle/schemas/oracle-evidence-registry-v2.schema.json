@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "post_hoc_ground_truth_informed", "base_registry", "base_sha256", "evidence"],
+  "properties": {
+    "schema_version": {"const": "oracle-evidence-registry/v2"},
+    "post_hoc_ground_truth_informed": {"const": true},
+    "base_registry": {"type": "string", "minLength": 1},
+    "base_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "applicability", "source_path", "sha256", "locator", "exact_quote", "supported_claim"],
+        "properties": {
+          "kind": {"enum": ["documentation", "standard", "fixed-delta"]},
+          "applicability": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["handler_criterion_ids", "sink_type_ids"],
+            "properties": {
+              "handler_criterion_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"}},
+              "sink_type_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"}}
+            }
+          },
+          "source_path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "locator": {"type": "string", "minLength": 1},
+          "exact_quote": {"type": "string", "minLength": 1},
+          "supported_claim": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

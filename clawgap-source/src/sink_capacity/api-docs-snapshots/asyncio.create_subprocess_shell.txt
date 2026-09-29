@@ -1,0 +1,73 @@
+nc/await asyncio APIs to
+create and manage subprocesses. 
+Here’s an example of how asyncio can run a shell command and
+obtain its result: 
+import asyncio async def run ( cmd ): proc = await asyncio . create_subprocess_shell ( cmd , stdout = asyncio . subprocess . PIPE , stderr = asyncio . subprocess . PIPE ) stdout , stderr = await proc . communicate () print ( f '[ { cmd !r} exited with { proc . returncode } ]' ) if stdout : print ( f '[stdout] \n { stdout . decode () } ' ) if stderr : print ( f '[stderr] \n { stderr . decode () } ' ) asyncio . run ( run ( 'ls /zzz' )) 
+will print: 
+[ 'ls /zzz' exited with 1 ] [ stderr ] ls : / zzz : No such file or directory 
+Because all asyncio subprocess functions are asynchronous and asyncio
+provides many tools to work with such functions, it is easy to execute
+and monitor multiple subprocesses in parallel. It is indeed trivial
+to modify the above example to run several commands simultaneously: 
+async def main (): await asyncio . gather ( run ( 'ls /zzz' ), run ( 'sleep 1; echo "hello"' )) asyncio . run ( main ()) 
+See also the Examples subsection. 
+Creating Subprocesses ¶ 
+async asyncio. create_subprocess_exec ( program , * args , stdin = None , stdout = None , stderr = None , limit = None , ** kwds ) ¶ 
+Create a subprocess. 
+The limit argument sets the buffer limit for StreamReader wrappers for stdout and stderr (if subprocess.PIPE is passed to stdout and stderr arguments). 
+Return a Process instance. 
+See the documentation of loop.subprocess_exec() for other
+parameters. 
+If the process object is garbage collected while the process is still
+running, the child process will be killed. 
+Changed in version 3.10: Removed the loop parameter. 
+async asyncio. create_subprocess_shell ( cmd , stdin = None , stdout = None , stderr = None , limit = None , ** kwds ) ¶ 
+Run the cmd shell command. 
+The limit argument sets the buffer limit for StreamReader wrappers for stdout and stderr (if subprocess.PIPE is passed to stdout and stderr arguments). 
+Return a Process instance. 
+See the documentation of loop.subprocess_shell() for other
+parameters. 
+If the process object is garbage collected while the process is still
+running, the child process will be killed. 
+Important 
+It is the application’s responsibility to ensure that all whitespace and
+special characters are quoted appropriately to avoid shell injection vulnerabilities. The shlex.quote() function can be used to properly
+escape whitespace and special shell characters in strings that are going
+to be used to construct shell commands. 
+Changed in version 3.10: Removed the loop parameter. 
+Note 
+Subprocesses are available for Windows if a ProactorEventLoop is
+used. See Subprocess Support on Windows for details. 
+See also 
+asyncio also has the following low-level APIs to work with subprocesses: loop.subprocess_exec() , loop.subprocess_shell() , loop.connect_read_pipe() , loop.connect_write_pipe() ,
+as well as the Subprocess Transports and Subprocess Protocols . 
+Constants ¶ 
+asyncio.subprocess. PIPE ¶ 
+Can be passed to the stdin , stdout or stderr parameters. 
+If PIPE is passed to stdin argument, the Process.stdin attribute
+will point to a StreamWriter instance. 
+If PIPE is passed to stdout or stderr arguments, the Process.stdout and Process.stderr attributes will point to StreamReader instances. 
+asyncio.subprocess. STDOUT ¶ 
+Special value that can be used as the stderr argument and indicates
+that standard error should be redirected into standard output. 
+asyncio.subprocess. DEVNULL ¶ 
+Special value that can be used as the stdin , stdout or stderr argument
+to process creation functions. It indicates that the special file os.devnull will be used for the corresponding subprocess stream. 
+Interacting with Subprocesses ¶ 
+Both create_subprocess_exec() and create_subprocess_shell() functions return instances of the Process class. Process is a high-level
+wrapper that allows communicating with subprocesses and watching for
+their completion. 
+class asyncio.subprocess. Process ¶ 
+An object that wraps OS processes created by the create_subprocess_exec() and create_subprocess_shell() functions. 
+This class is designed to have a similar API to the subprocess.Popen class, but there are some
+notable differences: 
+unlike Popen, Process instances do not have an equivalent to
+the poll() method; 
+the communicate() and wait() methods don’t have a timeout parameter: use the wait_for() function; 
+the Process.wait() method
+is asynchronous, whereas subprocess.Popen.wait() method
+is implemented as a blocking busy loop; 
+the universal_newlines parameter is not supported. 
+This class is not thread safe . 
+See also the Subprocess and Threads section. 
+async wait (

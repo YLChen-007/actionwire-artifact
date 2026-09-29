@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawgap-runtime-validation-case-v2.schema.json",
+  "title": "ClawGap candidate runtime-validation case v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "case_id", "candidate_ids", "report_bindings", "project",
+    "revision", "chain_id", "group_id", "requirement_id", "failure_mode",
+    "source_binding", "artifact_binding", "adapter", "probe", "fixture", "replay",
+    "matcher", "observations", "effect_policy", "generation"
+  ],
+  "properties": {
+    "schema_version": {"const": "clawgap-runtime-validation-case/v2"},
+    "case_id": {"type": "string", "pattern": "^RVC-[0-9a-f]{16}$"},
+    "candidate_ids": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^CAND-[0-9a-f]{16}$"}
+    },
+    "report_bindings": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["report_id", "report_name", "path", "sha256"],
+        "properties": {
+          "report_id": {"type": "string", "pattern": "^GT-[0-9a-f]{16}$"},
+          "report_name": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "requirement_id": {"type": "string", "pattern": "^(R|CR)-[0-9a-f]{16}$"},
+    "failure_mode": {"enum": ["wrong-check", "missing-check"]},
+    "source_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["analysis_revision", "files"],
+      "properties": {
+        "analysis_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "files": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {"$ref": "#/$defs/hashedFile"}
+        }
+      }
+    },
+    "artifact_binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["coverage_manifest", "ground_truth_manifest", "candidates", "comparisons", "ground_truth_coverage", "candidate_row", "semantic_row"],
+      "properties": {
+        "coverage_manifest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ground_truth_manifest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidates": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "comparisons": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "ground_truth_coverage": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "candidate_row": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "semantic_row": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "adapter": {"type": "string", "minLength": 1},
+    "probe": {"type": "string", "minLength": 1},
+    "fixture": {"type": "string", "minLength": 1},
+    "replay": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tool_name", "exploit_args", "control_args", "reproduction_prompt"],
+      "properties": {
+        "tool_name": {"type": "string", "minLength": 1},
+        "exploit_args": {"type": "object"},
+        "control_args": {"type": "object"},
+        "reproduction_prompt": {"type": "string", "minLength": 1}
+      }
+    },
+    "matcher": {
+      "type": "object", "additionalProperties": false,
+      "required": ["relation", "argument_path", "exploit_value", "control_value"],
+      "properties": {
+        "relation": {"type": "string", "minLength": 1},
+        "argument_path": {
+          "type": "array", "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "exploit_value": {},
+        "control_value": {}
+      }
+    },
+    "observations": {
+      "type": "array", "minItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["stage_id", "kind", "file", "symbol", "line", "expected"],
+        "properties": {
+          "stage_id": {"type": "string", "pattern": "^S[0-9]+$"},
+          "kind": {"enum": ["handler", "gate", "boundary", "sink", "effect"]},
+          "file": {"type": "string"},
+          "symbol": {"type": "string"},
+          "line": {"type": ["integer", "null"], "minimum": 1},
+          "expected": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "effect_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "allow_network", "allow_host_write"],
+      "properties": {
+        "mode": {"enum": ["intercept", "sandbox"]},
+        "allow_network": {"const": "loopback-only"},
+        "allow_host_write": {"const": false}
+      }
+    },
+    "generation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "reason", "model_generated"],
+      "properties": {
+        "status": {"enum": ["ready", "unsupported"]},
+        "reason": {"type": "string", "minLength": 1},
+        "model_generated": {"type": "boolean"}
+      }
+    }
+  },
+  "$defs": {
+    "hashedFile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "schema_version": "reviewed-gate-qualification/v1",
+  "group_ids": [
+    "HSG-2a9409f6633c1b6a",
+    "HSG-3209832c56152666"
+  ],
+  "chains": [
+    {
+      "project": "hermes-agent",
+      "chain_id": "C-2aa79d9ca43d",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "semantic_ir_sha256": "79ecf2672d9c5dbb177635192741a5a1dbe79f9c49b750bf4578ea94e4df9a18",
+      "qualified_gate_uids": [
+        "GU1ed6874487204858ee3a",
+        "GUfa8fbd80e924f0481119"
+      ],
+      "model_origin_evidence": [
+        {
+          "gate_uid": "GUfa8fbd80e924f0481119",
+          "input_locator": "/gates/0/semantic/input",
+          "exact_value": "Ve92a998fae36: _url, a URL string element bound from web_extract_tool's urls list parameter, scanned for secret-like tokens"
+        },
+        {
+          "gate_uid": "GU1ed6874487204858ee3a",
+          "input_locator": "/gates/1/semantic/input",
+          "exact_value": "V40ffe7cce26d: url string taken from web_extract_tool's urls list (for url in urls loop)"
+        }
+      ]
+    },
+    {
+      "project": "hermes-agent",
+      "chain_id": "C-46727898f25d",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "semantic_ir_sha256": "12bbaaaa35f40bb6574c3dbaf349da919b2a594b40efda9723545d40ac92113f",
+      "qualified_gate_uids": [
+        "GU1ed6874487204858ee3a",
+        "GUfa8fbd80e924f0481119"
+      ],
+      "model_origin_evidence": [
+        {
+          "gate_uid": "GUfa8fbd80e924f0481119",
+          "input_locator": "/gates/0/semantic/input",
+          "exact_value": "Ve92a998fae36: _url, a URL string element bound from web_extract_tool's urls list parameter, scanned for secret-like tokens"
+        },
+        {
+          "gate_uid": "GU1ed6874487204858ee3a",
+          "input_locator": "/gates/1/semantic/input",
+          "exact_value": "V40ffe7cce26d: url string taken from web_extract_tool's urls list (for url in urls loop)"
+        }
+      ]
+    },
+    {
+      "project": "chatgpt-on-wechat",
+      "chain_id": "C-cc8199b82f91",
+      "revision": "55aaf60a57ea6e9f4b8a54797572d98f65e88d2f",
+      "semantic_ir_sha256": "93062c3b59bbd34eb831a9197c221be507f669e792ec99481c3d0994855770f3",
+      "qualified_gate_uids": [],
+      "model_origin_evidence": []
+    },
+    {
+      "project": "hermes-agent",
+      "chain_id": "C-806a548b73e2",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "semantic_ir_sha256": "bc82555c937fae3452047be3e27dc9dc81ba5849ae95ca86f70056744229de7f",
+      "qualified_gate_uids": [
+        "GU1228344ddaf94b9b1c88",
+        "GUb5d69a74580bb70abd74",
+        "GUd41b18fdd81044c24697"
+      ],
+      "model_origin_evidence": [
+        {
+          "gate_uid": "GUd41b18fdd81044c24697",
+          "input_locator": "/gates/1/semantic/input",
+          "exact_value": "V25e78edc13db: image_url, attacker-controlled URL string derived from args"
+        },
+        {
+          "gate_uid": "GU1228344ddaf94b9b1c88",
+          "input_locator": "/gates/2/semantic/input",
+          "exact_value": "V2494094fa9fc: image_url (args-derived URL) bound to check_website_access.url formal"
+        },
+        {
+          "gate_uid": "GUb5d69a74580bb70abd74",
+          "input_locator": "/gates/3/semantic/input",
+          "exact_value": "V01c8d9c74e49: blocked, the return of check_website_access(image_url); None when allowed or a block-metadata dict when blocked"
+        },
+        {
+          "gate_uid": "GUb5d69a74580bb70abd74",
+          "input_locator": "/gates/2/semantic/input",
+          "exact_value": "V2494094fa9fc: image_url (args-derived URL) bound to check_website_access.url formal"
+        }
+      ]
+    }
+  ]
+}

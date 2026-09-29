@@ -1,0 +1,9 @@
+library: false
+extractor: python
+warnOnImplicitThis: false
+name: clawgap-callchain
+version: 0.0.1
+dependencies:
+  codeql/python-all: "*"
+  codeql/suite-helpers: "*"
+  codeql/util: "*"

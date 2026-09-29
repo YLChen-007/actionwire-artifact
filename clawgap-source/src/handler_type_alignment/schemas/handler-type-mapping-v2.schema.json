@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "project", "handler_id", "handler_name", "decision",
+    "handler_criterion_id", "handler_type_id", "reference_handler", "reason", "evidence"
+  ],
+  "properties": {
+    "schema_version": {"const": "handler-type-mapping/v2"},
+    "project": {"type": "string", "minLength": 1},
+    "handler_id": {"type": "string", "pattern": "^H-[0-9a-f]{16}$"},
+    "handler_name": {"type": "string", "minLength": 1},
+    "decision": {"enum": ["matched", "new-type"]},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "handler_type_id": {"type": "string", "pattern": "^HT-[0-9a-f]{16}$"},
+    "reference_handler": {"type": "string", "minLength": 1},
+    "reason": {"type": "string", "minLength": 1},
+    "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "coverage-chain-binding-registry/v1",
+  "analysis_mode": "canonical-trained-detector/v9",
+  "bindings": [
+    {
+      "report_id": "GT-228613a4d41e4934",
+      "schema_version": "coverage-chain-binding/v1",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "handler": {"tool_name": "_handle_terminal", "file": "tools/terminal_tool.py", "line": 2321, "source_parameter": "args"},
+      "effect_sink": {"name": "subprocess.Popen", "file": "tools/environments/local.py", "line": 413, "problematic_parameter": "_popen_cwd;args"},
+      "expected_policy_sink": {"name": "prompt_dangerous_approval", "file": "tools/approval.py", "line": 1220, "problematic_parameter": "command"}
+    },
+    {
+      "report_id": "GT-7be4b0f1a9b62e4c",
+      "schema_version": "coverage-chain-binding/v1",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "handler": {"tool_name": "_handle_terminal", "file": "tools/terminal_tool.py", "line": 2321, "source_parameter": "args"},
+      "effect_sink": {"name": "subprocess.Popen", "file": "tools/environments/local.py", "line": 413, "problematic_parameter": "_popen_cwd;args"},
+      "expected_policy_sink": {"name": "prompt_dangerous_approval", "file": "tools/approval.py", "line": 1220, "problematic_parameter": "command"}
+    },
+    {
+      "report_id": "GT-8760b9fa6b53a205",
+      "schema_version": "coverage-chain-binding/v1",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "handler": {"tool_name": "execute_code", "file": "tools/code_execution_tool.py", "line": 934, "source_parameter": "code;enabled_tools;task_id"},
+      "effect_sink": {"name": "subprocess.Popen", "file": "tools/code_execution_tool.py", "line": 1094, "problematic_parameter": "written-file-content"},
+      "expected_policy_sink": {"name": "prompt_dangerous_approval", "file": "tools/approval.py", "line": 1220, "problematic_parameter": "command"}
+    }
+  ]
+}

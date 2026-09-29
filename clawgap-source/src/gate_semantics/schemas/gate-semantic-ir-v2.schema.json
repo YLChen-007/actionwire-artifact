@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawgap.local/schemas/gate-semantic-ir-v2.schema.json",
+  "title": "GateSemanticIRV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "gate_id",
+    "mode",
+    "kind",
+    "input",
+    "output",
+    "summary",
+    "entry",
+    "checks",
+    "policies",
+    "terminals",
+    "default",
+    "on_error",
+    "unresolved",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "gate-semantic-ir/v2"},
+    "gate_id": {"type": "string", "pattern": "^G[0-9A-Za-z_-]+$"},
+    "mode": {"enum": ["predicate", "filter", "transform", "constraint"]},
+    "kind": {"const": "compound"},
+    "input": {"type": "string", "pattern": "^V[0-9A-Za-z_-]+:\\s*\\S"},
+    "output": {"type": "string", "pattern": "^[VDC][0-9A-Za-z_-]+:\\s*\\S"},
+    "summary": {"type": "string", "minLength": 1, "pattern": "^[^\\r\\n]+$"},
+    "entry": {"type": "string", "pattern": "^C[0-9]+$"},
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "op",
+          "summary",
+          "input",
+          "output",
+          "rule",
+          "outcomes",
+          "on_error",
+          "policy_refs",
+          "reject_examples",
+          "unresolved"
+        ],
+        "properties": {
+          "id": {"type": "string", "pattern": "^C[0-9]+$"},
+          "op": {
+            "enum": [
+              "derive",
+              "normalize",
+              "allow-if",
+              "block-if",
+              "admit-if",
+              "drop-if",
+              "transform",
+              "constrain",
+              "prompt",
+              "unknown"
+            ]
+          },
+          "summary": {"type": "string", "minLength": 1, "pattern": "^[^\\r\\n]+$"},
+          "input": {"type": "string", "minLength": 1},
+          "output": {"type": "string", "minLength": 1},
+          "rule": {"type": "string", "minLength": 1},
+          "outcomes": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {"type": "string", "minLength": 1}
+          },
+          "on_error": {"type": "string", "minLength": 1},
+          "policy_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^P_[A-Z0-9_]+$"},
+            "uniqueItems": true
+          },
+          "reject_examples": {
+            "type": "array",
+            "maxItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["input", "rejected_by", "reason"],
+              "properties": {
+                "input": {"type": "string", "minLength": 1},
+                "rejected_by": {"type": "string", "pattern": "^C[0-9]+$"},
+                "reason": {"type": "string", "minLength": 1},
+                "precondition": {"type": "string", "minLength": 1}
+              }
+            }
+          },
+          "unresolved": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "policies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "summary", "matching", "rules"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^P_[A-Z0-9_]+$"},
+          "summary": {"type": "string", "minLength": 1},
+          "matching": {"type": "string", "minLength": 1},
+          "rules": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "rule"],
+              "properties": {
+                "id": {"type": "string", "pattern": "^[A-Z][0-9]+$"},
+                "rule": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      }
+    },
+    "terminals": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "default": {"type": "string", "minLength": 1},
+    "on_error": {"type": "string", "minLength": 1},
+    "unresolved": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "status": {"enum": ["complete", "partial"]}
+  }
+}

@@ -1,0 +1,1806 @@
+# docs-map.yaml —— 文档 ↔ 代码映射的单一事实源
+#
+# 谁读它：scripts/check_doc_drift.py（Stop/PostToolUse/SessionStart 三 hook 共用）与 Claude 本身。
+# 为什么存在：本项目文档承载的是「方法论与意图」，无法从代码机械推导；此文件把
+#            「哪份文档管辖哪些代码」显式化，让「改代码 → 改文档」不脱节可被检测。
+#
+# kind 语义（决定强制力度——见 .claude/settings.json）：
+#   spec             手工维护的设计/意图文档；改了 code 就必须同步改 doc —— Stop hook 硬门禁。
+#   generated        由 generator 从 inputs 生成的文档；改了 inputs 需重跑 generator —— 仅提醒，不硬拦。
+#   external_anchors 文档钉向外部被分析项目的 file:line；工作区 hook 看不到 —— 仅登记，符号校验属 Phase 3。
+#
+# 路径均相对仓库根（git rev-parse --show-toplevel）。glob：`*` 与 `**` 均匹配任意字符（含 /）。
+# 多项目：新增项目在 projects.<name> 下另起一段；通用框架、Hermes 与 CowAgent 分开登记。
+#
+# 结构说明：CodeQL 查询在 src/ql/；hermes-agent 的设计+实现文档统一在 design/hermes-agent/；
+#          sink 能力卡生成器在 src/sink_capacity/。
+
+projects:
+  python-benchmark-pipeline:
+    spec:
+      - doc: design/common/static-pipeline.md
+        code:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql/project/**"
+          - "src/ql/get_project_model.ql"
+
+  handler-specifications:
+    spec:
+      - doc: design/common/static-pipeline.md
+        code:
+          - "src/handler_specifications/*.py"
+          - "src/handler_specifications/*.cjs"
+          - "src/handler_specifications/tests/**"
+          - "design/hermes-agent/handler-entry/debug/script/generate_tool_handler_specifications.py"
+          - "design/hermes-agent/handler-entry/debug/script/test_generate_tool_handler_specifications.py"
+
+    generated:
+      - doc: "output/*/handler-specifications/**"
+        generator: "python -m src.handler_specifications --all"
+        inputs:
+          - "src/handler_specifications/**"
+          - "src/projects/registry.py"
+          - "design/*/handler-entry/debug/tool-handler-entries.csv"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+
+  handler-type-alignment:
+    spec:
+      - doc: design/common/cross-project-oracle.md
+        code:
+          - "src/handler_identity.py"
+          - "src/handler_type_alignment/**"
+
+    generated:
+      - doc: "output/cross-project/handler-types/**"
+        generator: "python -m src.handler_type_alignment --all"
+        inputs:
+          - "src/handler_type_alignment/**"
+          - "src/handler_identity.py"
+          - "output/*/handler-specifications/tool-handler-specifications.json"
+          - "output/*/static/call-chains/manifest.json"
+          - "output/*/static/call-chains/handler-sink-chains.csv"
+          - "output/*/static/call-chains/sink-constraints.csv"
+
+  sink-type-alignment:
+    spec:
+      - doc: design/common/cross-project-oracle.md
+        code:
+          - "src/sink_type_alignment/**"
+
+    generated:
+      - doc: "output/cross-project/sink-types/**"
+        generator: "python -m src.sink_type_alignment --all"
+        inputs:
+          - "src/sink_type_alignment/**"
+          - "output/cross-project/handler-types/catalog.json"
+          - "output/cross-project/handler-types/mappings.jsonl"
+          - "output/cross-project/handler-types/manifest.json"
+          - "output/cross-project/handler-types/excluded-handlers.json"
+          - "output/*/handler-specifications/tool-handler-specifications.json"
+          - "output/*/static/call-chains/manifest.json"
+          - "output/*/static/call-chains/handler-sink-chains.csv"
+          - "output/*/static/call-chains/sink-constraints.csv"
+          - "output/*/call-chain-semantics/manifest.json"
+          - "output/*/call-chain-semantics/call-chain-semantics.jsonl"
+          - "output/*/handler-impact/handler-impact.jsonl"
+          - "src/call_chain_semantics/schemas/call-chain-semantic-ir-v3.schema.json"
+          - "src/sink_capacity/sink-capability-cards/**"
+          - "design/nanobot/nanobot-v0.1.4.post5-acceptance.json"
+          - "design/QwenPaw/qwenpaw-v1.1.10-acceptance.json"
+          - "design/chatgpt-on-wechat/groundtruth/cowagent-2.0.8-acceptance.json"
+          - "design/AstrBot/astrbot-4.25.2-acceptance.json"
+          - "design/nanoclaw/inventory/nanoclaw-static-oracle.json"
+          - "design/openclaw-cn/inventory/openclaw-cn-static-oracle.json"
+
+  group-oracle:
+    spec:
+      - doc: design/common/cross-project-oracle.md
+        code:
+          - "src/group_oracle/**"
+
+    generated:
+      - doc: "output/cross-project/group-oracles/**"
+        generator: "python -m src.group_oracle --all"
+        inputs:
+          - "src/group_oracle/**"
+          - "output/cross-project/handler-types/catalog.json"
+          - "output/cross-project/handler-types/mappings.jsonl"
+          - "output/cross-project/handler-types/manifest.json"
+          - "output/cross-project/sink-types/catalog.json"
+          - "output/cross-project/sink-types/mappings.jsonl"
+          - "output/cross-project/sink-types/handler-sink-groups.jsonl"
+          - "output/cross-project/sink-types/excluded-chains.jsonl"
+          - "output/cross-project/sink-types/manifest.json"
+          - "output/*/call-chain-semantics/manifest.json"
+          - "output/*/call-chain-semantics/call-chain-semantics.jsonl"
+          - "src/sink_capacity/sink-capability-cards/**"
+      - doc: "output/cross-project/group-oracles-corrected-v2/**"
+        generator: "python -m src.group_oracle --all --evidence-registry src/group_oracle/oracle-evidence-registry-corrected-v2.json --correction-ledger src/group_oracle/corrections/missed-reports-v2.json --out-dir output/cross-project/group-oracles-corrected-v2"
+        inputs:
+          - "src/group_oracle/**"
+          - "output/cross-project/group-oracles/manifest.json"
+          - "output/cross-project/coverage-comparison/manifest.json"
+          - "output/cross-project/coverage-comparison/ground-truth-*"
+          - "output/cross-project/handler-types/**"
+          - "output/cross-project/sink-types/**"
+          - "output/*/call-chain-semantics/**"
+
+  coverage-comparison:
+    spec:
+      - doc: design/common/filter-candidates.md
+        code:
+          - "src/coverage_comparison/**"
+      - doc: src/coverage_comparison/README.md
+        code:
+          - "src/coverage_comparison/**"
+          - "src/group_oracle/**"
+          - "src/sink_type_alignment/**"
+          - "src/sink_capacity/policy_contract.py"
+
+    generated:
+      - doc: "output/cross-project/coverage-comparison/**"
+        generator: "python -m src.coverage_comparison --all"
+        inputs:
+          - "src/coverage_comparison/**"
+          - "src/gate_semantics/agent_sdk.py"
+          - "src/sink_capacity/agent.py"
+          - "benchmark/**"
+          - "output/cross-project/handler-types/catalog.json"
+          - "output/cross-project/handler-types/mappings.jsonl"
+          - "output/cross-project/handler-types/manifest.json"
+          - "output/cross-project/sink-types/catalog.json"
+          - "output/cross-project/sink-types/mappings.jsonl"
+          - "output/cross-project/sink-types/handler-sink-groups.jsonl"
+          - "output/cross-project/sink-types/excluded-chains.jsonl"
+          - "output/cross-project/sink-types/manifest.json"
+          - "output/cross-project/group-oracles/oracles.jsonl"
+          - "output/cross-project/group-oracles/excluded-groups.jsonl"
+          - "output/cross-project/group-oracles/evidence-index.json"
+          - "output/cross-project/group-oracles/manifest.json"
+          - "output/cross-project/group-oracles-corrected-v2/oracles.jsonl"
+          - "output/cross-project/archive/coverage-v6/**"
+          - "output/cross-project/archive/coverage-comparison-v7/**"
+          - "output/cross-project/archive/coverage-comparison-v8/**"
+          - "output/cross-project/archive/coverage-comparison-v9/**"
+          - "output/cross-project/archive/coverage-comparison-v10/**"
+          - "output/cross-project/archive/coverage-comparison-v11/**"
+          - "output/cross-project/archive/coverage-comparison-v12/**"
+          - "output/cross-project/archive/coverage-comparison-v13/**"
+          - "output/cross-project/archive/coverage-comparison-v14/**"
+          - "output/*/static/call-chains/manifest.json"
+          - "output/*/static/call-chains/handler-sink-chains.csv"
+          - "output/*/call-chain-semantics/manifest.json"
+          - "output/*/call-chain-semantics/call-chain-semantics.jsonl"
+          - "src/sink_capacity/sink-capability-cards/**"
+      - doc: "output/cross-project/coverage-comparison-synthetic-inclusive/**"
+        generator: "python scripts/render_synthetic_inclusive_coverage.py"
+        inputs:
+          - "scripts/render_synthetic_inclusive_coverage.py"
+          - "scripts/build_nanobot_login_shell_synthetic.py"
+          - "output/cross-project/coverage-comparison/ground-truth-coverage.jsonl"
+          - "benchmark/python/nanobot-v0.1.4.post5-login-shell-synthetic/**"
+          - "benchmark/typescript/openclaw-v2026.2.1-two-vul-synthetic/**"
+          - "output/nanobot-login-shell-synthetic/static/call-chains/handler-sink-chains.csv"
+          - "output/openclaw-synthetic-two-vul/static/call-chains/handler-sink-chains.csv"
+
+  field-sensitive-flow:
+    spec:
+      - doc: design/hermes-agent/gate/gate-fte-design.md
+        code:
+          - "src/ql/field_flow/**"
+          - "src/ql/get_field_flow.ql"
+          - "src/ql/get_field_flow_exclusions.ql"
+          - "src/ql/tests/field_sensitive_flow/**"
+          - "src/ql-js/field_flow/**"
+          - "src/ql-js/get_field_flow.ql"
+          - "src/ql-js/get_project_field_bridges.ql"
+          - "src/ql-js/get_field_flow_exclusions.ql"
+          - "src/ql-js/tests/field_sensitive_flow/**"
+      - doc: src/coverage_comparison/README.md
+        code:
+          - "src/coverage_comparison/field_flow*.py"
+          - "src/coverage_comparison/tests/test_field_flow_conversion.py"
+
+  groundtruth-group-oracle-export:
+    generated:
+      - doc: "design/common/groundtruth-oracle/groundtruth-oracles.csv"
+        generator: "python design/common/groundtruth-oracle/generate.py"
+        inputs:
+          - "design/common/groundtruth-oracle/generate.py"
+          - "design/study/vuls-new-found/all-new-xclaw-vulnerabilities.xlsx"
+          - "output/cross-project/coverage-comparison/ground-truth-coverage.jsonl"
+          - "output/cross-project/coverage-comparison/comparisons.jsonl"
+          - "output/cross-project/group-oracles/oracles.jsonl"
+      - doc: "design/common/groundtruth-oracle/HSG-*.md"
+        generator: "python design/common/groundtruth-oracle/generate.py"
+        inputs:
+          - "design/common/groundtruth-oracle/generate.py"
+          - "design/study/vuls-new-found/all-new-xclaw-vulnerabilities.xlsx"
+          - "output/cross-project/coverage-comparison/ground-truth-coverage.jsonl"
+          - "output/cross-project/coverage-comparison/comparisons.jsonl"
+          - "output/cross-project/group-oracles/oracles.jsonl"
+
+  claude-handler-baseline:
+    spec:
+      - doc: design/common/handler-baseline.md
+        code:
+          - "src/handler_baseline/**"
+
+    generated:
+      - doc: "output/cross-project/claude-handler-baseline/**"
+        generator: "python -m src.handler_baseline --all --workers 4 --timeout 3600"
+        inputs:
+          - "src/handler_baseline/**"
+          - "src/projects/registry.py"
+          - "design/*/handler-entry/debug/tool-handler-entries.csv"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/claude-handler-baseline/ground-truth-*"
+        generator: "python -m src.handler_baseline --all --ground-truth-only --timeout 900"
+        inputs:
+          - "src/handler_baseline/**"
+          - "output/cross-project/claude-handler-baseline/blind-freeze.json"
+          - "output/cross-project/claude-handler-baseline/findings.jsonl"
+          - "design/*/groundtruth/new-vuls/**"
+      - doc: "output/cross-project/claude-handler-baseline-ground-truth-handlers/**"
+        generator: "python -m src.handler_baseline --all --ground-truth-handlers --workers 4 --timeout 3600"
+        inputs:
+          - "src/handler_baseline/**"
+          - "src/projects/registry.py"
+          - "design/*/handler-entry/debug/tool-handler-entries.csv"
+          - "design/*/groundtruth/new-vuls/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/claude-handler-baseline-credible-vulnerabilities-ground-truth-handlers/**"
+        generator: "python -m src.handler_baseline --all --ground-truth-handlers --report-policy most-credible-vulnerabilities --workers 4 --timeout 3600"
+        inputs:
+          - "src/handler_baseline/**"
+          - "src/projects/registry.py"
+          - "design/*/handler-entry/debug/tool-handler-entries.csv"
+          - "design/*/groundtruth/new-vuls/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+
+  runtime-validation:
+    spec:
+      - doc: design/common/runtime-validation-build-test-environment.md
+        code:
+          - "src/runtime_validation/environment_builder.py"
+          - "src/runtime_validation/environment_profiles/**"
+          - "src/runtime_validation/environment_fixtures/**"
+          - "src/runtime_validation/schemas/runtime-l2-environment-plan-v1.schema.json"
+          - "src/runtime_validation/launch_profiles/**"
+          - "src/runtime_validation/l2_instrumentation/**"
+          - "src/runtime_validation/containers/**"
+          - "src/runtime_validation/environment_smoke.py"
+          - "src/runtime_validation/qualification_images.py"
+          - "src/runtime_validation/qualification_runner.py"
+      - doc: design/common/runtime-validation-test-validation.md
+        code:
+          - "src/runtime_validation/__main__.py"
+          - "src/runtime_validation/campaign*.py"
+          - "src/runtime_validation/dynamic_trigger.py"
+          - "src/runtime_validation/droidclaw_l2.py"
+          - "src/runtime_validation/letta_l2.py"
+          - "src/runtime_validation/mercury_l2.py"
+          - "src/runtime_validation/nanoclaw_l2.py"
+          - "src/runtime_validation/nanobot_l2.py"
+          - "src/runtime_validation/nanobot_login_shell_l2.py"
+          - "src/runtime_validation/openclaw_additive_l2.py"
+          - "benchmark/typescript/openclaw/extensions/clawgap-additive/**"
+          - "benchmark/python/nanobot/clawgap_login_shell_mcp.py"
+          - "src/runtime_validation/hermes_agent_l2.py"
+          - "src/runtime_validation/l2_runtime.py"
+          - "src/runtime_validation/oracle.py"
+          - "src/runtime_validation/tests/**"
+          - "design/*/runtime-validation/oracles/**"
+      - doc: design/hermes-agent/runtime-validation/plan2.md
+        code:
+          - "src/runtime_validation/agent_*.py"
+          - "src/runtime_validation/inject/agent_sitecustomize.py"
+          - "src/runtime_validation/tests/test_agent_campaign.py"
+
+    generated:
+      - doc: "output/*/runtime-validation/**"
+        generator: "python -m src.runtime_validation --project hermes-agent --report CVE-2026-Device-Blocking-Expanduser-Bypass --prompt 'Use read_file to read /dev/./zero.'"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "design/*/runtime-validation/oracles/**"
+          - "design/*/groundtruth/new-vuls/**"
+          - "benchmark/python/**"
+      - doc: "output/cross-project/runtime-validation-covered-v2/**"
+        generator: "python -m src.runtime_validation generate-covered --coverage-root output/cross-project/coverage-comparison --out-dir output/cross-project/runtime-validation-covered-v2 --model deepseek-v4-flash --base-url https://api.deepseek.com/v1 --api-key-env DEEPSEEK_API_KEY && python -m src.runtime_validation run-campaign --campaign output/cross-project/runtime-validation-covered-v2 --attempts 3 --jobs 4"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/coverage-comparison/**"
+          - "output/*/call-chain-semantics/**"
+          - "design/*/groundtruth/new-vuls/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-validation-covered-v3/**"
+        generator: "python -m src.runtime_validation upgrade-covered-v3 --source-campaign output/cross-project/runtime-validation-covered-v2 --out-dir output/cross-project/runtime-validation-covered-v3 && python -m src.runtime_validation provision-drivers --campaign output/cross-project/runtime-validation-covered-v3 && python -m src.runtime_validation run-campaign --campaign output/cross-project/runtime-validation-covered-v3 --attempts 3 --jobs 4"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-validation-covered-v2/**"
+          - "output/cross-project/coverage-comparison/**"
+          - "design/*/groundtruth/new-vuls/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/**"
+        generator: "python -m src.runtime_validation generate-dynamic-trigger --coverage-root output/cross-project/coverage-comparison --candidates output/cross-project/coverage-comparison/candidates.jsonl --out-dir output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --model deepseek-v4-flash --base-url https://api.deepseek.com/v1 --api-key-env DEEPSEEK_API_KEY && python -m src.runtime_validation review-dynamic-trigger --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --model deepseek-v4-flash --base-url https://api.deepseek.com/v1 --api-key-env DEEPSEEK_API_KEY && python -m src.runtime_validation provision-drivers --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 && python -m src.runtime_validation run-dynamic-trigger --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --attempts 3 --jobs 4"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/coverage-comparison/candidates.jsonl"
+          - "output/cross-project/coverage-comparison/comparisons.jsonl"
+          - "output/cross-project/coverage-comparison/generic-ground-truth-coverage.jsonl"
+          - "output/*/call-chain-semantics/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-l2-qualification-v1/**"
+        generator: "python -m src.runtime_validation qualify-dynamic-trigger-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --out-dir output/cross-project/runtime-dynamic-trigger-l2-qualification-v1"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "src/runtime_validation/launch_profiles/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-environment-smoke-v1/**"
+        generator: "python -m src.runtime_validation run-environment-smoke --out-dir output/cross-project/runtime-environment-smoke-v1 --setup-timeout 1200 --launch-timeout 60"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-lettabot-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-lettabot-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --out-dir output/cross-project/runtime-dynamic-trigger-lettabot-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/typescript/lettabot/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-droidclaw-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-droidclaw-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --out-dir output/cross-project/runtime-dynamic-trigger-droidclaw-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/typescript/droidclaw/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-mercury-agent-l2-v2/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-mercury-agent-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --out-dir output/cross-project/runtime-dynamic-trigger-mercury-agent-l2-v2 --attempts 3"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/typescript/mercury-agent/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-openclaw-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-openclaw-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --out-dir output/cross-project/runtime-dynamic-trigger-openclaw-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/openclaw_l2.py"
+          - "src/runtime_validation/candidate_l2_executors.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/typescript/openclaw/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-openclaw-cn-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-openclaw-cn-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --out-dir output/cross-project/runtime-dynamic-trigger-openclaw-cn-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/openclaw_cn_l2.py"
+          - "src/runtime_validation/candidate_l2_executors.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/typescript/openclaw-cn/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-nanoclaw-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-nanoclaw-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --out-dir output/cross-project/runtime-dynamic-trigger-nanoclaw-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/nanoclaw_l2.py"
+          - "src/runtime_validation/candidate_l2_executors.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/typescript/nanoclaw/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-chatgpt-on-wechat-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-chatgpt-on-wechat-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-v1 --out-dir output/cross-project/runtime-dynamic-trigger-chatgpt-on-wechat-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/chatgpt_on_wechat_l2.py"
+          - "src/runtime_validation/candidate_l2_executors.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/python/chatgpt-on-wechat/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-chatgpt-on-wechat-historical-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-chatgpt-on-wechat-l2 --historical --out-dir output/cross-project/runtime-dynamic-trigger-chatgpt-on-wechat-historical-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/chatgpt_on_wechat_l2.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/coverage-comparison/training-regression-candidates.jsonl"
+          - "benchmark/python/chatgpt-on-wechat/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-astrbot-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-astrbot-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v2 --out-dir output/cross-project/runtime-dynamic-trigger-astrbot-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/astrbot_l2.py"
+          - "src/runtime_validation/candidate_l2_executors.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v2/cases.jsonl"
+          - "benchmark/python/AstrBot/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-qwenpaw-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-qwenpaw-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v2 --out-dir output/cross-project/runtime-dynamic-trigger-qwenpaw-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/qwenpaw_l2.py"
+          - "src/runtime_validation/candidate_l2_executors.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v2/cases.jsonl"
+          - "benchmark/python/QwenPaw/**"
+      - doc: "output/cross-project/runtime-dynamic-trigger-hermes-agent-l2-v1/**"
+        generator: "python -m src.runtime_validation run-dynamic-trigger-hermes-agent-l2 --campaign output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v3 --out-dir output/cross-project/runtime-dynamic-trigger-hermes-agent-l2-v1 --attempts 3"
+        inputs:
+          - "src/runtime_validation/hermes_agent_l2.py"
+          - "src/runtime_validation/candidate_l2_executors.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v3/cases.jsonl"
+          - "benchmark/python/hermes-agent/**"
+      - doc: "output/cross-project/runtime-auto-l2/**"
+        generator: "python scripts/run_candidate_l2_campaign.py --candidates output/cross-project/coverage-comparison/candidates.jsonl --out-dir output/cross-project/runtime-auto-l2"
+        inputs:
+          - "src/runtime_validation/**"
+          - "scripts/run_candidate_l2_campaign.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/coverage-comparison/candidates.jsonl"
+          - "output/cross-project/coverage-comparison/comparisons.jsonl"
+          - "output/cross-project/coverage-comparison/ground-truth-coverage.jsonl"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/coverage-comparison-expanded-v1/**"
+        generator: "python scripts/build_expanded_candidate_l2_inputs.py"
+        inputs:
+          - "scripts/build_expanded_candidate_l2_inputs.py"
+          - "output/cross-project/coverage-comparison/candidates.jsonl"
+          - "output/cross-project/coverage-comparison/training-regression-candidates.jsonl"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+      - doc: "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v2/**"
+        generator: "python scripts/build_expanded_candidate_l2_inputs.py"
+        inputs:
+          - "scripts/build_expanded_candidate_l2_inputs.py"
+          - "output/cross-project/coverage-comparison-expanded-v1/candidates.jsonl"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+      - doc: "output/cross-project/runtime-auto-l2-expanded-v2/**"
+        generator: "python scripts/run_candidate_l2_campaign.py --candidates output/cross-project/coverage-comparison-expanded-v1/candidates.jsonl --out-dir output/cross-project/runtime-auto-l2-expanded-v2"
+        inputs:
+          - "src/runtime_validation/**"
+          - "scripts/run_candidate_l2_campaign.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/coverage-comparison-expanded-v1/candidates.jsonl"
+          - "output/cross-project/coverage-comparison-expanded-v1/comparisons.jsonl"
+          - "output/cross-project/coverage-comparison-expanded-v1/ground-truth-coverage.jsonl"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v2/cases.jsonl"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/coverage-comparison-expanded-v3/**"
+        generator: "python scripts/build_expanded_candidate_l2_inputs_v3.py"
+        inputs:
+          - "scripts/build_expanded_candidate_l2_inputs_v3.py"
+          - "output/cross-project/coverage-comparison-expanded-v1/candidates.jsonl"
+          - "output/cross-project/coverage-comparison/training-regression-candidates.jsonl"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v2/cases.jsonl"
+      - doc: "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v3/**"
+        generator: "python scripts/build_expanded_candidate_l2_inputs_v3.py"
+        inputs:
+          - "scripts/build_expanded_candidate_l2_inputs_v3.py"
+          - "output/cross-project/coverage-comparison-expanded-v3/candidates.jsonl"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v2/cases.jsonl"
+      - doc: "output/cross-project/runtime-auto-l2-expanded-v3/**"
+        generator: "python scripts/run_candidate_l2_campaign.py --candidates output/cross-project/coverage-comparison-expanded-v3/candidates.jsonl --out-dir output/cross-project/runtime-auto-l2-expanded-v3"
+        inputs:
+          - "src/runtime_validation/**"
+          - "scripts/run_candidate_l2_campaign.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/coverage-comparison-expanded-v3/candidates.jsonl"
+          - "output/cross-project/coverage-comparison-expanded-v3/comparisons.jsonl"
+          - "output/cross-project/coverage-comparison-expanded-v3/ground-truth-coverage.jsonl"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-expanded-v3/cases.jsonl"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-auto-l2-gt-analysis-78-v1/**"
+        generator: "python scripts/render_candidate_l2_gt_analysis.py --candidates output/cross-project/coverage-comparison/candidates.jsonl --campaign output/cross-project/runtime-auto-l2 --out-dir output/cross-project/runtime-auto-l2-gt-analysis-78-v1"
+        inputs:
+          - "scripts/render_candidate_l2_gt_analysis.py"
+          - "src/runtime_validation/candidate_l2_projection.py"
+          - "output/cross-project/coverage-comparison/candidates.jsonl"
+          - "output/cross-project/coverage-comparison/ground-truth-coverage.jsonl"
+          - "output/cross-project/runtime-auto-l2/batch-ledger.jsonl"
+          - "output/cross-project/runtime-auto-l2/batch-manifest.json"
+      - doc: "output/cross-project/runtime-auto-l2-gt-analysis-v1/**"
+        generator: "python scripts/render_candidate_l2_gt_analysis.py --candidates output/cross-project/coverage-comparison-expanded-v1/candidates.jsonl --campaign output/cross-project/runtime-auto-l2-expanded-v2 --out-dir output/cross-project/runtime-auto-l2-gt-analysis-v1"
+        inputs:
+          - "scripts/render_candidate_l2_gt_analysis.py"
+          - "src/runtime_validation/candidate_l2_projection.py"
+          - "output/cross-project/coverage-comparison-expanded-v1/candidates.jsonl"
+          - "output/cross-project/coverage-comparison-expanded-v1/ground-truth-coverage.jsonl"
+          - "output/cross-project/runtime-auto-l2-expanded-v2/batch-ledger.jsonl"
+          - "output/cross-project/runtime-auto-l2-expanded-v2/batch-manifest.json"
+      - doc: "output/cross-project/runtime-auto-l2-gt-analysis-expanded-v3/**"
+        generator: "python scripts/render_candidate_l2_gt_analysis.py --candidates output/cross-project/coverage-comparison-expanded-v3/candidates.jsonl --campaign output/cross-project/runtime-auto-l2-expanded-v3 --out-dir output/cross-project/runtime-auto-l2-gt-analysis-expanded-v3"
+        inputs:
+          - "scripts/render_candidate_l2_gt_analysis.py"
+          - "src/runtime_validation/candidate_l2_projection.py"
+          - "output/cross-project/coverage-comparison-expanded-v3/candidates.jsonl"
+          - "output/cross-project/coverage-comparison-expanded-v3/ground-truth-coverage.jsonl"
+          - "output/cross-project/runtime-auto-l2-expanded-v3/batch-ledger.jsonl"
+          - "output/cross-project/runtime-auto-l2-expanded-v3/batch-manifest.json"
+      - doc: "output/cross-project/runtime-auto-l2-gt-regression-v1/**"
+        generator: "python -m src.runtime_validation validate-gt-linked-candidates-l2 --candidates output/cross-project/coverage-comparison/training-regression-candidates.jsonl --out-dir output/cross-project/runtime-auto-l2-gt-regression-v1"
+        inputs:
+          - "src/runtime_validation/candidate_l2.py"
+          - "src/runtime_validation/candidate_l2_executors.py"
+          - "src/runtime_validation/candidate_l2_projection.py"
+          - "src/runtime_validation/droidclaw_l2.py"
+          - "src/runtime_validation/letta_l2.py"
+          - "src/runtime_validation/mercury_l2.py"
+          - "src/projects/registry.py"
+          - "output/cross-project/coverage-comparison/candidates.jsonl"
+          - "output/cross-project/coverage-comparison/training-regression-candidates.jsonl"
+          - "output/cross-project/coverage-comparison/training-fallback-validations.jsonl"
+          - "output/cross-project/coverage-comparison/training-fallback-field-flow.jsonl"
+          - "output/cross-project/coverage-comparison/comparisons.jsonl"
+          - "output/cross-project/coverage-comparison/ground-truth-coverage.jsonl"
+          - "output/cross-project/runtime-dynamic-trigger-all-candidates-v1/cases.jsonl"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/ground-truth-tool-triggerability-v1/**"
+        generator: "python -m src.runtime_validation audit-gt-tool-triggerability --campaign output/cross-project/runtime-validation-covered-v3 --out-dir output/cross-project/ground-truth-tool-triggerability-v1 --jobs 4"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-validation-covered-v3/campaign.json"
+          - "output/cross-project/runtime-validation-covered-v3/cases.jsonl"
+          - "design/*/groundtruth/new-vuls/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-validation-ground-truth-audit-v1/**"
+        generator: "python -m src.runtime_validation audit-ground-truth --out-dir output/cross-project/runtime-validation-ground-truth-audit-v1"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "design/study/vuls-new-found/all-new-xclaw-vulnerabilities.xlsx"
+          - "design/*/groundtruth/new-vuls/**"
+          - "output/*/call-chain-semantics/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-validation-ground-truth-v1/**"
+        generator: "python -m src.runtime_validation audit-ground-truth --out-dir output/cross-project/runtime-validation-ground-truth-audit-v1 && python -m src.runtime_validation generate-ground-truth --audit output/cross-project/runtime-validation-ground-truth-audit-v1 --out-dir output/cross-project/runtime-validation-ground-truth-v1 --model deepseek-v4-flash --base-url https://api.deepseek.com/v1 --api-key-env DEEPSEEK_API_KEY && python -m src.runtime_validation provision-drivers --campaign output/cross-project/runtime-validation-ground-truth-v1 && python -m src.runtime_validation review-ground-truth --campaign output/cross-project/runtime-validation-ground-truth-v1 --model deepseek-v4-flash --base-url https://api.deepseek.com/v1 --api-key-env DEEPSEEK_API_KEY && python -m src.runtime_validation run-ground-truth --campaign output/cross-project/runtime-validation-ground-truth-v1 --attempts 3 --jobs 4"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-validation-ground-truth-audit-v1/**"
+          - "design/study/vuls-new-found/all-new-xclaw-vulnerabilities.xlsx"
+          - "design/*/groundtruth/new-vuls/**"
+          - "output/*/call-chain-semantics/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+      - doc: "output/cross-project/runtime-validation-ground-truth-production-like-v1/**"
+        generator: "python -m src.runtime_validation run-production-like-smoke --out-dir output/cross-project/runtime-validation-ground-truth-production-like-v1/smoke/hermes-device-blocking --claude-model deepseek-v4-pro --claude-base-url https://api.deepseek.com/anthropic --claude-credential-env DEEPSEEK_API_KEY --attempts 3 --timeout 60"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "design/hermes-agent/groundtruth/new-vuls/CVE-2026-Device-Blocking-Expanduser-Bypass-ISSUE-REPORT.md"
+          - "design/hermes-agent/groundtruth/new-vuls/CVE-2026-Device-Blocking-Expanduser-Bypass.json"
+          - "design/hermes-agent/runtime-validation/oracles/CVE-2026-Device-Blocking-Expanduser-Bypass.json"
+          - "benchmark/python/hermes-agent/**"
+      - doc: "output/cross-project/runtime-agent-validation-v1/scripted/**"
+        generator: "python -m src.runtime_validation run-agent-runtime-validation --coverage-root output/cross-project/coverage-comparison --candidate-id CAND-925c9d1319c3ccbd --out-dir output/cross-project/runtime-agent-validation-v1/scripted --controller scripted-pilot --confirmation-attempts 1 --timeout 60"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "design/hermes-agent/runtime-validation/plan2.md"
+          - "output/cross-project/coverage-comparison/manifest.json"
+          - "output/cross-project/coverage-comparison/comparisons.jsonl"
+          - "output/cross-project/coverage-comparison/candidates.jsonl"
+          - "output/hermes/call-chain-semantics/**"
+          - "benchmark/python/hermes-agent/**"
+      - doc: "output/cross-project/runtime-agent-validation-v1/live/**"
+        generator: "python -m src.runtime_validation run-agent-runtime-validation --coverage-root output/cross-project/coverage-comparison --candidate-id CAND-925c9d1319c3ccbd --out-dir output/cross-project/runtime-agent-validation-v1/live --controller openai-compatible --model deepseek-v4-flash --base-url https://api.deepseek.com/v1 --api-key-env DEEPSEEK_API_KEY --max-iterations 6 --confirmation-attempts 1 --timeout 60"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "design/hermes-agent/runtime-validation/plan2.md"
+          - "output/cross-project/coverage-comparison/manifest.json"
+          - "output/cross-project/coverage-comparison/comparisons.jsonl"
+          - "output/cross-project/coverage-comparison/candidates.jsonl"
+          - "output/hermes/call-chain-semantics/**"
+          - "benchmark/python/hermes-agent/**"
+      - doc: "output/cross-project/runtime-validation-adapter-qualification-v1/**"
+        generator: "python -m src.runtime_validation generate-adapter-qualification --source-campaign output/cross-project/runtime-validation-ground-truth-v1 --out-dir output/cross-project/runtime-validation-adapter-qualification-v1 && python -m src.runtime_validation prebuild-qualification-containers --campaign output/cross-project/runtime-validation-adapter-qualification-v1 --engine auto && python -m src.runtime_validation run-hermes-qualification-smoke --campaign output/cross-project/runtime-validation-adapter-qualification-v1 --out-dir output/cross-project/runtime-validation-adapter-qualification-v1/hermes-smoke --engine auto --attempts 3 && python -m src.runtime_validation run-adapter-qualification --campaign output/cross-project/runtime-validation-adapter-qualification-v1 --engine auto --attempts 3 --jobs 1 && python -m src.runtime_validation expand-adapter-qualification --source-campaign output/cross-project/runtime-validation-ground-truth-v1 --qualification-campaign output/cross-project/runtime-validation-adapter-qualification-v1 --out-dir output/cross-project/runtime-validation-adapter-qualification-v1/ground-truth-expansion && python -m src.runtime_validation prebuild-qualification-containers --campaign output/cross-project/runtime-validation-adapter-qualification-v1/ground-truth-expansion --engine auto && python -m src.runtime_validation run-adapter-qualification --campaign output/cross-project/runtime-validation-adapter-qualification-v1/ground-truth-expansion --engine auto --attempts 3 --jobs 1"
+        inputs:
+          - "src/runtime_validation/**"
+          - "src/projects/registry.py"
+          - "output/cross-project/runtime-validation-ground-truth-v1/**"
+          - "benchmark/python/**"
+          - "benchmark/typescript/**"
+
+  paper-metrics:
+    spec:
+      - doc: design/paperdata/design.md
+        code:
+          - "design/paperdata/script/get_paper_metrics.py"
+          - "design/paperdata/script/test_get_paper_metrics.py"
+      - doc: design/paperdata/readme.md
+        code:
+          - "design/paperdata/script/get_paper_metrics.py"
+
+    generated:
+      - doc: "design/paperdata/result.md"
+        generator: "python design/paperdata/script/get_paper_metrics.py"
+        inputs:
+          - "design/paperdata/script/get_paper_metrics.py"
+          - "design/paperdata/paper-metrics-cache.json"
+          - "output/cross-project/handler-types/mappings.jsonl"
+          - "output/cross-project/sink-types/mappings.jsonl"
+          - "output/cross-project/coverage-comparison/generic-candidates.jsonl"
+          - "output/cross-project/coverage-comparison/manifest.json"
+
+  handler-sink-chain-reports:
+    generated:
+      - doc: "design/openclaw/call-chain/debug/handler-sink-*"
+        generator: "python design/openclaw/call-chain/debug/scripts/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/openclaw/call-chain/debug/scripts/count_detected_call_chains.py"
+          - "output/openclaw/static/call-chains/handler-sink-chains.csv"
+          - "output/openclaw/static/call-chains/manifest.json"
+
+      - doc: "design/nanoclaw/call-chain/debug/handler-sink-*"
+        generator: "python design/nanoclaw/call-chain/debug/scripts/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/nanoclaw/call-chain/debug/scripts/count_detected_call_chains.py"
+          - "output/nanoclaw/static/call-chains/handler-sink-chains.csv"
+          - "output/nanoclaw/static/call-chains/manifest.json"
+
+      - doc: "design/openclaw-cn/call-chain/debug/handler-sink-*"
+        generator: "python design/openclaw-cn/call-chain/debug/scripts/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/openclaw-cn/call-chain/debug/scripts/count_detected_call_chains.py"
+          - "output/openclaw-cn/static/call-chains/handler-sink-chains.csv"
+          - "output/openclaw-cn/static/call-chains/manifest.json"
+
+      - doc: "design/mercury-agent/call-chain/debug/handler-sink-*"
+        generator: "python design/mercury-agent/call-chain/debug/scripts/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/mercury-agent/call-chain/debug/scripts/count_detected_call_chains.py"
+          - "output/mercury-agent/static/call-chains/handler-sink-chains.csv"
+          - "output/mercury-agent/static/call-chains/manifest.json"
+
+      - doc: "design/droidclaw/call-chain/debug/handler-sink-*"
+        generator: "python design/droidclaw/call-chain/debug/scripts/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/droidclaw/call-chain/debug/scripts/count_detected_call_chains.py"
+          - "output/droidclaw/static/call-chains/handler-sink-chains.csv"
+          - "output/droidclaw/static/call-chains/manifest.json"
+
+      - doc: "design/lettabot/call-chain/debug/handler-sink-*"
+        generator: "python design/lettabot/call-chain/debug/scripts/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/lettabot/call-chain/debug/scripts/count_detected_call_chains.py"
+          - "output/lettabot/static/call-chains/handler-sink-chains.csv"
+          - "output/lettabot/static/call-chains/manifest.json"
+
+      - doc: "design/chatgpt-on-wechat/call-chain/debug/handler-sink-*"
+        generator: "python design/chatgpt-on-wechat/call-chain/debug/script/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/chatgpt-on-wechat/call-chain/debug/script/count_detected_call_chains.py"
+          - "output/chatgpt-on-wechat/static/call-chains/handler-sink-chains.csv"
+          - "output/chatgpt-on-wechat/static/call-chains/manifest.json"
+
+      - doc: "design/nanobot/call-chain/debug/handler-sink-*"
+        generator: "python design/nanobot/call-chain/debug/script/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/nanobot/call-chain/debug/script/count_detected_call_chains.py"
+          - "output/nanobot/static/call-chains/handler-sink-chains.csv"
+          - "output/nanobot/static/call-chains/manifest.json"
+
+      - doc: "design/AstrBot/call-chain/debug/handler-sink-*"
+        generator: "python design/AstrBot/call-chain/debug/script/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/AstrBot/call-chain/debug/script/count_detected_call_chains.py"
+          - "output/AstrBot/static/call-chains/handler-sink-chains.csv"
+          - "output/AstrBot/static/call-chains/manifest.json"
+
+      - doc: "design/QwenPaw/call-chain/debug/handler-sink-*"
+        generator: "python design/QwenPaw/call-chain/debug/script/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/QwenPaw/call-chain/debug/script/count_detected_call_chains.py"
+          - "output/QwenPaw/static/call-chains/handler-sink-chains.csv"
+          - "output/QwenPaw/static/call-chains/manifest.json"
+
+      - doc: "design/poco-agent/call-chain/debug/handler-sink-*"
+        generator: "python design/poco-agent/call-chain/debug/script/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/poco-agent/call-chain/debug/script/count_detected_call_chains.py"
+          - "output/poco-agent/static/call-chains/handler-sink-chains.csv"
+          - "output/poco-agent/static/call-chains/manifest.json"
+
+      - doc: "design/hermes-agent/call-chain/debug/handler-sink-*"
+        generator: "python design/hermes-agent/call-chain/debug/script/count_detected_call_chains.py"
+        inputs:
+          - "design/common/call_chain_report.py"
+          - "design/hermes-agent/call-chain/debug/script/count_detected_call_chains.py"
+          - "output/hermes/static/call-chains/handler-sink-chains.csv"
+          - "output/hermes/static/call-chains/manifest.json"
+
+  zero-gate-audit:
+    spec:
+      - doc: design/hermes-agent/gate/gate-fte-design.md
+        code:
+          - "design/paperdata/script/generate_zero_gate_audit.py"
+          - "design/paperdata/script/test_generate_zero_gate_audit.py"
+
+    generated:
+      - doc: "design/paperdata/zero-gate-audit.json"
+        generator: "python design/paperdata/script/generate_zero_gate_audit.py"
+        inputs:
+          - "design/paperdata/script/generate_zero_gate_audit.py"
+          - "src/projects/registry.py"
+          - "output/*/static/gates/**"
+          - "output/*/gate-semantics/gate-index.csv"
+          - "output/*/static/call-chains/**"
+      - doc: "design/paperdata/debug/zero-gate-audit.md"
+        generator: "python design/paperdata/script/generate_zero_gate_audit.py"
+        inputs:
+          - "design/paperdata/script/generate_zero_gate_audit.py"
+          - "src/projects/registry.py"
+          - "output/*/static/gates/**"
+          - "output/*/gate-semantics/gate-index.csv"
+          - "output/*/static/call-chains/**"
+
+  chatgpt-on-wechat:
+    spec:
+      - doc: design/chatgpt-on-wechat/README.md
+        code:
+          - "src/ql/project/**"
+          - "src/ql/tests/cowagent_project_model/**"
+          - "design/chatgpt-on-wechat/call-chain/debug/script/render_d5_chain_coverage.py"
+          - "design/chatgpt-on-wechat/call-chain/debug/script/render_gt_coverage.py"
+          - "design/chatgpt-on-wechat/call-chain/debug/script/test_render_d5_chain_coverage.py"
+          - "design/chatgpt-on-wechat/call-chain/debug/script/test_render_gt_coverage.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "design/chatgpt-on-wechat/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/chatgpt-on-wechat/sink/debug/scripts/generate_sink_data.py"
+          - "design/chatgpt-on-wechat/sink/sink-method-overrides.json"
+          - "design/chatgpt-on-wechat/groundtruth/**"
+          - "scripts/ql_baseline_hook.py"
+          - "scripts/test_chatgpt_on_wechat_gt_coverage.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/chatgpt-on-wechat/**"
+        generator: "python -m src.pipeline --project chatgpt-on-wechat all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/**"
+
+      - doc: "design/chatgpt-on-wechat/call-chain/debug/d5-chain-coverage*"
+        generator: "python design/chatgpt-on-wechat/call-chain/debug/script/render_d5_chain_coverage.py"
+        inputs:
+          - "design/chatgpt-on-wechat/call-chain/debug/script/render_d5_chain_coverage.py"
+          - "design/chatgpt-on-wechat/groundtruth/**"
+          - "output/chatgpt-on-wechat/static/call-chains/**"
+          - "output/chatgpt-on-wechat/gate-semantics/**"
+          - "output/chatgpt-on-wechat/call-chain-semantics/**"
+
+      - doc: "design/chatgpt-on-wechat/call-chain/debug/gt-coverage*"
+        generator: "python design/chatgpt-on-wechat/call-chain/debug/script/render_gt_coverage.py"
+        inputs:
+          - "design/chatgpt-on-wechat/call-chain/debug/script/render_gt_coverage.py"
+          - "design/chatgpt-on-wechat/groundtruth/cowagent-2.0.8-acceptance.json"
+          - "output/chatgpt-on-wechat/static/call-chains/**"
+
+      - doc: "design/chatgpt-on-wechat/handler-entry/debug/*.csv"
+        generator: "python design/chatgpt-on-wechat/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/chatgpt-on-wechat/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/chatgpt-on-wechat/groundtruth/new-vuls/**"
+
+      - doc: "design/chatgpt-on-wechat/handler-entry/debug/*.md"
+        generator: "python design/chatgpt-on-wechat/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/chatgpt-on-wechat/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/chatgpt-on-wechat/groundtruth/new-vuls/**"
+
+      - doc: "design/chatgpt-on-wechat/sink/debug/sink-*"
+        generator: "python design/chatgpt-on-wechat/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/chatgpt-on-wechat/sink/debug/scripts/generate_sink_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+          - "src/ql/project/**"
+          - "design/chatgpt-on-wechat/groundtruth/new-vuls/**"
+          - "design/chatgpt-on-wechat/sink/sink-method-overrides.json"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/python/chatgpt-on-wechat
+      docs:
+        - "design/chatgpt-on-wechat/README.md"
+
+  AstrBot:
+    spec:
+      - doc: design/AstrBot/README.md
+        code:
+          - "src/ql/project/**"
+          - "src/ql/tests/astrbot_project_model/**"
+          - "design/AstrBot/astrbot-4.25.2-acceptance.json"
+          - "design/AstrBot/call-chain/debug/script/render_gt_coverage.py"
+          - "design/AstrBot/call-chain/debug/script/test_render_gt_coverage.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "design/AstrBot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/AstrBot/sink/debug/scripts/generate_sink_data.py"
+          - "design/AstrBot/sink/sink-method-overrides.json"
+          - "scripts/ql_baseline_hook.py"
+          - "scripts/test_astrbot_gt_coverage.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/AstrBot/**"
+        generator: "python -m src.pipeline --project AstrBot all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/**"
+
+      - doc: "design/AstrBot/call-chain/debug/gt-coverage*"
+        generator: "python design/AstrBot/call-chain/debug/script/render_gt_coverage.py"
+        inputs:
+          - "design/AstrBot/call-chain/debug/script/render_gt_coverage.py"
+          - "design/AstrBot/astrbot-4.25.2-acceptance.json"
+          - "design/AstrBot/groundtruth/new-vuls/**"
+          - "output/AstrBot/static/call-chains/**"
+
+      - doc: "design/AstrBot/handler-entry/debug/*.csv"
+        generator: "python design/AstrBot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/AstrBot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/AstrBot/groundtruth/new-vuls/**"
+
+      - doc: "design/AstrBot/handler-entry/debug/*.md"
+        generator: "python design/AstrBot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/AstrBot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/AstrBot/groundtruth/new-vuls/**"
+
+      - doc: "design/AstrBot/sink/debug/sink-*"
+        generator: "python design/AstrBot/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/AstrBot/sink/debug/scripts/generate_sink_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+          - "src/ql/project/**"
+          - "design/AstrBot/groundtruth/new-vuls/**"
+          - "design/AstrBot/sink/sink-method-overrides.json"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/python/AstrBot
+      docs:
+        - "design/AstrBot/README.md"
+
+  QwenPaw:
+    spec:
+      - doc: design/QwenPaw/README.md
+        code:
+          - "src/ql/project/**"
+          - "src/ql/tests/qwenpaw_project_model/**"
+          - "design/QwenPaw/qwenpaw-v1.1.10-acceptance.json"
+          - "design/QwenPaw/call-chain/debug/script/render_gt_coverage.py"
+          - "design/QwenPaw/call-chain/debug/script/test_render_gt_coverage.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "design/QwenPaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/QwenPaw/sink/debug/scripts/generate_sink_data.py"
+          - "design/QwenPaw/sink/sink-method-overrides.json"
+          - "scripts/test_qwenpaw_gt_coverage.py"
+          - "scripts/ql_baseline_hook.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/QwenPaw/**"
+        generator: "python -m src.pipeline --project QwenPaw all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/**"
+
+      - doc: "design/QwenPaw/call-chain/debug/gt-coverage*"
+        generator: "python design/QwenPaw/call-chain/debug/script/render_gt_coverage.py"
+        inputs:
+          - "design/QwenPaw/qwenpaw-v1.1.10-acceptance.json"
+          - "design/QwenPaw/groundtruth/**"
+          - "design/QwenPaw/call-chain/debug/script/render_gt_coverage.py"
+          - "output/QwenPaw/static/call-chains/**"
+
+      - doc: "design/QwenPaw/handler-entry/debug/*.csv"
+        generator: "python design/QwenPaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/QwenPaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/QwenPaw/groundtruth/new-vuls/**"
+
+      - doc: "design/QwenPaw/handler-entry/debug/*.md"
+        generator: "python design/QwenPaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/QwenPaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/QwenPaw/groundtruth/new-vuls/**"
+
+      - doc: "design/QwenPaw/sink/debug/sink-*"
+        generator: "python design/QwenPaw/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/QwenPaw/sink/debug/scripts/generate_sink_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+          - "src/ql/project/**"
+          - "design/QwenPaw/groundtruth/new-vuls/**"
+          - "design/QwenPaw/sink/sink-method-overrides.json"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/python/QwenPaw
+      docs:
+        - "design/QwenPaw/README.md"
+
+  nanobot:
+    spec:
+      - doc: design/nanobot/README.md
+        code:
+          - "src/ql/project/**"
+          - "src/ql/tests/nanobot_project_model/**"
+          - "design/nanobot/nanobot-v0.1.4.post5-acceptance.json"
+          - "design/nanobot/call-chain/debug/script/render_gt_coverage.py"
+          - "design/nanobot/call-chain/debug/script/test_render_gt_coverage.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "design/nanobot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/nanobot/sink/debug/scripts/generate_sink_data.py"
+          - "design/nanobot/sink/sink-method-overrides.json"
+          - "scripts/test_nanobot_gt_coverage.py"
+          - "scripts/ql_baseline_hook.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/nanobot/**"
+        generator: "python -m src.pipeline --project nanobot all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/**"
+
+      - doc: "design/nanobot/call-chain/debug/gt-coverage*"
+        generator: "python design/nanobot/call-chain/debug/script/render_gt_coverage.py"
+        inputs:
+          - "design/nanobot/nanobot-v0.1.4.post5-acceptance.json"
+          - "design/nanobot/groundtruth/**"
+          - "design/nanobot/call-chain/debug/script/render_gt_coverage.py"
+          - "output/nanobot/static/call-chains/**"
+
+      - doc: "design/nanobot/handler-entry/debug/*.csv"
+        generator: "python design/nanobot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/nanobot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/nanobot/groundtruth/new-vuls/**"
+
+      - doc: "design/nanobot/handler-entry/debug/*.md"
+        generator: "python design/nanobot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/nanobot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/nanobot/groundtruth/new-vuls/**"
+
+      - doc: "design/nanobot/sink/debug/sink-*"
+        generator: "python design/nanobot/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/nanobot/sink/debug/scripts/generate_sink_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+          - "src/ql/project/**"
+          - "design/nanobot/groundtruth/new-vuls/**"
+          - "design/nanobot/sink/sink-method-overrides.json"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/python/nanobot
+      docs:
+        - "design/nanobot/README.md"
+
+  poco-agent:
+    spec:
+      - doc: design/poco-agent/README.md
+        code:
+          - "src/ql/project/**"
+          - "src/ql/tests/poco_agent_project_model/**"
+          - "design/poco-agent/poco-agent-v0.5.4-acceptance.json"
+          - "design/poco-agent/call-chain/debug/script/render_gt_coverage.py"
+          - "design/poco-agent/call-chain/debug/script/test_render_gt_coverage.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "design/poco-agent/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/poco-agent/sink/debug/scripts/generate_sink_data.py"
+          - "design/poco-agent/sink/sink-method-overrides.json"
+          - "scripts/test_poco_agent_gt_coverage.py"
+          - "scripts/ql_baseline_hook.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/poco-agent/**"
+        generator: "python -m src.pipeline --project poco-agent all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/**"
+
+      - doc: "design/poco-agent/call-chain/debug/gt-coverage*"
+        generator: "python design/poco-agent/call-chain/debug/script/render_gt_coverage.py"
+        inputs:
+          - "design/poco-agent/poco-agent-v0.5.4-acceptance.json"
+          - "design/poco-agent/groundtruth/**"
+          - "design/poco-agent/call-chain/debug/script/render_gt_coverage.py"
+          - "output/poco-agent/static/call-chains/**"
+
+      - doc: "design/poco-agent/handler-entry/debug/*.csv"
+        generator: "python design/poco-agent/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/poco-agent/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/poco-agent/groundtruth/new-vuls/**"
+
+      - doc: "design/poco-agent/handler-entry/debug/*.md"
+        generator: "python design/poco-agent/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/poco-agent/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/project/**"
+          - "design/poco-agent/groundtruth/new-vuls/**"
+
+      - doc: "design/poco-agent/sink/debug/sink-*"
+        generator: "python design/poco-agent/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/poco-agent/sink/debug/scripts/generate_sink_data.py"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+          - "src/ql/project/**"
+          - "design/poco-agent/groundtruth/new-vuls/**"
+          - "design/poco-agent/sink/sink-method-overrides.json"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/python/poco-agent
+      docs:
+        - "design/poco-agent/README.md"
+
+  openclaw:
+    spec:
+      - doc: design/openclaw/ADAPTATION_SUMMARY.md
+        code:
+          - "src/ql-js/**"
+          - "src/ql-js/call/openclaw_filters.qll"
+          - "src/gate_semantics/typescript_slicer.py"
+          - "src/gate_semantics/typescript_bridge.mjs"
+          - "src/gate_semantics/tests/test_typescript_slicer.py"
+          - "src/gate_semantics/pipeline.py"
+          - "src/projects/registry.py"
+          - "src/pipeline/**"
+          - "src/sink_capacity/sink-capability-cards/node.*.md"
+          - "src/sink_capacity/sink-capability-cards/javascript.fetch.md"
+          - "src/sink_capacity/sink-capability-cards/javascript.response-text.md"
+          - "src/sink_capacity/sink-capability-cards/openclaw.*.md"
+
+      - doc: design/openclaw/README.md
+        code:
+          - "design/openclaw/inventory/debug/scripts/**"
+          - "design/openclaw/handler-entry/debug/scripts/**"
+          - "design/openclaw/sink/debug/scripts/**"
+          - "design/openclaw/call-chain/debug/scripts/**"
+          - "scripts/test_openclaw_gt_coverage.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/openclaw/**"
+        generator: "python -m src.pipeline --project openclaw all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql-js/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/node.*.md"
+          - "src/sink_capacity/sink-capability-cards/javascript.fetch.md"
+          - "src/sink_capacity/sink-capability-cards/javascript.response-text.md"
+          - "src/sink_capacity/sink-capability-cards/openclaw.*.md"
+
+      - doc: "design/openclaw/inventory/debug/sink-inventory.*"
+        generator: "python design/openclaw/inventory/debug/scripts/generate_inventory.py"
+        inputs:
+          - "design/openclaw/inventory/debug/scripts/generate_inventory.py"
+          - "design/openclaw/inventory/openclaw-groundtruth-lock.json"
+          - "design/openclaw/groundtruth/**"
+
+      - doc: "design/openclaw/handler-entry/debug/*"
+        generator: "python design/openclaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/openclaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/openclaw/inventory/debug/sink-inventory.json"
+          - "output/openclaw/static/call-chains/**"
+
+      - doc: "design/openclaw/sink/debug/*"
+        generator: "python design/openclaw/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/openclaw/sink/debug/scripts/generate_sink_data.py"
+          - "design/openclaw/inventory/debug/sink-inventory.json"
+          - "output/openclaw/static/call-chains/**"
+
+      - doc: "design/openclaw/call-chain/debug/gt-coverage*"
+        generator: "python design/openclaw/call-chain/debug/scripts/render_gt_coverage.py"
+        inputs:
+          - "design/openclaw/call-chain/debug/scripts/render_gt_coverage.py"
+          - "design/openclaw/inventory/openclaw-static-oracle.json"
+          - "design/openclaw/inventory/openclaw-groundtruth-lock.json"
+          - "design/openclaw/inventory/debug/sink-inventory.json"
+          - "design/openclaw/groundtruth/**"
+          - "output/openclaw/static/**"
+          - "output/openclaw/gate-semantics/gate-index.csv"
+
+      - doc: "design/openclaw/call-chain/debug/d5-chain-coverage*"
+        generator: "python design/openclaw/call-chain/debug/scripts/render_d5_chain_coverage.py"
+        inputs:
+          - "design/openclaw/call-chain/debug/scripts/render_d5_chain_coverage.py"
+          - "design/openclaw/inventory/debug/sink-inventory.json"
+          - "design/openclaw/handler-entry/debug/tool-handler-entries.csv"
+          - "design/openclaw/groundtruth/new-vuls/**"
+          - "output/openclaw/static/call-chains/**"
+          - "output/openclaw/call-chain-semantics/**"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/typescript/openclaw
+      docs:
+        - "design/openclaw/README.md"
+        - "design/openclaw/ADAPTATION_SUMMARY.md"
+
+  openclaw-cn:
+    spec:
+      - doc: design/openclaw-cn/ADAPTATION_SUMMARY.md
+        code:
+          - "src/ql-js/**"
+          - "src/gate_semantics/typescript_slicer.py"
+          - "src/gate_semantics/typescript_bridge.mjs"
+          - "src/gate_semantics/tests/test_typescript_slicer.py"
+          - "src/projects/registry.py"
+          - "src/pipeline/**"
+          - "src/sink_capacity/sink-capability-cards/node.*.md"
+          - "src/sink_capacity/sink-capability-cards/javascript.fetch.md"
+          - "src/sink_capacity/sink-capability-cards/openclaw-cn.*.md"
+
+      - doc: design/openclaw-cn/README.md
+        code:
+          - "design/openclaw-cn/inventory/debug/scripts/**"
+          - "design/openclaw-cn/handler-entry/debug/scripts/**"
+          - "design/openclaw-cn/sink/debug/scripts/**"
+          - "design/openclaw-cn/call-chain/debug/scripts/**"
+          - "scripts/test_openclaw_cn_gt_coverage.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/openclaw-cn/**"
+        generator: "python -m src.pipeline --project openclaw-cn all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql-js/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/node.*.md"
+          - "src/sink_capacity/sink-capability-cards/javascript.fetch.md"
+          - "src/sink_capacity/sink-capability-cards/openclaw-cn.*.md"
+
+      - doc: "design/openclaw-cn/inventory/debug/groundtruth-inventory.*"
+        generator: "python design/openclaw-cn/inventory/debug/scripts/generate_inventory.py"
+        inputs:
+          - "design/openclaw-cn/inventory/debug/scripts/generate_inventory.py"
+          - "design/openclaw-cn/inventory/openclaw-cn-source-gt-lock.json"
+          - "design/openclaw-cn/groundtruth/new-vuls/**"
+          - "benchmark/typescript/openclaw-cn/src/**"
+          - "benchmark/typescript/openclaw-cn/extensions/feishu/src/outbound.ts"
+          - "benchmark/typescript/openclaw-cn/extensions/feishu/src/media.ts"
+
+      - doc: "design/openclaw-cn/handler-entry/debug/*"
+        generator: "python design/openclaw-cn/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/openclaw-cn/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/openclaw-cn/inventory/debug/groundtruth-inventory.json"
+          - "src/ql-js/get_tool_handlers.ql"
+          - "src/ql-js/project/OpenClawCNModel.qll"
+
+      - doc: "design/openclaw-cn/sink/debug/*"
+        generator: "python design/openclaw-cn/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/openclaw-cn/sink/debug/scripts/generate_sink_data.py"
+          - "design/openclaw-cn/inventory/debug/groundtruth-inventory.json"
+          - "src/ql-js/call/sinks_af.qll"
+
+      - doc: "design/openclaw-cn/call-chain/debug/gt-coverage*"
+        generator: "python design/openclaw-cn/call-chain/debug/scripts/render_gt_coverage.py --pipeline-output output/openclaw-cn"
+        inputs:
+          - "design/openclaw-cn/call-chain/debug/scripts/render_gt_coverage.py"
+          - "design/openclaw-cn/inventory/openclaw-cn-static-oracle.json"
+          - "design/openclaw-cn/inventory/openclaw-cn-source-gt-lock.json"
+          - "design/openclaw-cn/inventory/debug/groundtruth-inventory.json"
+          - "design/openclaw-cn/groundtruth/new-vuls/**"
+          - "output/openclaw-cn/static/**"
+          - "output/openclaw-cn/gate-semantics/gate-index.csv"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/typescript/openclaw-cn
+      docs:
+        - "design/openclaw-cn/README.md"
+        - "design/openclaw-cn/ADAPTATION_SUMMARY.md"
+
+  nanoclaw:
+    spec:
+      - doc: design/nanoclaw/ADAPTATION_SUMMARY.md
+        code:
+          - "src/ql-js/**"
+          - "src/gate_semantics/typescript_slicer.py"
+          - "src/gate_semantics/typescript_bridge.mjs"
+          - "src/gate_semantics/tests/test_typescript_slicer.py"
+          - "src/projects/registry.py"
+          - "src/pipeline/**"
+          - "src/sink_capacity/sink-capability-cards/node.fs.copy.md"
+          - "src/sink_capacity/sink-capability-cards/nanoclaw.*.md"
+
+      - doc: design/nanoclaw/README.md
+        code:
+          - "design/nanoclaw/inventory/debug/scripts/**"
+          - "design/nanoclaw/handler-entry/debug/scripts/**"
+          - "design/nanoclaw/sink/debug/scripts/**"
+          - "design/nanoclaw/call-chain/debug/scripts/**"
+          - "scripts/test_nanoclaw_gt_coverage.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/nanoclaw/**"
+        generator: "python -m src.pipeline --project nanoclaw all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql-js/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/node.fs.copy.md"
+          - "src/sink_capacity/sink-capability-cards/nanoclaw.*.md"
+
+      - doc: "design/nanoclaw/inventory/debug/groundtruth-inventory.*"
+        generator: "python design/nanoclaw/inventory/debug/scripts/generate_inventory.py"
+        inputs:
+          - "design/nanoclaw/inventory/debug/scripts/generate_inventory.py"
+          - "design/nanoclaw/inventory/nanoclaw-groundtruth-lock.json"
+          - "design/nanoclaw/groundtruth/new-vuls/**"
+
+      - doc: "design/nanoclaw/handler-entry/debug/*"
+        generator: "python design/nanoclaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/nanoclaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/nanoclaw/inventory/debug/groundtruth-inventory.json"
+          - "src/ql-js/get_tool_handlers.ql"
+          - "src/ql-js/project/**"
+
+      - doc: "design/nanoclaw/sink/debug/*"
+        generator: "python design/nanoclaw/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/nanoclaw/sink/debug/scripts/generate_sink_data.py"
+          - "design/nanoclaw/inventory/debug/groundtruth-inventory.json"
+          - "src/ql-js/call/sinks_af.qll"
+
+      - doc: "design/nanoclaw/call-chain/debug/*coverage*"
+        generator: "python design/nanoclaw/call-chain/debug/scripts/render_gt_coverage.py"
+        inputs:
+          - "design/nanoclaw/call-chain/debug/scripts/render_gt_coverage.py"
+          - "design/nanoclaw/inventory/nanoclaw-static-oracle.json"
+          - "design/nanoclaw/inventory/nanoclaw-groundtruth-lock.json"
+          - "design/nanoclaw/inventory/debug/groundtruth-inventory.json"
+          - "output/nanoclaw/static/**"
+          - "output/nanoclaw/gate-semantics/gate-index.csv"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/typescript/nanoclaw
+      docs:
+        - "design/nanoclaw/README.md"
+        - "design/nanoclaw/ADAPTATION_SUMMARY.md"
+
+  mercury-agent:
+    spec:
+      - doc: design/mercury-agent/ADAPTATION_SUMMARY.md
+        code:
+          - "src/ql-js/project/MercuryAgentModel.qll"
+          - "src/ql-js/tests/mercury_agent_project_model/**"
+          - "src/ql-js/call/call.qll"
+          - "src/ql-js/call/sinks_af.qll"
+          - "src/gate_semantics/typescript_slicer.py"
+          - "src/gate_semantics/typescript_bridge.mjs"
+          - "src/projects/registry.py"
+          - "src/pipeline/**"
+          - "src/sink_capacity/sink-capability-cards/mercury.*.md"
+
+      - doc: design/mercury-agent/README.md
+        code:
+          - "design/mercury-agent/inventory/debug/scripts/**"
+          - "design/mercury-agent/handler-entry/debug/scripts/**"
+          - "design/mercury-agent/sink/debug/scripts/**"
+          - "design/mercury-agent/call-chain/debug/scripts/**"
+          - "scripts/test_mercury_agent_gt_coverage.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/mercury-agent/**"
+        generator: "python -m src.pipeline --project mercury-agent all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql-js/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/mercury.*.md"
+
+      - doc: "design/mercury-agent/inventory/debug/groundtruth-inventory.*"
+        generator: "python design/mercury-agent/inventory/debug/scripts/generate_inventory.py"
+        inputs:
+          - "design/mercury-agent/inventory/debug/scripts/generate_inventory.py"
+          - "design/mercury-agent/inventory/mercury-agent-groundtruth-lock.json"
+          - "design/mercury-agent/groundtruth/**"
+
+      - doc: "design/mercury-agent/handler-entry/debug/*"
+        generator: "python design/mercury-agent/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/mercury-agent/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/mercury-agent/inventory/debug/groundtruth-inventory.json"
+          - "src/ql-js/project/MercuryAgentModel.qll"
+
+      - doc: "design/mercury-agent/sink/debug/*"
+        generator: "python design/mercury-agent/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/mercury-agent/sink/debug/scripts/generate_sink_data.py"
+          - "design/mercury-agent/inventory/debug/groundtruth-inventory.json"
+          - "src/ql-js/call/sinks_af.qll"
+
+      - doc: "design/mercury-agent/call-chain/debug/gt-*"
+        generator: "python design/mercury-agent/call-chain/debug/scripts/render_gt_coverage.py --pipeline-output output/mercury-agent"
+        inputs:
+          - "design/mercury-agent/call-chain/debug/scripts/render_gt_coverage.py"
+          - "design/mercury-agent/inventory/mercury-agent-static-oracle.json"
+          - "design/mercury-agent/inventory/mercury-agent-groundtruth-lock.json"
+          - "design/mercury-agent/inventory/debug/groundtruth-inventory.json"
+          - "design/mercury-agent/groundtruth/**"
+          - "output/mercury-agent/static/**"
+          - "output/mercury-agent/gate-semantics/gate-index.csv"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/typescript/mercury-agent
+      docs:
+        - "design/mercury-agent/README.md"
+        - "design/mercury-agent/ADAPTATION_SUMMARY.md"
+
+  droidclaw:
+    spec:
+      - doc: design/droidclaw/ADAPTATION_SUMMARY.md
+        code:
+          - "src/ql-js/**"
+          - "src/gate_semantics/typescript_slicer.py"
+          - "src/gate_semantics/typescript_bridge.mjs"
+          - "src/projects/registry.py"
+          - "src/pipeline/**"
+          - "src/sink_capacity/sink-capability-cards/droidclaw.*.md"
+
+      - doc: design/droidclaw/README.md
+        code:
+          - "design/droidclaw/inventory/debug/scripts/**"
+          - "design/droidclaw/handler-entry/debug/scripts/**"
+          - "design/droidclaw/sink/debug/scripts/**"
+          - "design/droidclaw/call-chain/debug/scripts/**"
+          - "scripts/test_droidclaw_gt_coverage.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/droidclaw/**"
+        generator: "python -m src.pipeline --project droidclaw all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql-js/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/droidclaw.*.md"
+
+      - doc: "design/droidclaw/inventory/debug/groundtruth-inventory.*"
+        generator: "python design/droidclaw/inventory/debug/scripts/generate_inventory.py"
+        inputs:
+          - "design/droidclaw/inventory/debug/scripts/generate_inventory.py"
+          - "design/droidclaw/inventory/droidclaw-groundtruth-lock.json"
+          - "design/droidclaw/groundtruth/new-vuls/**"
+
+      - doc: "design/droidclaw/handler-entry/debug/*"
+        generator: "python design/droidclaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/droidclaw/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "design/droidclaw/inventory/debug/groundtruth-inventory.json"
+          - "src/ql-js/project/DroidClawModel.qll"
+
+      - doc: "design/droidclaw/sink/debug/*"
+        generator: "python design/droidclaw/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/droidclaw/sink/debug/scripts/generate_sink_data.py"
+          - "design/droidclaw/inventory/debug/groundtruth-inventory.json"
+          - "src/ql-js/call/sinks_af.qll"
+
+      - doc: "design/droidclaw/call-chain/debug/gt-*"
+        generator: "python design/droidclaw/call-chain/debug/scripts/render_gt_coverage.py --pipeline-output output/droidclaw"
+        inputs:
+          - "design/droidclaw/call-chain/debug/scripts/render_gt_coverage.py"
+          - "design/droidclaw/inventory/droidclaw-static-oracle.json"
+          - "design/droidclaw/inventory/droidclaw-groundtruth-lock.json"
+          - "design/droidclaw/inventory/debug/groundtruth-inventory.json"
+          - "design/droidclaw/groundtruth/new-vuls/**"
+          - "output/droidclaw/static/**"
+          - "output/droidclaw/gate-semantics/gate-index.csv"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/typescript/droidclaw
+      docs:
+        - "design/droidclaw/README.md"
+        - "design/droidclaw/ADAPTATION_SUMMARY.md"
+
+  lettabot:
+    spec:
+      - doc: design/lettabot/ADAPTATION_SUMMARY.md
+        code:
+          - "src/ql-js/**"
+          - "src/projects/registry.py"
+          - "src/pipeline/**"
+          - "src/sink_capacity/sink-capability-cards/lettabot.*.md"
+          - "src/sink_capacity/sink-capability-cards/node.fs.*.md"
+
+      - doc: design/lettabot/README.md
+        code:
+          - "design/lettabot/handler-entry/debug/scripts/**"
+          - "design/lettabot/sink/debug/scripts/**"
+          - "design/lettabot/call-chain/debug/scripts/**"
+          - "scripts/test_lettabot_adapter.py"
+          - "scripts/test_ql.py"
+
+    generated:
+      - doc: "output/lettabot/**"
+        generator: "python -m src.pipeline --project lettabot all"
+        inputs:
+          - "src/projects/**"
+          - "src/pipeline/**"
+          - "src/ql-js/**"
+          - "src/gate_semantics/**"
+          - "src/call_chain_semantics/**"
+          - "src/sink_capacity/sink-capability-cards/lettabot.*.md"
+          - "src/sink_capacity/sink-capability-cards/node.fs.*.md"
+
+      - doc: "design/lettabot/handler-entry/debug/*"
+        generator: "python design/lettabot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+        inputs:
+          - "design/lettabot/handler-entry/debug/scripts/generate_handler_entry_data.py"
+          - "src/ql-js/get_tool_handlers.ql"
+          - "src/ql-js/get_tool_boundaries.ql"
+          - "src/ql-js/project/ProjectModel.qll"
+          - "src/ql-js/project/LettaBotModel.qll"
+          - "benchmark/typescript/lettabot/vendor-source/README.md"
+          - "benchmark/typescript/lettabot/vendor-source/letta-code-v0.19.5/src/tools/toolDefinitions.ts"
+          - "benchmark/typescript/lettabot/vendor-source/letta-code-v0.19.5/src/tools/impl/*.ts"
+
+      - doc: "design/lettabot/sink/debug/*"
+        generator: "python design/lettabot/sink/debug/scripts/generate_sink_data.py"
+        inputs:
+          - "design/lettabot/sink/debug/scripts/generate_sink_data.py"
+          - "src/ql-js/call/sinks_af.qll"
+          - "benchmark/typescript/lettabot/vendor-source/letta-code-v0.19.5/src/tools/impl/*.ts"
+
+      - doc: "design/lettabot/call-chain/debug/adapter-coverage.*"
+        generator: "python design/lettabot/call-chain/debug/scripts/render_adapter_coverage.py --pipeline-output output/lettabot"
+        inputs:
+          - "design/lettabot/call-chain/debug/scripts/render_adapter_coverage.py"
+          - "output/lettabot/static/**"
+
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/typescript/lettabot
+      docs:
+        - "design/lettabot/README.md"
+        - "design/lettabot/ADAPTATION_SUMMARY.md"
+
+  hermes-agent:
+
+    # ── spec：改 code 必须同步 doc（硬门禁）─────────────────────────────
+    spec:
+      - doc: design/hermes-agent/call-chain/call_chain_hermes-design.md
+        code:
+          - "src/ql/call/call.qll"
+          - "src/ql/call/sinks_af.qll"
+          - "src/ql/util/util.qll"
+          - ".claude/settings.json"
+          - "scripts/ql_baseline_hook.py"
+          - "scripts/test_hermes_d5_baseline.py"
+          - "design/hermes-agent/call-chain/baseline/**"
+          - "design/hermes-agent/call-chain/debug/script/hermes_d5_baseline.py"
+          - "design/hermes-agent/call-chain/debug/script/render_chain_gates_coverage.py"
+          - "design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+          - "design/hermes-agent/call-chain/debug/script/test_hermes_d5_baseline.py"
+          - "design/hermes-agent/call-chain/debug/script/test_render_d5_chain_coverage.py"
+
+      - doc: design/hermes-agent/call-chain/call-chain-semantics-design.md
+        code:
+          - "src/call_chain_semantics/**"
+
+      - doc: design/hermes-agent/gate/gate-fte-design.md
+        code:
+          - "src/gate_semantics/**"
+          - "src/ql/gate/GateShapes.qll"
+          - "src/ql/tests/**"
+          - "src/ql/qlpack.yml"
+          - "src/ql/get_gates.ql"
+          - "src/ql/fte_filter.ql"
+          - "src/ql/call/filter_gates.qll"
+          - "src/ql/fte_transform.ql"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/get_handler_to_sink.ql"
+          - "scripts/test_ql.py"
+
+      - doc: design/hermes-agent/prompt-entry/prompt-entry-design.md
+        code:
+          - "src/ql/get_prompt_entries.ql"
+          - "src/ql/get_tool_registrations.ql"
+          - "design/hermes-agent/prompt-entry/debug/script/infer_prompt_entry_tools.py"
+          - "design/hermes-agent/prompt-entry/debug/script/test_infer_prompt_entry_tools.py"
+
+      - doc: design/hermes-agent/handler-entry/handler-entry-design.md
+        code:
+          - "src/ql/get_tool_handlers.ql"
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/test_process_handler_entry_data.py"
+          - "design/hermes-agent/handler-entry/debug/script/generate_tool_handler_specifications.py"
+          - "design/hermes-agent/handler-entry/debug/script/test_generate_tool_handler_specifications.py"
+
+      - doc: design/hermes-agent/sink/sink-design.md
+        code:
+          - "src/sink_capacity/**"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "design/hermes-agent/sink/debug/script/test_process_sink_data.py"
+
+      - doc: src/sink_capacity/README.md
+        code:
+          - "src/sink_capacity/*.py"
+
+    # ── generated：改 inputs 需重跑 generator（仅提醒；首版不纳入硬门禁）──────
+    generated:
+      - doc: "output/hermes/call-chain-semantics/**"
+        generator: "python -m src.call_chain_semantics.main"
+        inputs:
+          - "src/call_chain_semantics/**"
+          - "design/hermes-agent/call-chain/debug/handler-sink-chains.csv"
+          - "design/hermes-agent/call-chain/debug/chain-gates.csv"
+          - "design/hermes-agent/call-chain/debug/d5-chain-coverage-items.csv"
+          - "output/hermes/gate-semantics/gate-index.csv"
+          - "output/hermes/gate-semantics/repository/*/semantic.json"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+
+      - doc: "output/hermes/gate-semantics/**"
+        generator: "python -m src.gate_semantics.main && python -m src.gate_semantics.checker --write"
+        inputs:
+          - "src/gate_semantics/**"
+          - "src/sink_capacity/agent.py"
+          - "src/ql/get_gates.ql"
+          - "src/ql/fte_filter.ql"
+          - "src/ql/fte_transform.ql"
+          - "design/hermes-agent/gate/debug/gate-candidates.csv"
+          - "design/hermes-agent/gate/debug/gate-filter.csv"
+          - "design/hermes-agent/gate/debug/transform-candidates.csv"
+
+      - doc: "design/hermes-agent/gate/debug/gate-coverage-combined.md"
+        generator: "python design/hermes-agent/gate/debug/script/render_recall_result.py"
+        inputs:
+          - "design/hermes-agent/gate/debug/script/render_recall_result.py"
+          - "design/hermes-agent/gate/debug/taintC-per-gate.csv"
+          - "design/hermes-agent/gate/debug/transform-gt-coverage.csv"
+          - "design/hermes-agent/gate/debug/gate-candidates.csv"
+          - "design/hermes-agent/gate/debug/gate-filter.csv"
+          - "design/hermes-agent/gate/debug/transform-candidates.csv"
+
+      - doc: "design/hermes-agent/call-chain/debug/d5-chain-coverage.md"
+        generator: "python design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+        inputs:
+          - "design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+          - "design/hermes-agent/call-chain/debug/chain-gates.csv"
+          - "design/hermes-agent/call-chain/debug/handler-sink-discord-bridge.csv"
+          - "design/hermes-agent/gate/debug/gate-candidates.csv"
+          - "design/hermes-agent/gate/debug/transform-candidates.csv"
+          - "design/hermes-agent/gate/debug/taintC-per-gate.csv"
+          - "design/hermes-agent/gate/debug/transform-gt-coverage.csv"
+          - "design/hermes-agent/handler-entry/debug/tool-handler-entries.csv"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+
+      - doc: "design/hermes-agent/call-chain/debug/d5-chain-coverage.csv"
+        generator: "python design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+        inputs:
+          - "design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+          - "design/hermes-agent/call-chain/debug/chain-gates.csv"
+          - "design/hermes-agent/call-chain/debug/handler-sink-discord-bridge.csv"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+
+      - doc: "design/hermes-agent/call-chain/debug/d5-chain-coverage-items.csv"
+        generator: "python design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+        inputs:
+          - "design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+          - "design/hermes-agent/call-chain/debug/chain-gates.csv"
+          - "design/hermes-agent/call-chain/debug/handler-sink-discord-bridge.csv"
+          - "design/hermes-agent/gate/debug/taintC-per-gate.csv"
+          - "design/hermes-agent/gate/debug/transform-gt-coverage.csv"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+
+      - doc: "design/hermes-agent/call-chain/debug/d5-gt-items-snapshot.csv"
+        generator: "python design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+        inputs:
+          - "design/hermes-agent/call-chain/debug/script/render_d5_chain_coverage.py"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+
+      - doc: "design/hermes-agent/sink/debug/script/sink-points.csv"
+        generator: "python design/hermes-agent/sink/debug/script/process_sink_data.py"
+        inputs:
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+          - "src/ql/util/util.qll"
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+
+      - doc: "design/hermes-agent/sink/debug/script/sink-summary.csv"
+        generator: "python design/hermes-agent/sink/debug/script/process_sink_data.py"
+        inputs:
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+
+      - doc: "design/hermes-agent/sink/debug/script/sink-report.md"
+        generator: "python design/hermes-agent/sink/debug/script/process_sink_data.py"
+        inputs:
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+
+      - doc: "design/hermes-agent/sink/debug/script/sink-coverage.csv"
+        generator: "python design/hermes-agent/sink/debug/script/process_sink_data.py"
+        inputs:
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+
+      - doc: "design/hermes-agent/sink/debug/sink-coverage.md"
+        generator: "python design/hermes-agent/sink/debug/script/process_sink_data.py"
+        inputs:
+          - "design/hermes-agent/sink/debug/script/process_sink_data.py"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+          - "src/ql/get_sinks.ql"
+          - "src/ql/call/sinks_af.qll"
+
+      - doc: "design/hermes-agent/handler-entry/debug/tool-handler-entries.csv"
+        generator: "python design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+        inputs:
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "src/ql/get_tool_handlers.ql"
+          - "src/ql/call/call.qll"
+          - "src/ql/util/util.qll"
+
+      - doc: "design/hermes-agent/handler-entry/debug/entry-ground-truth-coverage.csv"
+        generator: "python design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+        inputs:
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+          - "design/hermes-agent/handler-entry/debug/tool-handler-entries.csv"
+
+      - doc: "design/hermes-agent/handler-entry/debug/entry-ground-truth-coverage.md"
+        generator: "python design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+        inputs:
+          - "design/hermes-agent/handler-entry/debug/script/process_handler_entry_data.py"
+          - "design/hermes-agent/groudtruth/new-vuls/*.json"
+          - "design/hermes-agent/handler-entry/debug/tool-handler-entries.csv"
+
+      - doc: "design/hermes-agent/prompt-entry/debug/prompt-entry-anchors.csv"
+        generator: "bin/codeql query run --database=/root/codeql-home/dbs/hermes-bench-py-db --additional-packs=src/ql -o /tmp/prompt-entries.bqrs src/ql/get_prompt_entries.ql && bin/codeql bqrs decode --format=csv /tmp/prompt-entries.bqrs > design/hermes-agent/prompt-entry/debug/prompt-entry-anchors.csv"
+        inputs:
+          - "src/ql/get_prompt_entries.ql"
+
+      - doc: "design/hermes-agent/prompt-entry/debug/tool-registrations.csv"
+        generator: "bin/codeql query run --database=/root/codeql-home/dbs/hermes-bench-py-db --additional-packs=src/ql -o /tmp/tool-registrations.bqrs src/ql/get_tool_registrations.ql && bin/codeql bqrs decode --format=csv /tmp/tool-registrations.bqrs > design/hermes-agent/prompt-entry/debug/tool-registrations.csv"
+        inputs:
+          - "src/ql/get_tool_registrations.ql"
+
+      - doc: "design/hermes-agent/prompt-entry/debug/prompt-entr*.csv"
+        generator: "python design/hermes-agent/prompt-entry/debug/script/infer_prompt_entry_tools.py --project-root benchmark/python/hermes-agent --prompt-anchors design/hermes-agent/prompt-entry/debug/prompt-entry-anchors.csv --registrations design/hermes-agent/prompt-entry/debug/tool-registrations.csv --handlers design/hermes-agent/handler-entry/debug/tool-handler-entries.csv --out-dir design/hermes-agent/prompt-entry/debug"
+        inputs:
+          - "design/hermes-agent/prompt-entry/debug/script/infer_prompt_entry_tools.py"
+          - "design/hermes-agent/prompt-entry/debug/prompt-entry-anchors.csv"
+          - "design/hermes-agent/prompt-entry/debug/tool-registrations.csv"
+          - "design/hermes-agent/handler-entry/debug/tool-handler-entries.csv"
+          - "benchmark/python/hermes-agent/toolsets.py"
+          - "benchmark/python/hermes-agent/hermes_cli/platforms.py"
+          - "benchmark/python/hermes-agent/hermes_cli/tools_config.py"
+
+      - doc: "design/hermes-agent/prompt-entry/debug/prompt-entry-tool-coverage.md"
+        generator: "python design/hermes-agent/prompt-entry/debug/script/infer_prompt_entry_tools.py --project-root benchmark/python/hermes-agent --prompt-anchors design/hermes-agent/prompt-entry/debug/prompt-entry-anchors.csv --registrations design/hermes-agent/prompt-entry/debug/tool-registrations.csv --handlers design/hermes-agent/handler-entry/debug/tool-handler-entries.csv --out-dir design/hermes-agent/prompt-entry/debug"
+        inputs:
+          - "design/hermes-agent/prompt-entry/debug/script/infer_prompt_entry_tools.py"
+          - "design/hermes-agent/prompt-entry/debug/prompt-entry-anchors.csv"
+          - "design/hermes-agent/prompt-entry/debug/tool-registrations.csv"
+          - "design/hermes-agent/handler-entry/debug/tool-handler-entries.csv"
+
+      - doc: "src/sink_capacity/sink-capability-cards/**"
+        generator: "python -m src.sink_capacity.main --no-llm --qll src/ql/call/sinks_af.qll --out src/sink_capacity/sink-capability-cards"
+        inputs:
+          - "src/ql/call/sinks_af.qll"
+          - "src/sink_capacity/*.py"
+
+    # ── external_anchors：doc→外部项目 file:line，符号锚定（Phase 3 才做 checker）──
+    external_anchors:
+      target_root: /root/my-project/agent-research/clawgap/benchmark/python/hermes-agent
+      docs:
+        - "design/整体设计.md"

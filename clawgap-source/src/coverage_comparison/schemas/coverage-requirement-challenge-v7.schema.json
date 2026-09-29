@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "group_id", "project", "revision", "chain_id", "requirement_id", "primary_assessment", "challenge_assessment", "disposition", "final_assessment"],
+  "properties": {
+    "schema_version": {"const": "coverage-requirement-challenge/v7"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "requirement_id": {"type": "string", "pattern": "^CR-[0-9a-f]{16}$"},
+    "primary_assessment": {"$ref": "#/$defs/assessment"},
+    "challenge_assessment": {"$ref": "#/$defs/assessment"},
+    "disposition": {"enum": ["affirmed", "revised-uncovered", "conflict-unknown"]},
+    "final_assessment": {"$ref": "#/$defs/assessment"}
+  },
+  "$defs": {
+    "line": {"type": "object", "additionalProperties": false, "required": ["start_line", "end_line", "quote"], "properties": {
+      "start_line": {"type": "integer", "minimum": 1}, "end_line": {"type": "integer", "minimum": 1}, "quote": {"type": "string"}
+    }},
+    "assessment": {"type": "object", "additionalProperties": false, "required": ["requirement_id", "applicability", "decision", "capability_evidence", "call_shape_facts", "gate_ids", "covered_semantics", "gap", "uncertainty"], "properties": {
+      "requirement_id": {"type": "string", "pattern": "^CR-[0-9a-f]{16}$"},
+      "applicability": {"enum": ["applicable", "not-applicable", "unknown"]},
+      "decision": {"enum": ["covered", "wrong-check", "missing-check", "not-applicable", "unknown"]},
+      "capability_evidence": {"type": "array", "items": {"$ref": "#/$defs/line"}},
+      "call_shape_facts": {"type": "array", "items": {"type": "string"}},
+      "gate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"}},
+      "covered_semantics": {"type": ["string", "null"]},
+      "gap": {"type": ["string", "null"]},
+      "uncertainty": {"type": ["string", "null"]}
+    }}
+  }
+}

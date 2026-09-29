@@ -1,0 +1,2 @@
+| adapter | lettabot | lettabot-ts |
+| handler | manage_todo | session-registered-local-tool |

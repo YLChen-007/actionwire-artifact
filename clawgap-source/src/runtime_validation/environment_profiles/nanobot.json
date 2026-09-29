@@ -1,0 +1,16 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "nanobot",
+  "revision": "337c4600f3d78797bb4ed845b5a02118c7ac2d00",
+  "runtime": "python",
+  "setup_command": "python -m venv --system-site-packages .clawgap-venv && UV_CACHE_DIR=/tmp/clawgap-uv-cache uv pip install --python .clawgap-venv/bin/python --no-deps -e . 'oauth-cli-kit==0.1.3'",
+  "launch_command": "mkdir -p \"$HOME/.nanobot\" && cat > \"$HOME/.nanobot/config.json\" <<EOF\n{\"agents\":{\"defaults\":{\"model\":\"custom/fake\",\"provider\":\"custom\",\"workspace\":\".\"}},\"providers\":{\"custom\":{\"apiKey\":\"clawgap-loopback-mock\",\"apiBase\":\"http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}/v1\"}},\"gateway\":{\"host\":\"127.0.0.1\",\"port\":18083}}\nEOF\n.clawgap-venv/bin/nanobot agent --message 'environment probe'",
+  "readiness_pattern": "__provider_request__",
+  "source_files": ["pyproject.toml", "nanobot/cli/commands.py"],
+  "dependency_files": ["pyproject.toml"],
+  "fixture_files": [],
+  "provider": {"protocol": "openai-chat-completions/v1", "response_mode": "json", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "path": "/v1/chat/completions"},
+  "input": {"kind": "cli-argument", "native_channel": true},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "nanobot/providers/custom_provider.py:1"}, {"kind": "pre-effect", "anchor": "nanobot/agent/tools/shell.py:1"}]},
+  "effect_interceptors": ["process", "filesystem"]
+}

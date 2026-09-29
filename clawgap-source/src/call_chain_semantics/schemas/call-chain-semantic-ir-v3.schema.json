@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawgap.local/schemas/call-chain-semantic-ir-v3.schema.json",
+  "title": "CallChainSemanticIRV3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "project", "chain_id", "handler", "sink",
+    "sink_constraint", "values", "summary", "gates", "unresolved", "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "call-chain-semantic-ir/v3"},
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1}
+      }
+    },
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "handler": {"type": "object"},
+    "sink": {"type": "object"},
+    "sink_constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constraint_id", "sink_id", "sink_api", "capability_class", "location",
+        "controlled_argument", "call_shape", "capability_card"
+      ],
+      "properties": {
+        "constraint_id": {"type": "string", "pattern": "^SC-[0-9a-f]{16}$"},
+        "sink_id": {"type": "string", "pattern": "^S-[0-9a-f]{16}$"},
+        "sink_api": {"type": "string", "minLength": 1},
+        "capability_class": {"type": "string", "minLength": 1},
+        "location": {"type": "string", "minLength": 1},
+        "controlled_argument": {"type": "string"},
+        "call_shape": {"type": "string", "minLength": 1},
+        "capability_card": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256"],
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      }
+    },
+    "values": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "summary": {"type": "string", "minLength": 1, "pattern": "^[^\\r\\n]+$"},
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gate_number", "gate_uid", "gate_name", "callsite", "static_verdict", "semantic"
+        ],
+        "properties": {
+          "gate_number": {"type": "integer", "minimum": 1},
+          "gate_uid": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"},
+          "gate_name": {"type": "string", "minLength": 1},
+          "callsite": {"type": "string", "minLength": 1},
+          "static_verdict": {"enum": ["confirmed", "branch-confirmed"]},
+          "semantic": {"type": "object"}
+        }
+      }
+    },
+    "unresolved": {
+      "type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true
+    },
+    "status": {"enum": ["complete", "partial"]}
+  }
+}

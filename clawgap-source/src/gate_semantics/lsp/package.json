@@ -1,0 +1,11 @@
+{
+  "name": "clawgap-gate-semantics-lsp",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned LSP-to-MCP bridge for gate-semantics source research.",
+  "dependencies": {
+    "@theupsider/lsp-mcp": "1.3.2",
+    "typescript": "5.9.3",
+    "typescript-language-server": "5.3.0"
+  }
+}

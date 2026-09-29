@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawgap-runtime-l2-environment-plan-v1.schema.json",
+  "title": "ClawGap runtime L2 environment plan v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project",
+    "revision",
+    "runtime",
+    "setup_command",
+    "launch_command",
+    "readiness_pattern",
+    "source_files",
+    "dependency_files",
+    "fixture_files",
+    "provider",
+    "input",
+    "instrumentation",
+    "effect_interceptors"
+  ],
+  "properties": {
+    "schema_version": {"const": "clawgap-runtime-l2-environment-plan/v1"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "runtime": {"enum": ["python", "node", "bun", "npm", "pnpm"]},
+    "setup_command": {"type": "string", "minLength": 1},
+    "launch_command": {"type": "string", "minLength": 1},
+    "probe_command": {"type": "string", "minLength": 1},
+    "readiness_pattern": {"type": "string", "minLength": 1},
+    "source_files": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "dependency_files": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "fixture_files": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "response_mode", "base_url", "credential"],
+      "properties": {
+        "protocol": {
+          "enum": [
+            "openai-chat-completions/v1",
+            "letta-api/v1",
+            "anthropic-messages/v1",
+            "project-custom/v1"
+          ]
+        },
+        "response_mode": {"enum": ["json", "sse"]},
+        "base_url": {"const": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}"},
+        "credential": {"const": "clawgap-loopback-mock"},
+        "path": {"type": "string", "minLength": 1},
+        "allowed_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "enum": ["stdin", "pty", "http-api", "native-test-channel", "mock-channel-bridge", "unix-socket", "cli-argument"]
+        },
+        "native_channel": {"type": "boolean"}
+      }
+    },
+    "instrumentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loader", "event_path", "anchors"],
+      "properties": {
+        "loader": {"enum": ["python-sitecustomize", "node-import", "bun-preload", "none"]},
+        "event_path": {"const": "events.raw.jsonl"},
+        "anchors": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "anchor"],
+            "properties": {
+              "kind": {
+                "enum": ["prompt", "provider-request", "dispatch", "handler", "controlled-value", "gate", "sink", "pre-effect"]
+              },
+              "anchor": {"type": "string", "pattern": "^[^:]+:[0-9]+$"}
+            }
+          }
+        }
+      }
+    },
+    "effect_interceptors": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["process", "filesystem", "http", "browser", "messaging", "adb", "subagent", "database"]
+      }
+    },
+    "launch_timeout_seconds": {"type": "integer", "minimum": 5, "maximum": 600},
+    "setup_timeout_seconds": {"type": "integer", "minimum": 5, "maximum": 3600}
+  }
+}

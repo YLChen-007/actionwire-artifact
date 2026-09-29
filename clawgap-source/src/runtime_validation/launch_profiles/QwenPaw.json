@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "QwenPaw",
+  "revision": "6d1e936f1ba08ad2e0398367f8c27529e9d1d5df",
+  "runtime": "python",
+  "entrypoint": {"command": ["python", "-m", "qwenpaw.cli.main", "app", "--host", "127.0.0.1", "--port", "${CLAWGAP_L2_APP_PORT}"], "cwd": "src", "readiness": {"kind": "tcp-port", "timeout_seconds": 30}},
+  "provider": {"mode": "project-provider-shim", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock", "shim_anchor": "src/qwenpaw/providers/provider_manager.py:1"},
+  "input_transport": {"kind": "http-api", "path": "/agents/chat", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["src/qwenpaw/cli/main.py", "src/qwenpaw/cli/app_cmd.py"], "dependency_files": ["pyproject.toml"], "disposable_roots": [".qwenpaw", "data"], "environment": {}},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/qwenpaw/providers/provider_manager.py:1"}, {"kind": "dispatch", "anchor": "src/qwenpaw/agents/tools/shell.py:1"}, {"kind": "handler", "anchor": "src/qwenpaw/agents/tools/shell.py:1"}, {"kind": "sink", "anchor": "src/qwenpaw/agents/tools/shell.py:1"}, {"kind": "pre-effect", "anchor": "src/qwenpaw/agents/tools/shell.py:1"}]},
+  "effect_interceptors": ["process"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["QwenPaw provider shim and agent-chat API fixture are not yet implemented"]}
+}

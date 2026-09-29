@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "group_id", "handler_criterion_id", "sink_type_id", "group_scope", "downstream_oracle_eligible", "chain_count", "chain_refs", "reason_code", "detail"],
+  "properties": {
+    "schema_version": {"const": "group-oracle-exclusion/v1"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": "null"},
+    "group_scope": {"const": "no-security-impact"},
+    "downstream_oracle_eligible": {"const": false},
+    "chain_count": {"type": "integer", "minimum": 1},
+    "chain_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "object", "additionalProperties": false, "required": ["project", "chain_id"], "properties": {"project": {"type": "string", "minLength": 1}, "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"}}}},
+    "reason_code": {"const": "no-security-impact"},
+    "detail": {"type": "string", "minLength": 1}
+  }
+}

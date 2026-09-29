@@ -1,0 +1,16 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "hermes-agent",
+  "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+  "runtime": "python",
+  "setup_command": "python -m venv .clawgap-venv && UV_CACHE_DIR=/tmp/clawgap-uv-cache uv pip install --python .clawgap-venv/bin/python -e .",
+  "launch_command": "mkdir -p \"$HOME\" && export HERMES_HOME=\"$HOME\" && cat > \"$HOME/config.yaml\" <<'EOF'\nmodel:\n  default: clawgap-environment-probe\n  provider: clawgap-loopback\nproviders:\n  clawgap-loopback:\n    name: ClawGap Loopback Fixture\n    base_url: http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}/v1\n    default_model: clawgap-environment-probe\n    model: clawgap-environment-probe\n    key_env: CLAWGAP_FAKE_PROVIDER_KEY\n    api_mode: chat_completions\nEOF\n.clawgap-venv/bin/hermes --model clawgap-environment-probe --provider clawgap-loopback --toolsets file -z 'environment probe'",
+  "readiness_pattern": "__provider_request__",
+  "source_files": ["pyproject.toml", "hermes", "hermes_cli/main.py"],
+  "dependency_files": ["pyproject.toml"],
+  "fixture_files": [],
+  "provider": {"protocol": "openai-chat-completions/v1", "response_mode": "json", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "path": "/v1/chat/completions", "allowed_paths": ["/version", "/v1/models", "/v1/models/clawgap-environment-probe", "/api/v1/models", "/api/tags", "/v1/props", "/props"]},
+  "input": {"kind": "cli-argument", "native_channel": true},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "hermes_cli/oneshot.py:1"}, {"kind": "pre-effect", "anchor": "hermes_cli/oneshot.py:1"}]},
+  "effect_interceptors": ["process", "filesystem"]
+}

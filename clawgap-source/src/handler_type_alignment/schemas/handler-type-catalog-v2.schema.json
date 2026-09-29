@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "seed_project", "types"],
+  "properties": {
+    "schema_version": {"const": "handler-type-catalog/v2"},
+    "seed_project": {"const": "nanobot"},
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "handler_type_id", "origin", "criterion", "representative_handler", "members"
+        ],
+        "properties": {
+          "handler_type_id": {"type": "string", "pattern": "^HT-[0-9a-f]{16}$"},
+          "origin": {"enum": ["nanobot-seed", "external-global"]},
+          "criterion": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "canonical_label", "operation_family", "resource_family", "effect",
+              "core_roles", "optional_roles", "compatibility_rule"
+            ],
+            "properties": {
+              "canonical_label": {"type": "string", "minLength": 1},
+              "operation_family": {"type": "string", "minLength": 1},
+              "resource_family": {"type": "string", "minLength": 1},
+              "effect": {"type": "string", "minLength": 1},
+              "core_roles": {
+                "type": "array",
+                "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+                "uniqueItems": true
+              },
+              "optional_roles": {
+                "type": "array",
+                "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+                "uniqueItems": true
+              },
+              "compatibility_rule": {"type": "string", "minLength": 1}
+            }
+          },
+          "representative_handler": {"type": "string", "minLength": 1},
+          "members": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true,
+            "minItems": 1
+          }
+        }
+      }
+    }
+  }
+}

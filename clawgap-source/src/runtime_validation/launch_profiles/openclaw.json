@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "openclaw",
+  "revision": "d842b28a1517f95aae2a5bcd97f2f726e42b93d8",
+  "runtime": "pnpm",
+  "entrypoint": {"build_command": ["pnpm", "run", "build"], "command": ["node", "openclaw.mjs", "tui"], "cwd": ".", "stdin_prompt": true, "readiness": {"kind": "none", "timeout_seconds": 30}},
+  "provider": {"mode": "project-provider-shim", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock", "shim_anchor": "src/agents/bash-tools.exec.ts:1"},
+  "input_transport": {"kind": "pty", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["openclaw.mjs", "src/agents/bash-tools.exec.ts"], "dependency_files": ["package.json", "pnpm-lock.yaml"], "disposable_roots": [".openclaw", ".clawdbot", "data"], "environment": {"OPENCLAW_SKIP_CHANNELS": "1", "CLAWDBOT_SKIP_CHANNELS": "1"}},
+  "instrumentation": {"loader": "node-import", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/agents/bash-tools.exec.ts:1"}, {"kind": "dispatch", "anchor": "src/agents/bash-tools.exec.ts:1"}, {"kind": "handler", "anchor": "src/agents/bash-tools.exec.ts:1"}, {"kind": "sink", "anchor": "src/agents/bash-tools.exec.ts:1"}, {"kind": "pre-effect", "anchor": "src/agents/bash-tools.exec.ts:1"}]},
+  "effect_interceptors": ["process", "filesystem", "browser", "http"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["OpenClaw disposable TUI profile and Node import instrumentation are not yet implemented"]}
+}

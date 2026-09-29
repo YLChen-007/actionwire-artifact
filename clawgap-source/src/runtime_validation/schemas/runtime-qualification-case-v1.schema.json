@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawgap-runtime-qualification-case-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "case_id", "family", "origin", "revision", "source_binding", "dependency_binding", "native_case", "replay", "prompt", "mock_provider", "observations", "effect_policy", "selection"],
+  "properties": {
+    "schema_version": {"const": "clawgap-runtime-qualification-case/v1"},
+    "case_id": {"type": "string", "pattern": "^RVQ-[0-9a-f]{16}$"},
+    "family": {
+      "type": "object", "additionalProperties": false,
+      "required": ["project", "adapter", "tool_name", "probe"],
+      "properties": {
+        "project": {"type": "string", "minLength": 1},
+        "adapter": {"type": "string", "minLength": 1},
+        "tool_name": {"type": "string", "minLength": 1},
+        "probe": {"type": "string", "minLength": 1}
+      }
+    },
+    "origin": {
+      "type": "object", "additionalProperties": false,
+      "required": ["report_id", "ground_truth_case_id", "source_campaign_sha256"],
+      "properties": {
+        "report_id": {"type": "string", "minLength": 1},
+        "ground_truth_case_id": {"type": "string", "minLength": 1},
+        "source_campaign_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_binding": {"type": "object"},
+    "dependency_binding": {"type": "object"},
+    "native_case": {"type": "object"},
+    "replay": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tool_name", "exploit_args", "control_args"],
+      "properties": {
+        "tool_name": {"type": "string", "minLength": 1},
+        "exploit_args": {"type": "object"},
+        "control_args": {"type": "object"}
+      }
+    },
+    "prompt": {"type": "string", "minLength": 1},
+    "mock_provider": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protocol", "tool_calls"],
+      "properties": {
+        "protocol": {"const": "clawgap-forced-tool-call/v1"},
+        "tool_calls": {
+          "type": "object", "additionalProperties": false,
+          "required": ["exploit", "control"],
+          "properties": {
+            "exploit": {"$ref": "#/$defs/toolCall"},
+            "control": {"$ref": "#/$defs/toolCall"}
+          }
+        }
+      }
+    },
+    "observations": {"type": "array", "minItems": 3, "items": {"type": "object"}},
+    "effect_policy": {"type": "object"},
+    "selection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rule", "family_key"],
+      "properties": {
+        "rule": {"const": "lexicographically-smallest-ready-reviewed-report-id"},
+        "family_key": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "string"}}
+      }
+    }
+  },
+  "$defs": {
+    "toolCall": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "arguments"],
+      "properties": {"name": {"type": "string"}, "arguments": {"type": "object"}}
+    }
+  }
+}

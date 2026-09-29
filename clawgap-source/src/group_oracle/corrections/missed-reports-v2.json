@@ -1,0 +1,608 @@
+{
+  "schema_version": "coverage-correction-ledger/v2",
+  "post_hoc_ground_truth_informed": true,
+  "baseline": {
+    "group_root": "output/cross-project/group-oracles",
+    "group_manifest_sha256": "be48a17b273cf1c477dc1882327a8ba4d4c7c304171ea6008aa6a7884dae64d8",
+    "coverage_root": "output/cross-project/coverage-comparison",
+    "coverage_manifest_sha256": "58603413835d626b0d2368ae1ef36724b1bc83aaffe4efecea128f35d98c7e7f",
+    "ground_truth_manifest_sha256": "efe13db0e522c0521e02d6b7010e907d858c86d49638da6bf70f83626305b3eb",
+    "provenance": {
+      "classification": "post-hoc-benchmark-overlay",
+      "overlay_id": "astrbot-write-policy-rollback-v1",
+      "source_bindings": [
+        {
+          "path": "benchmark/python/AstrBot/astrbot/core/tools/computer_tools/fs.py",
+          "sha256": "8e30a7f2d5feca48476dbe10bb52a6187ad4ffbdc07cd7adbdf7520303a8b45d"
+        },
+        {
+          "path": "design/AstrBot/astrbot-4.25.2-acceptance.json",
+          "sha256": "539cf3418cd0b9edc69a07eaad83e666b0395d50866d0fd954d165525ecd0ef5"
+        }
+      ]
+    }
+  },
+  "corrections": [
+    {
+      "report_id": "GT-6ac3205f7f0611f1",
+      "project": "AstrBot",
+      "report_name": "Add_admin_permission_checks_for_Python_and_Shell_execution-PathMismatch",
+      "revision": "0e973bd4d483d18e1672c4dfa2eb7aae31bc1f83",
+      "source_report": {
+        "path": "design/AstrBot/groundtruth/new-vuls/Add_admin_permission_checks_for_Python_and_Shell_execution-PathMismatch.json",
+        "sha256": "c9eb6d88d397e0eeed4d9b137dafe9ed4a47eaf0f5a05a1d8333dbd028413280"
+      },
+      "action": "refine",
+      "chain_ids": [
+        "C-d7d163fc71d1",
+        "C-fcc15eb8f295"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-5be2a6c86b3d5b8c",
+          "handler_criterion_id": "HC-9f87ffb48d21dcf9",
+          "sink_type_id": "ST-b56ba5981b78c108"
+        },
+        {
+          "group_id": "HSG-f68f753320779a45",
+          "handler_criterion_id": "HC-e5261aea1b56670d",
+          "sink_type_id": "ST-b56ba5981b78c108"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-60c25a89f130b8b1",
+        "R-2b7feb4738803063"
+      ],
+      "evidence_locators": [
+        "astrbot-write-root-permission-separation"
+      ]
+    },
+    {
+      "report_id": "GT-08747d323940c2bf",
+      "project": "QwenPaw",
+      "report_name": "Advisory-GHSA-jccr-rrw2-vc8h-guard-gap",
+      "revision": "6d1e936f1ba08ad2e0398367f8c27529e9d1d5df",
+      "source_report": {
+        "path": "design/QwenPaw/groundtruth/new-vuls/Advisory-GHSA-jccr-rrw2-vc8h-guard-gap.json",
+        "sha256": "0fb1cb72c3f6a9209a1b6ce22f36fb146f99a635063c3453ea26eb264af1d4b3"
+      },
+      "action": "refine",
+      "chain_ids": [
+        "C-25692672827b",
+        "C-926600eb0ae0"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-624a1a5350c71b22",
+          "handler_criterion_id": "HC-47050698a0d2d6e6",
+          "sink_type_id": "ST-e02ed71b8c27e312"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-a66de8fd2ddcec11",
+        "R-a7724a6380d27b3f"
+      ],
+      "evidence_locators": [
+        "jq-environment-builtin-semantics"
+      ]
+    },
+    {
+      "report_id": "GT-e718ba1614c17fc9",
+      "project": "droidclaw",
+      "report_name": "CVE-2026-30741-CLI-Shell-AutoApproval",
+      "revision": "c7c991933e4a0c03cec6044aa7fb9067d391f4d4",
+      "source_report": {
+        "path": "design/droidclaw/groundtruth/new-vuls/CVE-2026-30741-CLI-Shell-AutoApproval.json",
+        "sha256": "46e9e36ebd010fb181ed61ef53b805a5ba42d4d4aa146c6d56e1ccce0366b60b"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-cbf151b190b6"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-565964f736660df5",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-4d1af6e725607dd6"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "droidclaw-shell-action-approval"
+      ]
+    },
+    {
+      "report_id": "GT-8bcd5d09ee151bbb",
+      "project": "hermes-agent",
+      "report_name": "Advisory-GHSA-qmwg-qprg-3j38-browser-eval-private-nav",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "source_report": {
+        "path": "design/hermes-agent/groundtruth/new-vuls/Advisory-GHSA-qmwg-qprg-3j38-browser-eval-private-nav.json",
+        "sha256": "621676755d0a5a29279c06a7664b1377fca5c28e286f356d8de4d0a6de585af6"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-7e4b2881c7bd",
+        "C-86177d5821d6",
+        "C-885ac7df33e6",
+        "C-c30f12e0d681",
+        "C-c85cb5eaf191",
+        "C-e291e098771c",
+        "C-fd8a9e8e1871"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-5b7fd8fc5ab3ee7f",
+          "handler_criterion_id": "HC-4e2d43b153137049",
+          "sink_type_id": "ST-e02ed71b8c27e312"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "browser-eval-post-navigation-policy"
+      ]
+    },
+    {
+      "report_id": "GT-0464a079af99599a",
+      "project": "hermes-agent",
+      "report_name": "CVE-2026-Device-Blocking-Expanduser-Bypass",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "source_report": {
+        "path": "design/hermes-agent/groundtruth/new-vuls/CVE-2026-Device-Blocking-Expanduser-Bypass.json",
+        "sha256": "711967fb7cbbea1eebd2126772d74b6fc923426b380fc02903812362650d3d6b"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-dd7cafc93c6f",
+        "C-f391d47e1dd3"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-6ddd2c48df68eeee",
+          "handler_criterion_id": "HC-d6a5ed749a9cb61e",
+          "sink_type_id": "ST-e02ed71b8c27e312"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "device-path-canonicalization"
+      ]
+    },
+    {
+      "report_id": "GT-e5b4560f03ff5ff7",
+      "project": "hermes-agent",
+      "report_name": "CVE-2026-Discord-Mention-Bypass-Mattermost-Slack",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "source_report": {
+        "path": "design/hermes-agent/groundtruth/new-vuls/CVE-2026-Discord-Mention-Bypass-Mattermost-Slack.json",
+        "sha256": "75da8ee1381d07368e9be2993a7d308f24ec4bc1e2c83ac0e1e346e4f5a7ad7b"
+      },
+      "action": "refine",
+      "chain_ids": [
+        "C-2cab054a1849",
+        "C-7692f447a85e"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-075f4a4352f236d4",
+          "handler_criterion_id": "HC-5afd4fc3bb452de5",
+          "sink_type_id": "ST-bb143a84cb3c9008"
+        },
+        {
+          "group_id": "HSG-58678c3e6395f06a",
+          "handler_criterion_id": "HC-5afd4fc3bb452de5",
+          "sink_type_id": "ST-1552e8cb544535b8"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-658de9127ec6054b"
+      ],
+      "evidence_locators": [
+        "broadcast-mention-neutralization"
+      ]
+    },
+    {
+      "report_id": "GT-8760b9fa6b53a205",
+      "project": "hermes-agent",
+      "report_name": "CVE-Project-Code-Execution-Mode-Bypass",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "source_report": {
+        "path": "design/hermes-agent/groundtruth/new-vuls/CVE-Project-Code-Execution-Mode-Bypass.json",
+        "sha256": "9b86f08b2c1d1615e5a5ccfb8bc2a88ef07b8da94c87fb14081324f463249cb6"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-728f8e5e6c99"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-cf83f5754609b70c",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-9ba88b26bf31d99b"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "code-execution-action-approval"
+      ],
+      "evidence_deficiency": {
+        "kind": "current-chain-call-shape-mismatch",
+        "missing_facts": [
+          "call-shape",
+          "semantic-ir"
+        ],
+        "detail": "The bound chain C-728f8e5e6c99 terminates at prompt_dangerous_approval(command) for terminal shell input, while this report requires the execute_code code argument flowing to subprocess.Popen; the supplied current binding lacks the execute_code call shape and ordered semantic IR needed for a strict same-invariant judgment.",
+        "source_anchors": [
+          "output/hermes/static/call-chains/handler-sink-chains.csv:C-10420d9585cc",
+          "design/hermes-agent/groundtruth/new-vuls/CVE-Project-Code-Execution-Mode-Bypass.json:d5_tool_handler_entry[execute_code]"
+        ]
+      }
+    },
+    {
+      "report_id": "GT-66d27974a7057a00",
+      "project": "hermes-agent",
+      "report_name": "Issue-hermes-agent-38035-matrix-adapter-markdown",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "source_report": {
+        "path": "design/hermes-agent/groundtruth/new-vuls/Issue-hermes-agent-38035-matrix-adapter-markdown.json",
+        "sha256": "47cc3432329c3a38e4f030acb84be3b0e3f8f62cea908069b8f276cb874ec0c8"
+      },
+      "action": "refine",
+      "chain_ids": [
+        "C-444fa89ca724",
+        "C-b92f11a23cae",
+        "C-d3ea99c074fb"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-494f1bb58d703434",
+          "handler_criterion_id": "HC-5afd4fc3bb452de5",
+          "sink_type_id": "ST-cfe8c4497bec6581"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-3006446369968fce",
+        "R-6d1090df486cf305"
+      ],
+      "evidence_locators": [
+        "matrix-html-all-route-sanitization"
+      ]
+    },
+    {
+      "report_id": "GT-7be4b0f1a9b62e4c",
+      "project": "hermes-agent",
+      "report_name": "feat__configurable_approval_mode_for_cron_jobs__approvals_cr-762f7e97-Batch-Runner-Variant",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "source_report": {
+        "path": "design/hermes-agent/groundtruth/new-vuls/feat__configurable_approval_mode_for_cron_jobs__approvals_cr-762f7e97-Batch-Runner-Variant.json",
+        "sha256": "9435c1317c6f09e5666b911047be6641b1cfc5eb32e79f934f1d34bf2d43dde0"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-728f8e5e6c99"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-cf83f5754609b70c",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-9ba88b26bf31d99b"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "noninteractive-approval-routing"
+      ]
+    },
+    {
+      "report_id": "GT-228613a4d41e4934",
+      "project": "hermes-agent",
+      "report_name": "fix__add_missing_dangerous_command_patterns_in_approval_py-fd335a4e-Remote-Code-Execution-Pattern-Bypass",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "source_report": {
+        "path": "design/hermes-agent/groundtruth/new-vuls/fix__add_missing_dangerous_command_patterns_in_approval_py-fd335a4e-Remote-Code-Execution-Pattern-Bypass.json",
+        "sha256": "b3495e0e36a23e616917533f02a745b4af1b8d10332089b98fb54cf544ed0211"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-728f8e5e6c99"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-cf83f5754609b70c",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-9ba88b26bf31d99b"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "dangerous-command-class-completeness"
+      ],
+      "evidence_deficiency": {
+        "kind": "current-chain-call-shape-mismatch",
+        "missing_facts": [
+          "call-shape",
+          "semantic-ir"
+        ],
+        "detail": "The bound chain C-728f8e5e6c99 terminates at the approval prompt and omits post-approval shell process execution; strict matching lacks the downstream process call shape and ordered semantic IR needed to connect incomplete dangerous-command coverage to the executed shell effect.",
+        "source_anchors": [
+          "output/hermes/static/call-chains/handler-sink-chains.csv:C-14d19d5cfffa",
+          "design/hermes-agent/groundtruth/new-vuls/fix__add_missing_dangerous_command_patterns_in_approval_py-fd335a4e-Remote-Code-Execution-Pattern-Bypass.json:d5_sink_points"
+        ]
+      }
+    },
+    {
+      "report_id": "GT-990508c50a91d6c0",
+      "project": "hermes-agent",
+      "report_name": "fix_security___block_sandbox_backend_creds_from_subprocess_e-6a320e8b-MessagingCreds-Exploit-TP",
+      "revision": "04439ac77f08915b4886bc3c79165a9538af6219",
+      "source_report": {
+        "path": "design/hermes-agent/groundtruth/new-vuls/fix_security___block_sandbox_backend_creds_from_subprocess_e-6a320e8b-MessagingCreds-Exploit-TP.json",
+        "sha256": "5bba317847d429ce1d5e63505e0a7c92c96e3df695762c7f11d872971ac4180c"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-14d19d5cfffa"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-19572d32b3711665",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-e02ed71b8c27e312"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "subprocess-messaging-credential-isolation"
+      ]
+    },
+    {
+      "report_id": "GT-8bc166f51f4d4e84",
+      "project": "lettabot",
+      "report_name": "type-p-task-subagent-permission-bypass-variant",
+      "revision": "99c3b5dd73550fe0a4eac2ee31b1c3229ca9e550",
+      "source_report": {
+        "path": "design/lettabot/groundtruth/new-vuls/type-p-task-subagent-permission-bypass-variant.json",
+        "sha256": "99f8293ca95d7cc9c48b6dac752e3d4e83e6a90f20dc4ab69b889236b9e970ec"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-a7c7342f7e5d",
+        "C-c9803bb10895"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-3f22d012b418a809",
+          "handler_criterion_id": "HC-1b49649c03a87531",
+          "sink_type_id": "ST-c1e221bc5659e53d"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "delegated-subagent-capability-congruence"
+      ]
+    },
+    {
+      "report_id": "GT-3014a6f6e0eb6356",
+      "project": "openclaw",
+      "report_name": "Advirsory-GHSA-3h2q-j2v4-6w5r",
+      "revision": "d842b28a1517f95aae2a5bcd97f2f726e42b93d8",
+      "source_report": {
+        "path": "design/openclaw/groundtruth/new-vuls/Advirsory-GHSA-3h2q-j2v4-6w5r.json",
+        "sha256": "3dde2a43988f78693e413c9afa2f204c57d9d42d45d3973194a9ad0ee76e4e49"
+      },
+      "action": "refine",
+      "chain_ids": [
+        "C-e8dab9b6c034"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-19572d32b3711665",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-e02ed71b8c27e312"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-7d484342ea4ab1ff"
+      ],
+      "evidence_locators": [
+        "shell-wrapper-flag-normalization"
+      ]
+    },
+    {
+      "report_id": "GT-3f58bce54af41cb6",
+      "project": "openclaw",
+      "report_name": "Advirsory-GHSA-48wf-g7cp-gr3m",
+      "revision": "d842b28a1517f95aae2a5bcd97f2f726e42b93d8",
+      "source_report": {
+        "path": "design/openclaw/groundtruth/new-vuls/Advirsory-GHSA-48wf-g7cp-gr3m.json",
+        "sha256": "26ab4cb4a6f6ece7f6997b1461c4da33a044a8783e2093f067cec97a54c71338"
+      },
+      "action": "refine",
+      "chain_ids": [
+        "C-69d9c5038eab",
+        "C-e8dab9b6c034"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-19572d32b3711665",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-e02ed71b8c27e312"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-7d484342ea4ab1ff"
+      ],
+      "evidence_locators": [
+        "shell-wrapper-flag-normalization"
+      ]
+    },
+    {
+      "report_id": "GT-4c46d29b279d35d4",
+      "project": "openclaw",
+      "report_name": "Advisory-GHSA-JCCR-RRW2-VC8H-dataflow-jq-module-import",
+      "revision": "d842b28a1517f95aae2a5bcd97f2f726e42b93d8",
+      "source_report": {
+        "path": "design/openclaw/groundtruth/new-vuls/Advisory-GHSA-JCCR-RRW2-VC8H-dataflow-jq-module-import.json",
+        "sha256": "463c92a86761dca89339502945d81d974b9020941a46a41b07fed6624faa5bb1"
+      },
+      "action": "add",
+      "chain_ids": [
+        "C-69d9c5038eab"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-19572d32b3711665",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-e02ed71b8c27e312"
+        }
+      ],
+      "existing_requirement_ids": [],
+      "evidence_locators": [
+        "jq-module-directive-semantics"
+      ]
+    },
+    {
+      "report_id": "GT-4dd18a7b8bff8776",
+      "project": "openclaw-cn",
+      "report_name": "Advisory-GHSA-536q-mj95-h29h-openclaw-browser-navigation-guard",
+      "revision": "558f272e6c90e7e0c37644e505e161b91ef738f0",
+      "source_report": {
+        "path": "design/openclaw-cn/groundtruth/new-vuls/Advisory-GHSA-536q-mj95-h29h-openclaw-browser-navigation-guard.json",
+        "sha256": "5aa3d90b38947018d994fec9ae95f73178e2acb9cef28db1e9d0dbd54a5fb6c3"
+      },
+      "action": "refine",
+      "chain_ids": [
+        "C-43547b3d15af",
+        "C-55d5a01286d9",
+        "C-7ab8ac8b0bc3"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-28c8beb2ba0a100e",
+          "handler_criterion_id": "HC-4ed26ca19433a28f",
+          "sink_type_id": "ST-555355c736f5f589"
+        },
+        {
+          "group_id": "HSG-b1ae1652ac484199",
+          "handler_criterion_id": "HC-4ed26ca19433a28f",
+          "sink_type_id": "ST-88b6ea632280b963"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-22845054dd063065",
+        "R-94b98277dc10991f"
+      ],
+      "evidence_locators": [
+        "post-interaction-navigation-validation"
+      ]
+    },
+    {
+      "report_id": "GT-b5784fc039d3c2b6",
+      "project": "openclaw-cn",
+      "report_name": "Advisory-GHSA-qcc4-p59m-p54m-dangling-symlink-apply-patch",
+      "revision": "558f272e6c90e7e0c37644e505e161b91ef738f0",
+      "source_report": {
+        "path": "design/openclaw-cn/groundtruth/new-vuls/Advisory-GHSA-qcc4-p59m-p54m-dangling-symlink-apply-patch.json",
+        "sha256": "9ad231ee14b83a5f65689c21c14f79fe03f73aee9ddf7bdfd169178517c72035"
+      },
+      "action": "reassess",
+      "chain_ids": [
+        "C-615ba5933208"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-f68f753320779a45",
+          "handler_criterion_id": "HC-e5261aea1b56670d",
+          "sink_type_id": "ST-b56ba5981b78c108"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-60c25a89f130b8b1",
+        "R-8b11134d2e8daa99"
+      ],
+      "evidence_locators": []
+    },
+    {
+      "report_id": "GT-972149e20567600a",
+      "project": "openclaw-cn",
+      "report_name": "Advisory-GHSA-qmwg-qprg-3j38-browser-act-post-navigation-guard",
+      "revision": "558f272e6c90e7e0c37644e505e161b91ef738f0",
+      "source_report": {
+        "path": "design/openclaw-cn/groundtruth/new-vuls/Advisory-GHSA-qmwg-qprg-3j38-browser-act-post-navigation-guard.json",
+        "sha256": "6b9e0d0361574333d1d5fe34947f817e5352dfd9b78755a61bc042b5f445150c"
+      },
+      "action": "reassess",
+      "chain_ids": [
+        "C-c3bca0d13488",
+        "C-c65750883c4f"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-3aea2a0eae12dc2f",
+          "handler_criterion_id": "HC-4ed26ca19433a28f",
+          "sink_type_id": "ST-ff4457be1b6efdf7"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-7f73f7793d51bdee"
+      ],
+      "evidence_locators": []
+    },
+    {
+      "report_id": "GT-926a392790b47c19",
+      "project": "openclaw-cn",
+      "report_name": "CVE-2026-32008-openTab-file-scheme",
+      "revision": "558f272e6c90e7e0c37644e505e161b91ef738f0",
+      "source_report": {
+        "path": "design/openclaw-cn/groundtruth/new-vuls/CVE-2026-32008-openTab-file-scheme.json",
+        "sha256": "929a32b4990c437aa1ff11b0c3cac2c7d1819b8664760571ef3ea133cebc9f81"
+      },
+      "action": "reassess",
+      "chain_ids": [
+        "C-80f385bc4731",
+        "C-89906707c957",
+        "C-ca95e585bf13"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-b1ae1652ac484199",
+          "handler_criterion_id": "HC-4ed26ca19433a28f",
+          "sink_type_id": "ST-88b6ea632280b963"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-94b98277dc10991f"
+      ],
+      "evidence_locators": []
+    },
+    {
+      "report_id": "GT-ab38ed6c7e25bf05",
+      "project": "openclaw-cn",
+      "report_name": "openclaw-cn-OpenClaw-exec-allow-always-approval-can-be-reused-across-different-busybox-sh-c-payloads",
+      "revision": "558f272e6c90e7e0c37644e505e161b91ef738f0",
+      "source_report": {
+        "path": "design/openclaw-cn/groundtruth/new-vuls/openclaw-cn-OpenClaw-exec-allow-always-approval-can-be-reused-across-different-busybox-sh-c-payloads.json",
+        "sha256": "435f67aab74529fd533ea350f4b3206f1d57c2d152a832036fd2fb6d9966049a"
+      },
+      "action": "refine",
+      "chain_ids": [
+        "C-4f2a88096fc4",
+        "C-de3c8c876d51"
+      ],
+      "groups": [
+        {
+          "group_id": "HSG-19572d32b3711665",
+          "handler_criterion_id": "HC-af72e7eeddd90792",
+          "sink_type_id": "ST-e02ed71b8c27e312"
+        }
+      ],
+      "existing_requirement_ids": [
+        "R-070eb640ac998674",
+        "R-8bf48322fe3c87a0"
+      ],
+      "evidence_locators": [
+        "durable-approval-inner-payload-binding"
+      ]
+    }
+  ]
+}

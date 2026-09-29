@@ -1,0 +1,57 @@
+{
+  "schema_version": "reviewed-url-policy-bindings/v1",
+  "description": "Exact model-origin gate bindings for the two reviewed URL-group regression targets; this is not a vulnerability ground-truth ledger.",
+  "groups": [
+    {
+      "sample_id": "G06",
+      "group_id": "HSG-2a9409f6633c1b6a",
+      "policies": [
+        "url-secret-pattern-block",
+        "url-address-prefilter"
+      ],
+      "model_subject": "urls[*]",
+      "chain_ids": [
+        "C-2aa79d9ca43d",
+        "C-46727898f25d"
+      ],
+      "gate_uids": [
+        "GUfa8fbd80e924f0481119",
+        "GU1ed6874487204858ee3a"
+      ],
+      "policy_gate_uids": {
+        "url-secret-pattern-block": [
+          "GUfa8fbd80e924f0481119"
+        ],
+        "url-address-prefilter": [
+          "GU1ed6874487204858ee3a"
+        ]
+      }
+    },
+    {
+      "sample_id": "G25",
+      "group_id": "HSG-3209832c56152666",
+      "policies": [
+        "configured-website-blocklist",
+        "remote-image-url-admission"
+      ],
+      "model_subject": "image_url derived from args",
+      "chain_ids": [
+        "C-806a548b73e2"
+      ],
+      "gate_uids": [
+        "GU1228344ddaf94b9b1c88",
+        "GUb5d69a74580bb70abd74",
+        "GUd41b18fdd81044c24697"
+      ],
+      "policy_gate_uids": {
+        "configured-website-blocklist": [
+          "GU1228344ddaf94b9b1c88",
+          "GUb5d69a74580bb70abd74"
+        ],
+        "remote-image-url-admission": [
+          "GUd41b18fdd81044c24697"
+        ]
+      }
+    }
+  ]
+}

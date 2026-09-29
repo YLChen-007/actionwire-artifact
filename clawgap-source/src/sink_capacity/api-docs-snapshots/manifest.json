@@ -1,0 +1,137 @@
+{
+  "subprocess.Popen": {
+    "name": "subprocess.Popen",
+    "url": "https://docs.python.org/3/library/subprocess.html#subprocess.Popen",
+    "fetched_at": "2026-07-03T08:21:23+00:00",
+    "sha256": "24498394783132fa0cb002b8a36f746ff95ae360c288ef5562c942d669e538a2",
+    "text_file": "subprocess.Popen.txt",
+    "html_file": "subprocess.Popen.html",
+    "chars": 4700
+  },
+  "subprocess.run": {
+    "name": "subprocess.run",
+    "url": "https://docs.python.org/3/library/subprocess.html#subprocess.run",
+    "fetched_at": "2026-07-03T08:21:24+00:00",
+    "sha256": "24498394783132fa0cb002b8a36f746ff95ae360c288ef5562c942d669e538a2",
+    "text_file": "subprocess.run.txt",
+    "html_file": "subprocess.run.html",
+    "chars": 4700
+  },
+  "os.system": {
+    "name": "os.system",
+    "url": "https://docs.python.org/3/library/os.html#os.system",
+    "fetched_at": "2026-07-03T08:21:25+00:00",
+    "sha256": "016630003cd4a4795ebd690778f513365c94746c8ba51eb0032dfc525dd907c9",
+    "text_file": "os.system.txt",
+    "html_file": "os.system.html",
+    "chars": 4700
+  },
+  "asyncio.create_subprocess_exec": {
+    "name": "asyncio.create_subprocess_exec",
+    "url": "https://docs.python.org/3/library/asyncio-subprocess.html#asyncio.create_subprocess_exec",
+    "fetched_at": "2026-07-03T08:21:25+00:00",
+    "sha256": "86d6cdb0e20a1912c4451c56f3bccca3ffe3f9d70e4e8f015f53b6672acbe68c",
+    "text_file": "asyncio.create_subprocess_exec.txt",
+    "html_file": "asyncio.create_subprocess_exec.html",
+    "chars": 4700
+  },
+  "asyncio.create_subprocess_shell": {
+    "name": "asyncio.create_subprocess_shell",
+    "url": "https://docs.python.org/3/library/asyncio-subprocess.html#asyncio.create_subprocess_shell",
+    "fetched_at": "2026-07-03T08:21:25+00:00",
+    "sha256": "86d6cdb0e20a1912c4451c56f3bccca3ffe3f9d70e4e8f015f53b6672acbe68c",
+    "text_file": "asyncio.create_subprocess_shell.txt",
+    "html_file": "asyncio.create_subprocess_shell.html",
+    "chars": 4700
+  },
+  "builtins.eval": {
+    "name": "builtins.eval",
+    "url": "https://docs.python.org/3/library/functions.html#eval",
+    "fetched_at": "2026-07-03T08:21:26+00:00",
+    "sha256": "f323d00825fc9f29cd349c7c1ba7556afd3b3a5f26fe3a5bc71fa78336ce8818",
+    "text_file": "builtins.eval.txt",
+    "html_file": "builtins.eval.html",
+    "chars": 4700
+  },
+  "builtins.exec": {
+    "name": "builtins.exec",
+    "url": "https://docs.python.org/3/library/functions.html#exec",
+    "fetched_at": "2026-07-03T08:21:27+00:00",
+    "sha256": "f323d00825fc9f29cd349c7c1ba7556afd3b3a5f26fe3a5bc71fa78336ce8818",
+    "text_file": "builtins.exec.txt",
+    "html_file": "builtins.exec.html",
+    "chars": 4700
+  },
+  "builtins.open": {
+    "name": "builtins.open",
+    "url": "https://docs.python.org/3/library/functions.html#open",
+    "fetched_at": "2026-07-03T08:21:27+00:00",
+    "sha256": "f323d00825fc9f29cd349c7c1ba7556afd3b3a5f26fe3a5bc71fa78336ce8818",
+    "text_file": "builtins.open.txt",
+    "html_file": "builtins.open.html",
+    "chars": 4700
+  },
+  "pathlib.Path.read_text": {
+    "name": "pathlib.Path.read_text",
+    "url": "https://docs.python.org/3/library/pathlib.html#pathlib.Path.read_text",
+    "fetched_at": "2026-07-03T08:21:28+00:00",
+    "sha256": "d01ef1286999700ee5c119c9996a1d215817e19d823b678bbad459f07f922819",
+    "text_file": "pathlib.Path.read_text.txt",
+    "html_file": "pathlib.Path.read_text.html",
+    "chars": 4700
+  },
+  "pathlib.Path.read_bytes": {
+    "name": "pathlib.Path.read_bytes",
+    "url": "https://docs.python.org/3/library/pathlib.html#pathlib.Path.read_bytes",
+    "fetched_at": "2026-07-03T08:21:28+00:00",
+    "sha256": "d01ef1286999700ee5c119c9996a1d215817e19d823b678bbad459f07f922819",
+    "text_file": "pathlib.Path.read_bytes.txt",
+    "html_file": "pathlib.Path.read_bytes.html",
+    "chars": 4700
+  },
+  "pathlib.Path.open": {
+    "name": "pathlib.Path.open",
+    "url": "https://docs.python.org/3/library/pathlib.html#pathlib.Path.open",
+    "fetched_at": "2026-07-03T08:21:29+00:00",
+    "sha256": "d01ef1286999700ee5c119c9996a1d215817e19d823b678bbad459f07f922819",
+    "text_file": "pathlib.Path.open.txt",
+    "html_file": "pathlib.Path.open.html",
+    "chars": 4700
+  },
+  "httpx.AsyncClient.get": {
+    "name": "httpx.AsyncClient.get",
+    "url": "https://www.python-httpx.org/api/#asyncclient",
+    "fetched_at": "2026-07-03T08:21:29+00:00",
+    "sha256": "6cc4f086e86915841582755139d5d52ff26afae13acbeba3a937c4e4ca2e0241",
+    "text_file": "httpx.AsyncClient.get.txt",
+    "html_file": "httpx.AsyncClient.get.html",
+    "chars": 4500
+  },
+  "httpx.Client.request": {
+    "name": "httpx.Client.request",
+    "url": "https://www.python-httpx.org/api/#client",
+    "fetched_at": "2026-07-03T08:21:30+00:00",
+    "sha256": "6cc4f086e86915841582755139d5d52ff26afae13acbeba3a937c4e4ca2e0241",
+    "text_file": "httpx.Client.request.txt",
+    "html_file": "httpx.Client.request.html",
+    "chars": 4700
+  },
+  "requests.get": {
+    "name": "requests.get",
+    "url": "https://requests.readthedocs.io/en/latest/api/#requests.get",
+    "fetched_at": "2026-07-03T08:21:31+00:00",
+    "sha256": "eaf45553c8aaf94d30a68d4844e237df7b8a94f3fe2055b0a871ef0d7e302a82",
+    "text_file": "requests.get.txt",
+    "html_file": "requests.get.html",
+    "chars": 4700
+  },
+  "markdown.Markdown.convert": {
+    "name": "markdown.Markdown.convert",
+    "url": "https://python-markdown.github.io/reference/#convert",
+    "fetched_at": "2026-07-03T08:21:31+00:00",
+    "sha256": "c18bcdfe426a18f536902b6881d827afb287ffc923142a38797ad16634745445",
+    "text_file": "markdown.Markdown.convert.txt",
+    "html_file": "markdown.Markdown.convert.html",
+    "chars": 4700
+  }
+}

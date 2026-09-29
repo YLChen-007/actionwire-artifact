@@ -1,0 +1,23 @@
+| adapter | QwenPaw | qwenpaw |
+| edge | to-thread | execute_shell_command->_execute_subprocess_sync |
+| handler | browser_use | browser_use |
+| handler | execute_shell_command | execute_shell_command |
+| handler | materialize_skill | materialize_skill |
+| handler | memory_search | ADBPGMemoryManager.memory_search |
+| handler | memory_search | ReMeLightMemoryManager.memory_search |
+| negative | transform-near-misses | absent |
+| pre-handler-gate | browser_use | assign-then-branch [pre-handler] |
+| pre-handler-gate | execute_shell_command | assign-then-branch [pre-handler] |
+| pre-handler-gate | materialize_skill | assign-then-branch [pre-handler] |
+| pre-handler-gate | memory_search | assign-then-branch [pre-handler] |
+| profile | ADBPGMemoryManager.memory_search | adbpg-optional |
+| profile | ReMeLightMemoryManager.memory_search | remelight-default |
+| registration | browser_use | QwenPawAgent._create_toolkit.tool_functions |
+| registration | execute_shell_command | QwenPawAgent._create_toolkit.tool_functions |
+| registration | materialize_skill | QwenPawAgent._create_toolkit.tool_functions |
+| registration | memory_search | QwenPawAgent.memory_manager.list_memory_tools |
+| source | browser_use | action;cdp_port |
+| source | execute_shell_command | command;cwd |
+| source | materialize_skill | name;body |
+| source | memory_search | query;max_results;min_score |
+| transform-signature | _collapse_embedded_newlines | src/qwenpaw/agents/tools/shell.py::_collapse_embedded_newlines:sink-transform |

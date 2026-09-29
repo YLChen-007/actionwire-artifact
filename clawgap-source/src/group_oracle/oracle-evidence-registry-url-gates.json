@@ -1,0 +1,69 @@
+{
+  "schema_version": "oracle-evidence-registry/v1",
+  "evidence": [
+    {
+      "kind": "documentation",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-d960df59f247179e"
+        ],
+        "sink_type_ids": [
+          "ST-74a1648d8e88dead"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/model-origin-url-policies.md",
+      "sha256": "8dfee97da165510ec836d0a7bfa8f6d5e6abdbc3cb4866f4cdf1e0d9c3e346f4",
+      "locator": "url-secret-pattern-block",
+      "exact_quote": "When model-origin URL arguments are submitted to an external content-retrieval service, reject the entire invocation before any backend dispatch if any raw URL or its once-percent-decoded form matches a protected, recognized secret-token pattern. The matching policy is the configured or versioned set of recognized token patterns and boundaries; this does not claim detection of every secret or require changing the URL contents. An unmatched URL does not by itself satisfy any independent destination policy.",
+      "supported_claim": "When model-origin URL arguments are submitted to an external content-retrieval service, reject the entire invocation before any backend dispatch if any raw URL or its once-percent-decoded form matches a protected, recognized secret-token pattern. The matching policy is the configured or versioned set of recognized token patterns and boundaries; this does not claim detection of every secret or require changing the URL contents. An unmatched URL does not by itself satisfy any independent destination policy."
+    },
+    {
+      "kind": "documentation",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-d960df59f247179e"
+        ],
+        "sink_type_ids": [
+          "ST-74a1648d8e88dead"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/model-origin-url-policies.md",
+      "sha256": "8dfee97da165510ec836d0a7bfa8f6d5e6abdbc3cb4866f4cdf1e0d9c3e346f4",
+      "locator": "url-address-prefilter",
+      "exact_quote": "When a member prefilters model-origin URLs before submission to an external content-retrieval service, only URLs admitted by that destination policy may be submitted. Reject missing hostnames, the policy's always-blocked metadata hostnames, and any resolved address in its always-blocked IP/network set regardless of private-address opt-outs. Reject ordinary private/internal addresses unless the policy explicitly permits private addresses or the URL matches its trusted-HTTPS-host exception. DNS failure and otherwise unhandled validation exceptions reject the URL. Filter rejected URLs individually and submit only the remaining safe URLs; submit none when none remain. This is a local prefilter, not a guarantee about the retrieval service's later DNS resolution or redirects.",
+      "supported_claim": "When a member prefilters model-origin URLs before submission to an external content-retrieval service, only URLs admitted by that destination policy may be submitted. Reject missing hostnames, the policy's always-blocked metadata hostnames, and any resolved address in its always-blocked IP/network set regardless of private-address opt-outs. Reject ordinary private/internal addresses unless the policy explicitly permits private addresses or the URL matches its trusted-HTTPS-host exception. DNS failure and otherwise unhandled validation exceptions reject the URL. Filter rejected URLs individually and submit only the remaining safe URLs; submit none when none remain. This is a local prefilter, not a guarantee about the retrieval service's later DNS resolution or redirects."
+    },
+    {
+      "kind": "documentation",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-2ba850024be5b542"
+        ],
+        "sink_type_ids": [
+          "ST-83923c85e4a23cd3"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/model-origin-url-policies.md",
+      "sha256": "8dfee97da165510ec836d0a7bfa8f6d5e6abdbc3cb4866f4cdf1e0d9c3e346f4",
+      "locator": "configured-website-blocklist",
+      "exact_quote": "When a member with an enabled, successfully loaded website-blocklist policy downloads a model-origin URL, reject the request before the HTTP call if the normalized hostname matches an active blocked rule, using the policy's exact-host, dot-suffix or wildcard matching semantics. This obligation applies only to members and configurations that provide that policy. A public IP address or an allowed HTTP scheme does not exempt a hostname blocked by the active website policy.",
+      "supported_claim": "When a member with an enabled, successfully loaded website-blocklist policy downloads a model-origin URL, reject the request before the HTTP call if the normalized hostname matches an active blocked rule, using the policy's exact-host, dot-suffix or wildcard matching semantics. This obligation applies only to members and configurations that provide that policy. A public IP address or an allowed HTTP scheme does not exempt a hostname blocked by the active website policy."
+    },
+    {
+      "kind": "documentation",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-2ba850024be5b542"
+        ],
+        "sink_type_ids": [
+          "ST-83923c85e4a23cd3"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/model-origin-url-policies.md",
+      "sha256": "8dfee97da165510ec836d0a7bfa8f6d5e6abdbc3cb4866f4cdf1e0d9c3e346f4",
+      "locator": "remote-image-url-admission",
+      "exact_quote": "When a member admits a model-origin image URL to its remote HTTP download branch, require an HTTP or HTTPS scheme. For members using the recorded private-address admission policy, reject missing hostnames, always-blocked metadata hostnames and addresses in the always-blocked IP/network sets regardless of private-address opt-outs; reject ordinary private/internal addresses unless the policy explicitly permits private addresses or the hostname qualifies for its trusted-HTTPS exception, and reject DNS failures and otherwise unhandled URL-validation exceptions.",
+      "supported_claim": "When a member admits a model-origin image URL to its remote HTTP download branch, require an HTTP or HTTPS scheme. For members using the recorded private-address admission policy, reject missing hostnames, always-blocked metadata hostnames and addresses in the always-blocked IP/network sets regardless of private-address opt-outs; reject ordinary private/internal addresses unless the policy explicitly permits private addresses or the hostname qualifies for its trusted-HTTPS exception, and reject DNS failures and otherwise unhandled URL-validation exceptions."
+    }
+  ]
+}

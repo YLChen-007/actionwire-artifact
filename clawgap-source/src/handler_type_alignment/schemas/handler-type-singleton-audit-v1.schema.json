@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "proposal_id", "member", "candidate_family_ids", "verdict",
+    "selected_family_id", "closest_candidate_ids", "distinguishing_reason", "evidence",
+    "final_handler_type_id"
+  ],
+  "properties": {
+    "schema_version": {"const": "handler-type-singleton-audit/v1"},
+    "proposal_id": {"type": "string", "pattern": "^(HP|HT)-[0-9a-f]{16}$"},
+    "member": {"type": "string", "minLength": 1},
+    "candidate_family_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^(HP|HT)-[0-9a-f]{16}$"},
+      "uniqueItems": true
+    },
+    "verdict": {"const": "distinct"},
+    "selected_family_id": {"type": "null"},
+    "closest_candidate_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^(HP|HT)-[0-9a-f]{16}$"},
+      "uniqueItems": true
+    },
+    "distinguishing_reason": {"type": "string", "minLength": 1},
+    "evidence": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "final_handler_type_id": {"type": "string", "pattern": "^HT-[0-9a-f]{16}$"}
+  }
+}

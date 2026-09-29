@@ -1,0 +1,10 @@
+| adapter | tinyclaw | tinyclaw-ts |
+| chain | claude-cli | spawn:external-agent-cli |
+| chain | codex-cli | spawn:external-agent-cli |
+| chain | opencode-cli | spawn:external-agent-cli |
+| handler | claude-cli | packages/core/src/adapters/index.ts |
+| handler | codex-cli | packages/core/src/adapters/index.ts |
+| handler | opencode-cli | packages/core/src/adapters/index.ts |
+| shared-sink | unregistered-handler | spawn-detected |
+| sink | spawn | packages/core/src/unrelated.ts |
+| sink | spawn:external-agent-cli | packages/core/src/invoke.ts |

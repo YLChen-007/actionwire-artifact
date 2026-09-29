@@ -1,0 +1,4 @@
+| apply_patch | parsePatchText | src/agents/apply-patch.ts | 15 | fs.writeFile:apply-patch |
+| exec | sanitizeEnv | src/node-host/runner.ts | 35 | child_process.spawn:node-host |
+| nodes | parseEnvPairs | src/agents/tools/nodes-tool.ts | 12 | callGatewayTool:node.invoke |
+| nodes | sanitizeEnv | src/node-host/runner.ts | 35 | child_process.spawn:node-host |

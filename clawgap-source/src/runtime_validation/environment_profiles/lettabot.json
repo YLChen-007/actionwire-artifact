@@ -1,0 +1,16 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "lettabot",
+  "revision": "99c3b5dd73550fe0a4eac2ee31b1c3229ca9e550",
+  "runtime": "npm",
+  "setup_command": "npm ci --ignore-scripts && npm run build",
+  "launch_command": "cat > lettabot.yaml <<EOF\nserver:\n  mode: docker\n  baseUrl: http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}\n  api:\n    host: 127.0.0.1\n    port: 18085\nagent:\n  id: clawgap-fake-agent\n  name: ClawGapEnvironmentProbe\nchannels:\n  mock:\n    enabled: true\nfeatures:\n  cron: false\n  heartbeat:\n    enabled: false\npolling:\n  enabled: false\nEOF\nmkdir -p \"$HOME/workspace/.letta/agents\" \"$PWD/data\" && cp vendor-source/letta-code-v0.19.5/src/agent/subagents/builtin/reflection.md vendor-source/letta-code-v0.19.5/src/agent/subagents/builtin/history-analyzer.md vendor-source/letta-code-v0.19.5/src/agent/subagents/builtin/explore.md \"$HOME/workspace/.letta/agents/\" && export LETTA_BASE_URL=\"http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}\" LETTA_API_KEY=clawgap-loopback-mock LETTABOT_CONFIG=\"$PWD/lettabot.yaml\" DATA_DIR=\"$PWD/data\" WORKING_DIR=\"$HOME/workspace\" LETTA_CODE_TELEM=0 && node --import ./lettabot_mock_channel_register.mjs dist/main.js",
+  "readiness_pattern": "__provider_request__",
+  "source_files": ["package.json", "src/main.ts", "src/config/types.ts", "src/channels/factory.ts", "src/test/mock-channel.ts"],
+  "dependency_files": ["package-lock.json"],
+  "fixture_files": ["src/runtime_validation/l2_instrumentation/node/lettabot_mock_channel_register.mjs", "src/runtime_validation/l2_instrumentation/node/lettabot_mock_channel_hooks.mjs"],
+  "provider": {"protocol": "letta-api/v1", "response_mode": "sse", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "path": "/v1/conversations/default/messages", "allowed_paths": ["/v1/health", "/v1/agents/", "/v1/agents/clawgap-fake-agent", "/v1/agents/clawgap-fake-agent/tools", "/v1/agents/clawgap-fake-agent/messages", "/v1/conversations/default/messages", "/v1/metadata/balance", "/v1/models/", "/v1/runs/"]},
+  "input": {"kind": "mock-channel-bridge", "native_channel": false},
+  "instrumentation": {"loader": "node-import", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/main.ts:1"}, {"kind": "pre-effect", "anchor": "src/main.ts:1"}]},
+  "effect_interceptors": ["process", "subagent"]
+}

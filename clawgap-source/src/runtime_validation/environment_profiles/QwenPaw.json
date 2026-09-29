@@ -1,0 +1,17 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "QwenPaw",
+  "revision": "6d1e936f1ba08ad2e0398367f8c27529e9d1d5df",
+  "runtime": "python",
+  "setup_command": "python -m venv --system-site-packages .clawgap-venv && UV_CACHE_DIR=/tmp/clawgap-uv-cache uv pip install --python .clawgap-venv/bin/python --no-deps -e . 'agentscope==1.0.20' 'agent-client-protocol==0.9.0' 'mcp==1.27.2' 'segno==1.6.6' 'reme-ai==0.3.1.8' 'qdrant-client==1.16.0' && cp ../../../src/runtime_validation/environment_fixtures/python/mcp_streamablehttp_client.py .clawgap-venv/lib/python3.13/site-packages/mcp/client/streamablehttp_client.py && .clawgap-venv/bin/python -c 'import mcp.client.streamablehttp_client'",
+  "launch_command": "mkdir -p \"$HOME/qwenpaw\" \"$HOME/qwenpaw-secret/providers/custom\" && export QWENPAW_WORKING_DIR=\"$HOME/qwenpaw\" QWENPAW_SECRET_DIR=\"$HOME/qwenpaw-secret\" && cat > \"$HOME/qwenpaw-secret/providers/custom/clawgap.json\" <<EOF\n{\"id\":\"clawgap\",\"name\":\"ClawGap Loopback Fixture\",\"base_url\":\"http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}/v1\",\"api_key\":\"clawgap-loopback-mock\",\"chat_model\":\"OpenAIChatModel\",\"extra_models\":[{\"id\":\"clawgap-environment-probe\",\"name\":\"ClawGap Environment Probe\"}]}\nEOF\ncat > \"$HOME/qwenpaw-secret/providers/active_model.json\" <<'EOF'\n{\"provider_id\":\"clawgap\",\"model\":\"clawgap-environment-probe\"}\nEOF\n.clawgap-venv/bin/qwenpaw app --host 127.0.0.1 --port 18081",
+  "probe_command": "for second in $(seq 1 20); do QWENPAW_WORKING_DIR=\"$HOME/qwenpaw\" QWENPAW_SECRET_DIR=\"$HOME/qwenpaw-secret\" curl --max-time 20 -sS -X POST http://127.0.0.1:18081/api/console/chat -H 'Content-Type: application/json' --data '{\"input\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"environment probe\"}]}]}' >/dev/null && exit 0; sleep 1; done; exit 1",
+  "readiness_pattern": "Application startup complete",
+  "source_files": ["pyproject.toml", "src/qwenpaw/cli/main.py"],
+  "dependency_files": ["pyproject.toml"],
+  "fixture_files": ["src/runtime_validation/environment_fixtures/python/mcp_streamablehttp_client.py"],
+  "provider": {"protocol": "openai-chat-completions/v1", "response_mode": "json", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock"},
+  "input": {"kind": "http-api", "native_channel": true},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/qwenpaw/agents/model_factory.py:1"}, {"kind": "pre-effect", "anchor": "src/qwenpaw/utils/command_runner.py:1"}]},
+  "effect_interceptors": ["process", "filesystem", "http"]
+}

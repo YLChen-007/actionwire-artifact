@@ -1,0 +1,16 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "mercury-agent",
+  "revision": "587fad1bf9449598d1b27833f8c7db55d164741a",
+  "runtime": "npm",
+  "setup_command": "npm ci --ignore-scripts && npm run build",
+  "launch_command": "mkdir -p \"$HOME/.mercury\" && cat > \"$HOME/.mercury/mercury.yaml\" <<EOF\nidentity:\n  name: Mercury\n  owner: ClawGap\n  creator: ClawGap\nproviders:\n  default: openaiCompat\n  openaiCompat:\n    name: openaiCompat\n    apiKey: clawgap-loopback-mock\n    baseUrl: http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}/v1\n    model: clawgap-environment-probe\n    enabled: true\nchannels:\n  telegram:\n    enabled: false\nmemory:\n  secondBrain:\n    enabled: false\nsubagents:\n  enabled: false\nspotify:\n  enabled: false\nweb:\n  enabled: false\nEOF\ncat > \"$HOME/.mercury/permissions.yaml\" <<'EOF'\ncapabilities:\n  filesystem:\n    enabled: true\n    scopes:\n      - {path: ., read: true, write: true}\n  shell:\n    enabled: true\n    cwdOnly: true\n  git:\n    enabled: false\nEOF\n(sleep 8; printf '\\033[B'; sleep 1; printf '\\r'; sleep 2; printf 'environment probe'; sleep 1; printf '\\r') | script -qec 'node dist/index.js start --foreground' /dev/null",
+  "readiness_pattern": "__provider_request__",
+  "source_files": ["package.json", "src/index.ts", "src/utils/config.ts"],
+  "dependency_files": ["package-lock.json"],
+  "fixture_files": [],
+  "provider": {"protocol": "openai-chat-completions/v1", "response_mode": "sse", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "path": "/v1/chat/completions"},
+  "input": {"kind": "pty", "native_channel": true},
+  "instrumentation": {"loader": "node-import", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/utils/config.ts:216"}, {"kind": "pre-effect", "anchor": "src/capabilities/shell/run-command.ts:1"}]},
+  "effect_interceptors": ["process"]
+}

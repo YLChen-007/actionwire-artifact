@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "handler_criterion_id", "handler_type_id",
+    "inheritance_order", "shared_parent_scope", "additive_leaf_delta_scope"
+  ],
+  "properties": {
+    "schema_version": {"const": "handler-oracle-inheritance/v1"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "handler_type_id": {"type": "string", "pattern": "^HT-[0-9a-f]{16}$"},
+    "inheritance_order": {
+      "type": "array",
+      "prefixItems": [
+        {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+        {"type": "string", "pattern": "^HT-[0-9a-f]{16}$"}
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "shared_parent_scope": {"const": "shared-requirements"},
+    "additive_leaf_delta_scope": {"const": "additive-delta"}
+  }
+}

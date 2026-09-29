@@ -1,0 +1,9 @@
+library: false
+extractor: javascript
+warnOnImplicitThis: false
+name: clawgap-callchain-javascript
+version: 0.0.1
+dependencies:
+  codeql/javascript-all: "*"
+  codeql/suite-helpers: "*"
+  codeql/util: "*"

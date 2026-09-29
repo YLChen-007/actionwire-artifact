@@ -1,0 +1,72 @@
+e ) ¶ 
+Open the file pointed to by the path, like the built-in open() function does: 
+>>> p = Path ( 'setup.py' ) >>> with p . open () as f : ... f . readline () ... '#!/usr/bin/env python3\n' 
+Path. read_text ( encoding = None , errors = None , newline = None ) ¶ 
+Return the decoded contents of the pointed-to file as a string: 
+>>> p = Path ( 'my_text_file' ) >>> p . write_text ( 'Text file contents' ) 18 >>> p . read_text () 'Text file contents' 
+The file is opened and then closed. The optional parameters have the same
+meaning as in open() . 
+Added in version 3.5. 
+Changed in version 3.13: The newline parameter was added. 
+Path. read_bytes ( ) ¶ 
+Return the binary contents of the pointed-to file as a bytes object: 
+>>> p = Path ( 'my_binary_file' ) >>> p . write_bytes ( b 'Binary file contents' ) 20 >>> p . read_bytes () b'Binary file contents' 
+Added in version 3.5. 
+Path. write_text ( data , encoding = None , errors = None , newline = None ) ¶ 
+Open the file pointed to in text mode, write data to it, and close the
+file: 
+>>> p = Path ( 'my_text_file' ) >>> p . write_text ( 'Text file contents' ) 18 >>> p . read_text () 'Text file contents' 
+An existing file of the same name is overwritten. The optional parameters
+have the same meaning as in open() . 
+Added in version 3.5. 
+Changed in version 3.10: The newline parameter was added. 
+Path. write_bytes ( data ) ¶ 
+Open the file pointed to in bytes mode, write data to it, and close the
+file: 
+>>> p = Path ( 'my_binary_file' ) >>> p . write_bytes ( b 'Binary file contents' ) 20 >>> p . read_bytes () b'Binary file contents' 
+An existing file of the same name is overwritten. 
+Added in version 3.5. 
+Reading directories ¶ 
+Path. iterdir ( ) ¶ 
+When the path points to a directory, yield path objects of the directory
+contents: 
+>>> p = Path ( 'docs' ) >>> for child in p . iterdir (): child ... PosixPath('docs/conf.py') PosixPath('docs/_templates') PosixPath('docs/make.bat') PosixPath('docs/index.rst') PosixPath('docs/_build') PosixPath('docs/_static') PosixPath('docs/Makefile') 
+The children are yielded in arbitrary order, and the special entries '.' and '..' are not included. If a file is removed from or added
+to the directory after creating the iterator, it is unspecified whether
+a path object for that file is included. 
+If the path is not a directory or otherwise inaccessible, OSError is
+raised. 
+Path. glob ( pattern , * , case_sensitive = None , recurse_symlinks = False ) ¶ 
+Glob the given relative pattern in the directory represented by this path,
+yielding all matching files (of any kind): 
+>>> sorted ( Path ( '.' ) . glob ( '*.py' )) [PosixPath('pathlib.py'), PosixPath('setup.py'), PosixPath('test_pathlib.py')] >>> sorted ( Path ( '.' ) . glob ( '*/*.py' )) [PosixPath('docs/conf.py')] >>> sorted ( Path ( '.' ) . glob ( '**/*.py' )) [PosixPath('build/lib/pathlib.py'), PosixPath('docs/conf.py'), PosixPath('pathlib.py'), PosixPath('setup.py'), PosixPath('test_pathlib.py')] 
+Note 
+The paths are returned in no particular order.
+If you need a specific order, sort the results. 
+See also 
+Pattern language documentation. 
+By default, or when the case_sensitive keyword-only argument is set to None , this method matches paths using platform-specific casing rules:
+typically, case-sensitive on POSIX, and case-insensitive on Windows.
+Set case_sensitive to True or False to override this behaviour. 
+By default, or when the recurse_symlinks keyword-only argument is set to False , this method follows symlinks except when expanding “ ** ”
+wildcards. Set recurse_symlinks to True to always follow symlinks. 
+Note 
+Any OSError exceptions raised from scanning the filesystem are
+suppressed. This includes PermissionError when accessing
+directories without read permission. 
+Raises an auditing event pathlib.Path.glob with arguments self , pattern . 
+Changed in version 3.12: The case_sensitive parameter was added. 
+Changed in version 3.13: The recurse_symlinks parameter was added. 
+Changed in version 3.13: The pattern parameter accepts a path-like object . 
+Changed in version 3.13: Any OSError exceptions raised from scanning the filesystem are
+suppressed. In previous versions, such exceptions are suppressed in many
+cases, but not all. 
+Path. rglob ( pattern , * , case_sensitive = None , recurse_symlinks = False ) ¶ 
+Glob the given relative pattern recursively. This is like calling Path.glob() with “ **/ ” added in front of the pattern . 
+Note 
+The paths are returned in no particular order.
+If you need a specific order, sort the results. 
+Note 
+Any OSError exceptions raised from scanning the filesystem are
+suppressed. This includes PermissionError when accessing
+directories without read permiss

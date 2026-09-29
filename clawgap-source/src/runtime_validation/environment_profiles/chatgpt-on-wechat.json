@@ -1,0 +1,16 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "chatgpt-on-wechat",
+  "revision": "55aaf60a57ea6e9f4b8a54797572d98f65e88d2f",
+  "runtime": "python",
+  "setup_command": "python -m venv --system-site-packages .clawgap-venv && UV_CACHE_DIR=/tmp/clawgap-uv-cache uv pip install --python .clawgap-venv/bin/python --no-deps -e .",
+  "launch_command": "python -c 'import json; p=\"config.json\"; d=json.load(open(p)); d[\"channel_type\"]=\"terminal\"; d[\"web_console\"]=False; d[\"agent\"]=False; d[\"knowledge\"]=False; d[\"bot_type\"]=\"openai\"; d[\"model\"]=\"clawgap-environment-probe\"; d[\"open_ai_api_key\"]=\"clawgap-loopback-mock\"; d[\"open_ai_api_base\"]=\"http://127.0.0.1:'\"$CLAWGAP_PROVIDER_PORT\"'/v1\"; json.dump(d, open(p, \"w\"))' && { sleep 2; printf 'environment probe\\n'; sleep 30; } | script -qec '.clawgap-venv/bin/python app.py' /dev/null",
+  "readiness_pattern": "__provider_request__",
+  "source_files": ["pyproject.toml", "app.py", "requirements.txt"],
+  "dependency_files": ["requirements.txt"],
+  "fixture_files": [],
+  "provider": {"protocol": "openai-chat-completions/v1", "response_mode": "sse", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "path": "/v1/chat/completions"},
+  "input": {"kind": "native-test-channel", "native_channel": true},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "bridge/bridge.py:1"}, {"kind": "pre-effect", "anchor": "agent/tools/base_tool.py:1"}]},
+  "effect_interceptors": ["process", "filesystem", "messaging"]
+}

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawgap.local/schemas/gate-semantic-ir-v1.schema.json",
+  "title": "GateSemanticIRV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "gate_id",
+    "mode",
+    "input",
+    "output",
+    "summary",
+    "steps",
+    "default",
+    "on_error",
+    "reject_examples",
+    "bypass_examples",
+    "status"
+  ],
+  "properties": {
+    "gate_id": {"type": "string", "pattern": "^G[0-9A-Za-z_-]+$"},
+    "mode": {
+      "enum": ["predicate", "filter", "transform", "constraint"]
+    },
+    "input": {"type": "string", "pattern": "^V[0-9A-Za-z_-]+:\\s*\\S"},
+    "output": {"type": "string", "pattern": "^[VDC][0-9A-Za-z_-]+:\\s*\\S"},
+    "summary": {"type": "string", "minLength": 1, "pattern": "^[^\\r\\n]+$"},
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "op", "rule"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^S[1-8]$"},
+          "op": {
+            "enum": [
+              "derive",
+              "normalize",
+              "allow-if",
+              "block-if",
+              "admit-if",
+              "drop-if",
+              "transform",
+              "constrain",
+              "prompt",
+              "unknown"
+            ]
+          },
+          "rule": {"type": "string", "minLength": 1},
+          "when": {"type": "string", "minLength": 1},
+          "unless": {"type": "string", "minLength": 1},
+          "source_rules": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "default": {"type": "string", "minLength": 1},
+    "on_error": {"type": "string", "minLength": 1},
+    "reject_examples": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["input", "rejected_by", "reason"],
+        "properties": {
+          "input": {"type": "string", "minLength": 1},
+          "rejected_by": {"type": "string", "pattern": "^S[1-8]$"},
+          "reason": {"type": "string", "minLength": 1},
+          "precondition": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "bypass_examples": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["input", "passed_by", "reason", "potential_security_impact"],
+        "properties": {
+          "input": {"type": "string", "minLength": 1},
+          "passed_by": {"type": "string", "pattern": "^S[1-8]$"},
+          "reason": {"type": "string", "minLength": 1},
+          "potential_security_impact": {"type": "string", "minLength": 1},
+          "precondition": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "status": {"enum": ["complete", "partial"]}
+  }
+}

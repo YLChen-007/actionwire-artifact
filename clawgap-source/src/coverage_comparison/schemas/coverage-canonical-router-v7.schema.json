@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project", "revision", "chain_id", "score", "reasons", "capability_class", "selected", "selection_reason"],
+  "properties": {
+    "schema_version": {"const": "coverage-canonical-router/v7"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "score": {"type": "integer", "minimum": 0},
+    "reasons": {"type": "array", "items": {"type": "object", "required": ["reason", "score"]}},
+    "capability_class": {"type": "string"},
+    "selected": {"type": "boolean"},
+    "selection_reason": {"type": ["string", "null"]}
+  }
+}

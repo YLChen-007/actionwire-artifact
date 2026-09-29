@@ -1,0 +1,70 @@
+Skip to content 
+Developer Interface 
+Helper Functions 
+Note 
+Only use these functions if you're testing HTTPX in a console
+or making a small number of requests. Using a Client will
+enable HTTP/2 and connection pooling for more efficient and
+long-lived connections. 
+httpx. request ( method , url , * , params=None , content=None , data=None , files=None , json=None , headers=None , cookies=None , auth=None , proxy=None , timeout=Timeout(timeout=5.0) , follow_redirects=False , verify=True , trust_env=True ) 
+Sends an HTTP request. 
+Parameters: 
+method - HTTP method for the new Request object: GET , OPTIONS , HEAD , POST , PUT , PATCH , or DELETE . 
+url - URL for the new Request object. 
+params - (optional) Query parameters to include in the URL, as a
+string, dictionary, or sequence of two-tuples. 
+content - (optional) Binary content to include in the body of the
+request, as bytes or a byte iterator. 
+data - (optional) Form data to include in the body of the request,
+as a dictionary. 
+files - (optional) A dictionary of upload files to include in the
+body of the request. 
+json - (optional) A JSON serializable object to include in the body
+of the request. 
+headers - (optional) Dictionary of HTTP headers to include in the
+request. 
+cookies - (optional) Dictionary of Cookie items to include in the
+request. 
+auth - (optional) An authentication class to use when sending the
+request. 
+proxy - (optional) A proxy URL where all the traffic should be routed. 
+timeout - (optional) The timeout configuration to use when sending
+the request. 
+follow_redirects - (optional) Enables or disables HTTP redirects. 
+verify - (optional) Either True to use an SSL context with the
+default CA bundle, False to disable verification, or an instance of ssl.SSLContext to use a custom context. 
+trust_env - (optional) Enables or disables usage of environment
+variables for configuration. 
+Returns: Response 
+Usage: 
+>>> import httpx >>> response = httpx . request ( 'GET' , 'https://httpbin.org/get' ) >>> response < Response [ 200 OK ] > 
+httpx. get ( url , * , params=None , headers=None , cookies=None , auth=None , proxy=None , follow_redirects=False , verify=True , timeout=Timeout(timeout=5.0) , trust_env=True ) 
+Sends a GET request. 
+Parameters : See httpx.request . 
+Note that the data , files , json and content parameters are not available
+on this function, as GET requests should not include a request body. 
+httpx. options ( url , * , params=None , headers=None , cookies=None , auth=None , proxy=None , follow_redirects=False , verify=True , timeout=Timeout(timeout=5.0) , trust_env=True ) 
+Sends an OPTIONS request. 
+Parameters : See httpx.request . 
+Note that the data , files , json and content parameters are not available
+on this function, as OPTIONS requests should not include a request body. 
+httpx. head ( url , * , params=None , headers=None , cookies=None , auth=None , proxy=None , follow_redirects=False , verify=True , timeout=Timeout(timeout=5.0) , trust_env=True ) 
+Sends a HEAD request. 
+Parameters : See httpx.request . 
+Note that the data , files , json and content parameters are not available
+on this function, as HEAD requests should not include a request body. 
+httpx. post ( url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , auth=None , proxy=None , follow_redirects=False , verify=True , timeout=Timeout(timeout=5.0) , trust_env=True ) 
+Sends a POST request. 
+Parameters : See httpx.request . 
+httpx. put ( url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , auth=None , proxy=None , follow_redirects=False , verify=True , timeout=Timeout(timeout=5.0) , trust_env=True ) 
+Sends a PUT request. 
+Parameters : See httpx.request . 
+httpx. patch ( url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , auth=None , proxy=None , follow_redirects=False , verify=True , timeout=Timeout(timeout=5.0) , trust_env=True ) 
+Sends a PATCH request. 
+Parameters : See httpx.request . 
+httpx. delete ( url , * , params=None , headers=None , cookies=None , auth=None , proxy=None , follow_redirects=False , timeout=Timeout(timeout=5.0) , verify=True , trust_env=True ) 
+Sends a DELETE request. 
+Parameters : See httpx.request . 
+Note that the data , files , json and content parameters are not available
+on this function, as DELETE requests should not include a request body. 
+httpx. stream ( method , url , * , params=None

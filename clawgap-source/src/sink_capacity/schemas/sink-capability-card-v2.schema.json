@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "activation": {
+      "type": "object",
+      "properties": {
+        "all_of": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/predicate" }
+        },
+        "any_of": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/predicate" }
+        }
+      },
+      "additionalProperties": false,
+      "anyOf": [
+        { "required": ["all_of"] },
+        { "required": ["any_of"] }
+      ]
+    },
+    "predicate": {
+      "type": "object",
+      "required": ["predicate", "subject", "operator", "value"],
+      "properties": {
+        "predicate": {
+          "enum": [
+            "always",
+            "role-bound",
+            "role-caller-bindable",
+            "role-authority",
+            "role-value",
+            "runtime-feature",
+            "transform-present",
+            "call-shape",
+            "default-active"
+          ]
+        },
+        "subject": { "type": "string", "minLength": 1 },
+        "operator": {
+          "enum": ["equals", "not-equals", "contains", "in", "exists"]
+        },
+        "value": {}
+      },
+      "additionalProperties": false
+    },
+    "policyRequirement": {
+      "type": "object",
+      "required": ["policy_id", "rule", "applicability", "security_effect", "examples"],
+      "properties": {
+        "policy_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "rule": { "type": "string", "minLength": 1 },
+        "applicability": { "type": "string", "minLength": 1 },
+        "security_effect": { "type": "string", "minLength": 1 },
+        "examples": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "required": [
+    "schema_version",
+    "card_id",
+    "api",
+    "api_family",
+    "runtime",
+    "capability_class",
+    "normative_authority",
+    "bound_sinks",
+    "roles",
+    "facets",
+    "library_guarantees",
+    "defaults",
+    "example_usage",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": { "const": "sink-capability-card/v2" },
+    "card_id": { "type": "string", "pattern": "^SCC-[0-9a-f]{16}$" },
+    "api": { "type": "string", "minLength": 1 },
+    "api_family": { "type": "string", "minLength": 1 },
+    "runtime": {
+      "type": "object",
+      "required": ["language", "ecosystem", "package", "version"],
+      "properties": {
+        "language": { "type": "string", "minLength": 1 },
+        "ecosystem": { "type": "string", "minLength": 1 },
+        "package": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "capability_class": { "type": "string", "minLength": 1 },
+    "normative_authority": { "const": "capability-facts-only" },
+    "bound_sinks": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "roles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["role_id", "description", "bindings"],
+        "properties": {
+          "role_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "description": { "type": "string", "minLength": 1 },
+          "bindings": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["expression", "caller_bindable"],
+              "properties": {
+                "expression": { "type": "string", "minLength": 1 },
+                "caller_bindable": { "type": "boolean" }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "facets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["facet_id", "capability", "role_ids", "activation"],
+        "properties": {
+          "facet_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "capability": { "type": "string", "minLength": 1 },
+          "role_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+          },
+          "activation": { "$ref": "#/$defs/activation" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "library_guarantees": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["guarantee_id", "statement", "activation"],
+        "properties": {
+          "guarantee_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "statement": { "type": "string", "minLength": 1 },
+          "activation": { "$ref": "#/$defs/activation" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "defaults": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["default_id", "role_id", "value", "security_effect", "activation"],
+        "properties": {
+          "default_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "role_id": {
+            "oneOf": [
+              { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+              { "type": "null" }
+            ]
+          },
+          "value": {},
+          "security_effect": { "type": "string", "minLength": 1 },
+          "activation": { "$ref": "#/$defs/activation" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "example_usage": {
+      "type": "object",
+      "required": ["benign", "capability_edge"],
+      "properties": {
+        "benign": { "type": "string", "minLength": 1 },
+        "capability_edge": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "policy_contract": {
+      "type": "object",
+      "required": ["schema_version", "boundary", "requirements"],
+      "properties": {
+        "schema_version": { "const": "approval-policy-contract/v1" },
+        "boundary": { "type": "string", "minLength": 1 },
+        "requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/policyRequirement" }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

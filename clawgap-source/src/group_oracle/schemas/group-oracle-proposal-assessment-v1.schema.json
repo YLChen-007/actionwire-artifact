@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "group_id", "proposal_id", "decision", "selected_proposal_id", "evidence_ids", "reason", "final_requirement_id"],
+  "properties": {
+    "schema_version": {"const": "group-oracle-proposal-assessment/v1"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "proposal_id": {"type": "string", "pattern": "^RP-[0-9a-f]{16}$"},
+    "decision": {"enum": ["add", "already-covered", "reject"]},
+    "selected_proposal_id": {"type": ["string", "null"], "pattern": "^RP-[0-9a-f]{16}$"},
+    "evidence_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^EV-[0-9a-f]{16}$"}},
+    "reason": {"type": "string", "minLength": 1},
+    "final_requirement_id": {"type": ["string", "null"], "pattern": "^R-[0-9a-f]{16}$"}
+  }
+}

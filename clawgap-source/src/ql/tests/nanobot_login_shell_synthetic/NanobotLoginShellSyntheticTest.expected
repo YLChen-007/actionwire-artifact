@@ -1,0 +1,1 @@
+| Advisory-GHSA-jccr-rrw2-vc8h-login-shell-env-disclosure | exec | create_subprocess_exec | command;login;HOME |

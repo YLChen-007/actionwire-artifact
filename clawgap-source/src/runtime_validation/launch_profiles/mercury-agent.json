@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "mercury-agent",
+  "revision": "587fad1bf9449598d1b27833f8c7db55d164741a",
+  "runtime": "npm",
+  "entrypoint": {"build_command": ["npm", "run", "build"], "command": ["node", "dist/index.js"], "cwd": ".", "stdin_prompt": true, "readiness": {"kind": "none", "timeout_seconds": 30}},
+  "provider": {"mode": "native-openai-compatible", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock"},
+  "input_transport": {"kind": "pty", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["src/index.ts", "src/utils/config.ts"], "dependency_files": ["package.json", "package-lock.json"], "disposable_roots": [".mercury", "data"], "environment": {"DEFAULT_PROVIDER": "openaiCompat", "OPENAI_COMPAT_ENABLED": "true", "OPENAI_COMPAT_API_KEY": "clawgap-loopback-mock", "OPENAI_COMPAT_BASE_URL": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1"}},
+  "instrumentation": {"loader": "node-import", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/utils/config.ts:216"}, {"kind": "dispatch", "anchor": "src/capabilities/registry.ts:1"}, {"kind": "handler", "anchor": "src/capabilities/shell/run-command.ts:1"}, {"kind": "sink", "anchor": "src/capabilities/shell/run-command.ts:1"}, {"kind": "pre-effect", "anchor": "src/capabilities/shell/run-command.ts:1"}]},
+  "effect_interceptors": ["process"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["Mercury targeted PTY launch and disposable-build instrumentation are not integrated into the shared all-project qualification launcher"]}
+}

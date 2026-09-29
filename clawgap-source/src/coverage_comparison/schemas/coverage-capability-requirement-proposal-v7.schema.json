@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "requirement_source", "group_id", "handler_criterion_id",
+    "sink_type_id", "project", "revision", "chain_id", "handler_id", "sink_id",
+    "requirement_id", "capability_facet", "guard_rule", "applicability",
+    "controlled_argument", "boundary_hypothesis", "protected_asset_hypothesis",
+    "risk_if_unguarded", "capability_card", "capability_evidence",
+    "call_shape_facts", "overlap_requirement_ids", "disposition"
+  ],
+  "properties": {
+    "schema_version": {"const": "coverage-capability-requirement-proposal/v7"},
+    "requirement_source": {"const": "capability-card"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "handler_id": {"type": "string", "pattern": "^H-[0-9a-f]{16}$"},
+    "sink_id": {"type": "string", "pattern": "^S-[0-9a-f]{16}$"},
+    "requirement_id": {"type": "string", "pattern": "^CAPR-[0-9a-f]{16}$"},
+    "capability_facet": {"type": "string", "minLength": 1},
+    "guard_rule": {"type": "string", "minLength": 1},
+    "applicability": {"type": "string", "minLength": 1},
+    "controlled_argument": {"type": "string", "minLength": 1},
+    "boundary_hypothesis": {"type": "string", "minLength": 1},
+    "protected_asset_hypothesis": {"type": "string", "minLength": 1},
+    "risk_if_unguarded": {"type": "string", "minLength": 1},
+    "capability_card": {"$ref": "#/$defs/card"},
+    "capability_evidence": {
+      "type": "array", "uniqueItems": true,
+      "items": {"$ref": "#/$defs/line"}
+    },
+    "call_shape_facts": {
+      "type": "array", "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "overlap_requirement_ids": {
+      "type": "array", "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^R-[0-9a-f]{16}$"}
+    },
+    "disposition": {
+      "enum": ["novel", "covered-by-group", "group-overlap-conflict"]
+    }
+  },
+  "$defs": {
+    "card": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "line": {
+      "type": "object", "additionalProperties": false,
+      "required": ["start_line", "end_line", "quote"],
+      "properties": {
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "quote": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

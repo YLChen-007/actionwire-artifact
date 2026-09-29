@@ -1,0 +1,13 @@
+#!/bin/sh
+case "$*" in
+  'shell wm size') printf '%s\n' 'Physical size: 1080x2400' ;;
+  'shell dumpsys activity activities')
+    printf '%s\n' 'mResumedActivity=ActivityRecord{clawgap com.clawgap.fixture/.MainActivity}' ;;
+  'shell uiautomator dump /sdcard/window_dump.xml') printf '%s\n' 'UI hierarchy dumped to: /sdcard/window_dump.xml' ;;
+  'pull /sdcard/window_dump.xml'*)
+    last=''
+    for last in "$@"; do :; done
+    cp "${CLAWGAP_FAKE_SCREEN_XML:?}" "$last"
+    printf '%s\n' "$last: 1 file pulled" ;;
+  *) printf '%s\n' 'clawgap fake adb response' ;;
+esac

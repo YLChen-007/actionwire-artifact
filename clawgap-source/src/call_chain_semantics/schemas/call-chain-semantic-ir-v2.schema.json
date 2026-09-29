@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawgap.local/schemas/call-chain-semantic-ir-v2.schema.json",
+  "title": "CallChainSemanticIRV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "chain_id",
+    "handler",
+    "sink",
+    "values",
+    "summary",
+    "gates",
+    "unresolved",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "call-chain-semantic-ir/v2"},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{10}$"},
+    "handler": {"type": "object"},
+    "sink": {"type": "object"},
+    "values": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "object"}
+    },
+    "summary": {"type": "string", "minLength": 1, "pattern": "^[^\\r\\n]+$"},
+    "gates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "gate_number",
+          "gate_uid",
+          "gate_name",
+          "callsite",
+          "static_verdict",
+          "semantic"
+        ],
+        "properties": {
+          "gate_number": {"type": "integer", "minimum": 1},
+          "gate_uid": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"},
+          "gate_name": {"type": "string", "minLength": 1},
+          "callsite": {"type": "string", "minLength": 1},
+          "static_verdict": {"enum": ["confirmed", "branch-confirmed"]},
+          "semantic": {"type": "object"}
+        }
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "status": {"enum": ["complete", "partial"]}
+  }
+}

@@ -1,0 +1,6 @@
+| assigned_result | assign-then-branch | check | 27 |
+| direct_condition | in-condition | check | 21 |
+| mapping_truthiness | inline-condition | <complete condition> | 44 |
+| nested_constructor | in-condition | is_file | 51 |
+| nested_producer | in-condition | has_binary_extension | 58 |
+| tuple_unpacked_result | assign-then-branch | check_pair | 34 |

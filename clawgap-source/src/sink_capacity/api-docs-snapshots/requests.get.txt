@@ -1,0 +1,107 @@
+ert file (.pem). If Tuple, (‘cert’, ‘key’) pair. 
+Returns : 
+Response object 
+Return type : 
+requests.Response 
+Usage: 
+>>> import requests >>> req = requests . request ( 'GET' , 'https://httpbin.org/get' ) >>> req <Response [200]> 
+requests. head ( url : _t.UriType , ** kwargs : Unpack [ _t.RequestKwargs ] ) → Response [source] ¶ 
+Sends a HEAD request. 
+Parameters : 
+url – URL for the new Request object. 
+**kwargs – Optional arguments that request takes. If allow_redirects is not provided, it will be set to False (as
+opposed to the default request behavior). 
+Returns : 
+Response object 
+Return type : 
+requests.Response 
+requests. get ( url : _t.UriType , params : _t.ParamsType = None , ** kwargs : Unpack [ _t.GetKwargs ] ) → Response [source] ¶ 
+Sends a GET request. 
+Parameters : 
+url – URL for the new Request object. 
+params – (optional) Dictionary, list of tuples or bytes to send
+in the query string for the Request . 
+**kwargs – Optional arguments that request takes. 
+Returns : 
+Response object 
+Return type : 
+requests.Response 
+requests. post ( url : _t.UriType , data : _t.DataType = None , json : _t.JsonType = None , ** kwargs : Unpack [ _t.PostKwargs ] ) → Response [source] ¶ 
+Sends a POST request. 
+Parameters : 
+url – URL for the new Request object. 
+data – (optional) Dictionary, list of tuples, bytes, or file-like
+object to send in the body of the Request . 
+json – (optional) A JSON serializable Python object to send in the body of the Request . 
+**kwargs – Optional arguments that request takes. 
+Returns : 
+Response object 
+Return type : 
+requests.Response 
+requests. put ( url : _t.UriType , data : _t.DataType = None , ** kwargs : Unpack [ _t.DataKwargs ] ) → Response [source] ¶ 
+Sends a PUT request. 
+Parameters : 
+url – URL for the new Request object. 
+data – (optional) Dictionary, list of tuples, bytes, or file-like
+object to send in the body of the Request . 
+json – (optional) A JSON serializable Python object to send in the body of the Request . 
+**kwargs – Optional arguments that request takes. 
+Returns : 
+Response object 
+Return type : 
+requests.Response 
+requests. patch ( url : _t.UriType , data : _t.DataType = None , ** kwargs : Unpack [ _t.DataKwargs ] ) → Response [source] ¶ 
+Sends a PATCH request. 
+Parameters : 
+url – URL for the new Request object. 
+data – (optional) Dictionary, list of tuples, bytes, or file-like
+object to send in the body of the Request . 
+json – (optional) A JSON serializable Python object to send in the body of the Request . 
+**kwargs – Optional arguments that request takes. 
+Returns : 
+Response object 
+Return type : 
+requests.Response 
+requests. delete ( url : _t.UriType , ** kwargs : Unpack [ _t.RequestKwargs ] ) → Response [source] ¶ 
+Sends a DELETE request. 
+Parameters : 
+url – URL for the new Request object. 
+**kwargs – Optional arguments that request takes. 
+Returns : 
+Response object 
+Return type : 
+requests.Response 
+Exceptions ¶ 
+exception requests. RequestException ( * args : Any , ** kwargs : Any ) [source] ¶ 
+There was an ambiguous exception that occurred while handling your
+request. 
+exception requests. ConnectionError ( * args : Any , ** kwargs : Any ) [source] ¶ 
+A Connection error occurred. 
+exception requests. HTTPError ( * args : Any , ** kwargs : Any ) [source] ¶ 
+An HTTP error occurred. 
+exception requests. TooManyRedirects ( * args : Any , ** kwargs : Any ) [source] ¶ 
+Too many redirects. 
+exception requests. ConnectTimeout ( * args : Any , ** kwargs : Any ) [source] ¶ 
+The request timed out while trying to connect to the remote server. 
+Requests that produced this error are safe to retry. 
+exception requests. ReadTimeout ( * args : Any , ** kwargs : Any ) [source] ¶ 
+The server did not send any data in the allotted amount of time. 
+exception requests. Timeout ( * args : Any , ** kwargs : Any ) [source] ¶ 
+The request timed out. 
+Catching this error will catch both ConnectTimeout and ReadTimeout errors. 
+exception requests. JSONDecodeError ( * args : Any , ** kwargs : Any ) [source] ¶ 
+Couldn’t decode the text into json 
+Request Sessions ¶ 
+class requests. Session [source] ¶ 
+A Requests session. 
+Provides cookie persistence, connection-pooling, and configuration. 
+Basic Usage: 
+>>> import requests >>> s = requests . Session () >>> s . get ( 'https://httpbin.org/get' ) <Response [200]> 
+Or as a context manager: 
+>>> with requests . Session () as s : ... s . get ( 'https://httpbin.org/get' ) <Response [200]> 
+auth : _t.AuthType ¶ 
+Default Authentication tuple or object to attach to Request . 
+cert : _t.CertType ¶ 
+SSL client certificate default, if String, path to ssl client
+cert file (.pem). If Tuple, (‘cert’, ‘key’) pair. 
+close ( ) → None [source] ¶ 

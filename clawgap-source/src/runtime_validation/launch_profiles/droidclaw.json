@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "droidclaw",
+  "revision": "c7c991933e4a0c03cec6044aa7fb9067d391f4d4",
+  "runtime": "bun",
+  "entrypoint": {"command": ["bun", "run", "src/kernel.ts"], "cwd": ".", "stdin_prompt": true, "readiness": {"kind": "stdio-line", "timeout_seconds": 20, "pattern": "Enter your goal"}},
+  "provider": {"mode": "native-openai-compatible", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock"},
+  "input_transport": {"kind": "stdin", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["src/kernel.ts", "src/actions.ts", "src/llm-providers.ts"], "dependency_files": ["package.json"], "disposable_roots": ["data", ".droidclaw"], "environment": {"ANDROID_SERIAL": "clawgap-fake"}},
+  "instrumentation": {"loader": "bun-preload", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/llm-providers.ts:1"}, {"kind": "dispatch", "anchor": "src/kernel.ts:400"}, {"kind": "handler", "anchor": "src/actions.ts:699"}, {"kind": "sink", "anchor": "src/actions.ts:703"}, {"kind": "pre-effect", "anchor": "src/actions.ts:703"}]},
+  "effect_interceptors": ["process", "adb"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["DroidClaw targeted fake screen XML, fake ADB, and Bun source renderer are not integrated into the shared all-project qualification launcher"]}
+}

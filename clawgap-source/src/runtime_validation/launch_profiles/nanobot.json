@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "nanobot",
+  "revision": "337c4600f3d78797bb4ed845b5a02118c7ac2d00",
+  "runtime": "python",
+  "entrypoint": {"command": ["python", "-m", "nanobot.cli.commands", "agent", "--message", "${CLAWGAP_L2_PROMPT}", "--config", "${CLAWGAP_L2_CONFIG}"], "cwd": ".", "readiness": {"kind": "process-exit", "timeout_seconds": 60}},
+  "provider": {"mode": "project-provider-shim", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock", "shim_anchor": "nanobot/providers/litellm_provider.py:1"},
+  "input_transport": {"kind": "stdin", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["nanobot/cli/commands.py", "nanobot/agent/tools/registry.py"], "dependency_files": ["pyproject.toml"], "disposable_roots": ["data", ".nanobot"], "environment": {}},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "nanobot/providers/litellm_provider.py:1"}, {"kind": "dispatch", "anchor": "nanobot/agent/tools/registry.py:1"}, {"kind": "handler", "anchor": "nanobot/agent/tools/shell.py:1"}, {"kind": "sink", "anchor": "nanobot/agent/tools/shell.py:1"}, {"kind": "pre-effect", "anchor": "nanobot/agent/tools/shell.py:1"}]},
+  "effect_interceptors": ["process", "messaging"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["nanobot disposable config and provider-shim renderer are not yet implemented"]}
+}

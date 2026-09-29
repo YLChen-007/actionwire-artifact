@@ -1,0 +1,85 @@
+n-Markdown 3.10.2 documentation » 
+Library Reference » 
+Using Markdown as a Python Library ¶ 
+First and foremost, Python-Markdown is intended to be a python library module
+used by various projects to convert Markdown syntax into HTML. 
+The Basics ¶ 
+To use markdown as a module: 
+import markdown
+html = markdown.markdown(your_text_string) 
+The Details ¶ 
+Python-Markdown provides two public functions ( markdown.markdown and markdown.markdownFromFile ) both of which wrap the
+public class markdown.Markdown . If you’re processing one
+document at a time, these functions will serve your needs. However, if you need
+to process multiple documents, it may be advantageous to create a single
+instance of the markdown.Markdown class and pass multiple documents through
+it. If you do use a single instance though, make sure to call the reset method appropriately ( see below ). 
+markdown.markdown(text [, **kwargs]) ¶ 
+Warning 
+The Python-Markdown library does not sanitize its HTML output. If
+you are processing Markdown input from an untrusted source, it is your
+responsibility to ensure that it is properly sanitized. For more
+information see Sanitizing HTML Output . 
+The following options are available on the markdown.markdown function: 
+text 
+The source Unicode string. (required) 
+Important 
+Python-Markdown expects a Unicode string as input (some simple ASCII binary strings may work only by
+coincidence) and returns output as a Unicode string. Do not pass binary strings to it! If your input is
+encoded, (e.g. as UTF-8), it is your responsibility to decode it. For example: 
+with open("some_file.txt", "r", encoding="utf-8") as input_file:
+ text = input_file.read()
+html = markdown.markdown(text) 
+If you want to write the output to disk, you must encode it yourself: 
+with open("some_file.html", "w", encoding="utf-8", errors="xmlcharrefreplace") as output_file:
+ output_file.write(html) 
+extensions 
+A list of extensions. 
+Python-Markdown provides an API for third parties to
+write extensions to the parser adding their own additions or changes to the
+syntax. A few commonly used extensions are shipped with the markdown
+library. See the extension documentation for a
+list of available extensions. 
+The list of extensions may contain instances of extensions and/or strings
+of extension names. 
+extensions=[MyExtClass(), 'myext', 'path.to.my.ext:MyExtClass'] 
+Note 
+The preferred method is to pass in an instance of an extension. Strings
+should only be used when it is impossible to import the Extension Class
+directly (from the command line or in a template). 
+When passing in extension instances, each class instance must be a subclass
+of markdown.extensions.Extension and any configuration options should be
+defined when initiating the class instance rather than using the extension_configs keyword. For example: 
+from markdown.extensions import Extension
+class MyExtClass(Extension):
+ # define your extension here...
+markdown.markdown(text, extensions=[MyExtClass(option='value')]) 
+If an extension name is provided as a string, the string must either be the
+registered entry point of any installed extension or the importable path
+using Python’s dot notation. 
+See the documentation specific to an extension for the string name assigned
+to an extension as an entry point. Simply include the defined name as
+a string in the list of extensions. For example, if an extension has the
+name myext assigned to it and the extension is properly installed, then
+do the following: 
+markdown.markdown(text, extensions=['myext']) 
+If an extension does not have a registered entry point, Python’s dot
+notation may be used instead. The extension must be installed as a
+Python module on your PYTHONPATH. Generally, a class should be specified in
+the name. The class must be at the end of the name and be separated by a
+colon from the module. 
+Therefore, if you were to import the class like this: 
+from path.to.module import MyExtClass 
+Then load the extension as follows: 
+markdown.markdown(text, extensions=['path.to.module:MyExtClass']) 
+If only one extension is defined within a module and the module includes a makeExtension function which returns an instance of the extension, then
+the class name is not necessary. For example, in that case one could do extensions=['path.to.module'] . Check the documentation for a specific
+extension to determine if it supports this feature. 
+When loading an extension by name (as a string), you can only pass in
+configuration settings to the extension by using the extension_configs keyword. 
+See Also 
+See the documentation of the Extension API for
+assistance in creating extensions. 
+extension_configs 
+A dictionary of configuration settings for extensions. 
+Any 

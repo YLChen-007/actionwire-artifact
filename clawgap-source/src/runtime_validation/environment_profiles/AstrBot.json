@@ -1,0 +1,17 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "AstrBot",
+  "revision": "0e973bd4d483d18e1672c4dfa2eb7aae31bc1f83",
+  "runtime": "python",
+  "setup_command": "python -m venv --system-site-packages .clawgap-venv && UV_CACHE_DIR=/tmp/clawgap-uv-cache uv pip install --python .clawgap-venv/bin/python --no-deps -e . && mkdir -p .astrbot data/config data/plugins data/temp astrbot/dashboard/dist && : > astrbot/dashboard/dist/index.html && python -c 'import json; p=\"data/cmd_config.json\"; d=json.load(open(p, encoding=\"utf-8-sig\")); d[\"provider\"]=[{\"id\":\"clawgap\",\"provider\":\"openai\",\"type\":\"openai_chat_completion\",\"provider_type\":\"chat_completion\",\"enable\":True,\"key\":[\"clawgap-loopback-mock\"],\"api_base\":\"http://127.0.0.1:'\"$CLAWGAP_PROVIDER_PORT\"'/v1\",\"timeout\":30,\"proxy\":\"\",\"custom_headers\":{},\"model\":\"clawgap-environment-probe\"}]; d[\"provider_settings\"][\"default_provider_id\"]=\"clawgap\"; d[\"dashboard\"].update({\"username\":\"astrbot\",\"pbkdf2_password\":\"pbkdf2_sha256$600000$74fd00ecb9aff68f597a31a62096e2f7$76005b6d00b47bd3f6c9a0d2e767cd0b03ad8b9b7844b245b2020505b31e962f\",\"password_change_required\":False,\"host\":\"127.0.0.1\",\"port\":18080}); json.dump(d, open(p,\"w\",encoding=\"utf-8\"))'",
+  "launch_command": "export ASTRBOT_ROOT=\"$PWD\"; .clawgap-venv/bin/astrbot run --port 18080",
+  "probe_command": "for second in $(seq 1 20); do .clawgap-venv/bin/python ../../../src/runtime_validation/environment_fixtures/astrbot/open_api_probe.py && exit 0; sleep 1; done; exit 1",
+  "readiness_pattern": "AstrBot started.",
+  "source_files": ["pyproject.toml", "astrbot/cli/__main__.py"],
+  "dependency_files": ["pyproject.toml"],
+  "fixture_files": ["src/runtime_validation/environment_fixtures/astrbot/open_api_probe.py"],
+  "provider": {"protocol": "openai-chat-completions/v1", "response_mode": "sse", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "path": "/v1/chat/completions", "allowed_paths": ["/v1/models"]},
+  "input": {"kind": "native-test-channel", "native_channel": true},
+  "instrumentation": {"loader": "python-sitecustomize", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "astrbot/core/provider/provider.py:1"}, {"kind": "pre-effect", "anchor": "astrbot/core/tools/computer_tools/fs.py:1"}]},
+  "effect_interceptors": ["process", "filesystem"]
+}

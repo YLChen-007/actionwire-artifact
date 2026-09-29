@@ -1,0 +1,79 @@
+lse , limits=Limits(max_connections=100, max_keepalive_connections=20, keepalive_expiry=5.0) , max_redirects=20 , event_hooks=None , base_url='' , transport=None , default_encoding='utf-8' ) 
+An HTTP client, with connection pooling, HTTP/2, redirects, cookie persistence, etc. 
+It can be shared between threads. 
+Usage: 
+>>> client = httpx . Client () >>> response = client . get ( 'https://example.org' ) 
+Parameters: 
+auth - (optional) An authentication class to use when sending
+requests. 
+params - (optional) Query parameters to include in request URLs, as
+a string, dictionary, or sequence of two-tuples. 
+headers - (optional) Dictionary of HTTP headers to include when
+sending requests. 
+cookies - (optional) Dictionary of Cookie items to include when
+sending requests. 
+verify - (optional) Either True to use an SSL context with the
+default CA bundle, False to disable verification, or an instance of ssl.SSLContext to use a custom context. 
+http2 - (optional) A boolean indicating if HTTP/2 support should be
+enabled. Defaults to False . 
+proxy - (optional) A proxy URL where all the traffic should be routed. 
+timeout - (optional) The timeout configuration to use when sending
+requests. 
+limits - (optional) The limits configuration to use. 
+max_redirects - (optional) The maximum number of redirect responses
+that should be followed. 
+base_url - (optional) A URL to use as the base when building
+request URLs. 
+transport - (optional) A transport class to use for sending requests
+over the network. 
+trust_env - (optional) Enables or disables usage of environment
+variables for configuration. 
+default_encoding - (optional) The default encoding to use for decoding
+response text, if no charset information is included in a response Content-Type
+header. Set to a callable for automatic character set detection. Default: "utf-8". 
+headers 
+HTTP headers to include when sending requests. 
+cookies 
+Cookie values to include when sending requests. 
+params 
+Query parameters to include in the URL when sending requests. 
+auth 
+Authentication class used when none is passed at the request-level. 
+See also Authentication . 
+request ( self , method , url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Build and send a request. 
+Equivalent to: 
+request = client . build_request ( ... ) response = client . send ( request , ... ) 
+See Client.build_request() , Client.send() and Merging of configuration for how the various parameters
+are merged with client-level configuration. 
+get ( self , url , * , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Send a GET request. 
+Parameters : See httpx.request . 
+head ( self , url , * , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Send a HEAD request. 
+Parameters : See httpx.request . 
+options ( self , url , * , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Send an OPTIONS request. 
+Parameters : See httpx.request . 
+post ( self , url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Send a POST request. 
+Parameters : See httpx.request . 
+put ( self , url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Send a PUT request. 
+Parameters : See httpx.request . 
+patch ( self , url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Send a PATCH request. 
+Parameters : See httpx.request . 
+delete ( self , url , * , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Send a DELETE request. 
+Parameters : See httpx.request . 
+stream ( self , method , url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , auth= , follow_redirects= , timeout= , extensions=None ) 
+Alternative to httpx.request() that streams the response body
+instead of loading it into memory at once. 
+Parameters : See httpx.request . 
+See also: Streaming Responses 
+build_request ( self , method , url , * , content=None , data=None , files=None , json=None , params=None , headers=None , cookies=None , timeout= , extensions=None ) 
+Build and return a request instance. 
+The params , headers and cookies arguments
+are merged with any values set on the client. 
+The url argum

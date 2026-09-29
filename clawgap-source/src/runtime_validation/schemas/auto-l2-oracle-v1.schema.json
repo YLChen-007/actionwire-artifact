@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClawGap Auto L2 Oracle v1",
+  "type": "object",
+  "required": ["schema_version", "candidate_id", "case_id", "attempts", "roles", "identity", "exploit", "control", "health"],
+  "properties": {
+    "schema_version": {"const": "clawgap-auto-l2-oracle/v1"},
+    "candidate_id": {"type": "string", "pattern": "^CAND-"},
+    "case_id": {"type": "string", "minLength": 1},
+    "attempts": {"const": 3},
+    "roles": {"type": "array", "contains": {"const": "exploit"}},
+    "identity": {"type": "object"},
+    "exploit": {"type": "object"},
+    "control": {"type": "object"},
+    "health": {"type": "object"}
+  }
+}

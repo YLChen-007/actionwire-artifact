@@ -1,0 +1,11 @@
+| adapter | nanobot | nanobot |
+| handler | exec | ExecTool.execute |
+| handler | read_file | ReadFileTool.execute |
+| negative | transform-near-misses | absent |
+| sensitive | _search_brave | rpc-payload:Dict |
+| sensitive | _search_brave | url:StringLiteral |
+| sink | exec | process |
+| sink | read_file | file |
+| source | exec | command;working_dir |
+| source | read_file | path |
+| transform-signature | _resolve_path | nanobot/agent/tools/filesystem.py::_resolve_path:sink-transform |

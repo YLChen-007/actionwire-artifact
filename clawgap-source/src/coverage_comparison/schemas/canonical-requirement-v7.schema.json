@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "requirement_id", "group_id", "rule", "applicability",
+    "controlled_facet", "enforcement_stage", "state_lifetime", "policy_basis",
+    "protected_asset", "security_effect", "provenance", "evidence", "refines_cr_ids"
+  ],
+  "properties": {
+    "schema_version": {"const": "canonical-requirement/v7"},
+    "requirement_id": {"type": "string", "pattern": "^CR-[0-9a-f]{16}$"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "rule": {"type": "string", "minLength": 1},
+    "applicability": {"type": "string", "minLength": 1},
+    "controlled_facet": {"type": "string", "minLength": 1},
+    "enforcement_stage": {"type": "string", "minLength": 1},
+    "state_lifetime": {"type": "string", "minLength": 1},
+    "policy_basis": {"type": "string", "minLength": 1},
+    "protected_asset": {"type": "string", "minLength": 1},
+    "security_effect": {"type": "string", "minLength": 1},
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sources"],
+      "properties": {
+        "sources": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["legacy_requirement_id", "kind", "payload_sha256"],
+            "properties": {
+              "legacy_requirement_id": {"type": "string", "pattern": "^(R|CAPR|SR|LIR)-[0-9a-f]{16}$"},
+              "kind": {"enum": ["group-oracle", "capability-card", "source-derived", "learned-invariant"]},
+              "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
+    "evidence": {"type": "array", "items": {"type": "object"}},
+    "refines_cr_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^CR-[0-9a-f]{16}$"}}
+  }
+}

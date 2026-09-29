@@ -1,0 +1,21 @@
+| adapter | AstrBot | astrbot |
+| call-edge | LocalFileSystemComponent.edit_file | LocalFileSystemComponent.edit_file._run |
+| call-edge | LocalFileSystemComponent.write_file | LocalFileSystemComponent.write_file._run |
+| call-edge | LocalPythonComponent.exec | LocalPythonComponent.exec._run |
+| call-edge | LocalShellComponent.exec | LocalShellComponent.exec._run |
+| call-edge | _probe_local_file | _probe_local_file._run |
+| edge | component | FileEditTool.call->LocalFileSystemComponent.edit_file |
+| edge | component | FileWriteTool.call->LocalFileSystemComponent.write_file |
+| edge | to-thread | LocalFileSystemComponent.edit_file->LocalFileSystemComponent.edit_file._run |
+| edge | to-thread | LocalFileSystemComponent.write_file->LocalFileSystemComponent.write_file._run |
+| edge | to-thread | LocalPythonComponent.exec->LocalPythonComponent.exec._run |
+| edge | to-thread | LocalShellComponent.exec->LocalShellComponent.exec._run |
+| edge | to-thread | _probe_local_file->_probe_local_file._run |
+| handler | astrbot_file_edit_tool | FileEditTool.call |
+| handler | astrbot_file_read_tool | FileReadTool.call |
+| handler | astrbot_file_write_tool | FileWriteTool.call |
+| nested-gate | _normalize_rw_path | nested-call [parent:_normalize_rw_path] |
+| source | astrbot_file_edit_tool | path;old;new |
+| source | astrbot_file_read_tool | path |
+| source | astrbot_file_write_tool | path;content |
+| transform | _resolve_tool_path | astrbot/core/tools/computer_tools/fs.py::_resolve_tool_path |

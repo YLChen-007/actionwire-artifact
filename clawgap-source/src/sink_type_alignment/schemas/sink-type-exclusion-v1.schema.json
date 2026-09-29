@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "project", "revision", "chain_id", "sink_id", "tool_name", "handler_id", "reason_code", "detail"],
+  "properties": {
+    "schema_version": {"const": "sink-type-exclusion/v1"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "sink_id": {"type": "string", "pattern": "^S-[0-9a-f]{16}$"},
+    "tool_name": {"type": "string", "minLength": 1},
+    "handler_id": {"type": ["string", "null"], "pattern": "^H-[0-9a-f]{16}$"},
+    "reason_code": {"enum": ["impact-pruned", "semantic-assembly-failure", "unresolved-handler-alignment"]},
+    "detail": {"type": "string", "minLength": 1}
+  }
+}

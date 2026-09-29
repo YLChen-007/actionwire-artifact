@@ -1,0 +1,52 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "poco-agent",
+  "revision": "7a61cb9f0e871f75f5623448f849f1e3d1958e35",
+  "runtime": "python",
+  "setup_command": "export UV_HTTP_TIMEOUT=300 UV_CACHE_DIR=/tmp/clawgap-uv-cache; uv sync --frozen --project backend && uv sync --frozen --project executor && uv sync --frozen --project executor_manager && mkdir -p \"$CLAWGAP_STATE_ROOT/postgres/data\" \"$CLAWGAP_STATE_ROOT/postgres/socket\" && docker run --rm -d --name \"clawgap-poco-pg-${CLAWGAP_STATE_ROOT##*/}\" --network none -e POSTGRES_PASSWORD=clawgap -e POSTGRES_DB=poco -v \"$CLAWGAP_STATE_ROOT/postgres/data:/var/lib/postgresql/data\" -v \"$CLAWGAP_STATE_ROOT/postgres/socket:/var/run/postgresql\" postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685 > \"$CLAWGAP_STATE_ROOT/postgres/container\" && for second in $(seq 1 30); do docker exec \"$(cat \"$CLAWGAP_STATE_ROOT/postgres/container\")\" pg_isready -U postgres -d poco >/dev/null 2>&1 && break; sleep 1; done && (cd backend && DATABASE_URL=\"postgresql+psycopg2://postgres:clawgap@/poco?host=$CLAWGAP_STATE_ROOT/postgres/socket\" UV_PROJECT_ENVIRONMENT=\"$PWD/.venv\" uv run --project . alembic upgrade head)",
+  "launch_command": "cleanup() { kill -TERM -- -$backend_pid -$executor_pid -$manager_pid 2>/dev/null || true; docker rm -f \"$(cat \"$CLAWGAP_STATE_ROOT/postgres/container\")\" >/dev/null 2>&1 || true; }; trap cleanup EXIT INT TERM; export DEBUG=false BOOTSTRAP_ON_STARTUP=false DATABASE_URL=\"postgresql+psycopg2://postgres:clawgap@/poco?host=$CLAWGAP_STATE_ROOT/postgres/socket\" AUTH_MODE=disabled SECRET_KEY=clawgap-loopback-mock INTERNAL_API_TOKEN=clawgap-loopback-mock EXECUTOR_MANAGER_URL=http://127.0.0.1:18088 RUN_MIGRATIONS=true BACKEND_URL=http://127.0.0.1:18086 CALLBACK_BASE_URL=http://127.0.0.1:18088 CALLBACK_TOKEN=clawgap-loopback-mock ANTHROPIC_API_KEY=clawgap-loopback-mock ANTHROPIC_BASE_URL=http://127.0.0.1:${CLAWGAP_PROVIDER_PORT} DEFAULT_MODEL=clawgap-environment-probe TASK_PULL_ENABLED=false WORKSPACE_ROOT=\"$HOME/poco-workspaces\" S3_ENDPOINT=http://127.0.0.1:${CLAWGAP_PROVIDER_PORT} S3_ACCESS_KEY=clawgap S3_SECRET_KEY=clawgap-secret S3_BUCKET=clawgap S3_REGION=us-east-1; echo 'Starting Poco backend' >&2; (cd backend && UV_PROJECT_ENVIRONMENT=\"$PWD/.venv\" uv run --project . uvicorn app.main:app --host 127.0.0.1 --port 18086) & backend_pid=$!; (cd executor && UV_PROJECT_ENVIRONMENT=\"$PWD/.venv\" uv run --project . uvicorn app.main:app --host 127.0.0.1 --port 18087) & executor_pid=$!; (cd executor_manager && UV_PROJECT_ENVIRONMENT=\"$PWD/.venv\" uv run --project . uvicorn app.main:app --host 127.0.0.1 --port 18088) & manager_pid=$!; ready=0; for second in $(seq 1 180); do curl -fsS http://127.0.0.1:18086/api/v1/health >/dev/null 2>&1 && curl -fsS http://127.0.0.1:18087/health >/dev/null 2>&1 && curl -fsS http://127.0.0.1:18088/api/v1/health >/dev/null 2>&1 && ready=1 && echo 'Poco environment ready' && break; sleep 1; done; if [ \"$ready\" != 1 ]; then exit 1; fi; wait",
+  "probe_command": "DATABASE_URL='unused' backend/.venv/bin/python -c \"import json, os, urllib.request; from anthropic import Anthropic; endpoint='http://127.0.0.1:'+os.environ['CLAWGAP_PROVIDER_PORT']; listing=urllib.request.urlopen(endpoint+'/clawgap?list-type=2', timeout=10); assert b'ListBucketResult' in listing.read(); client=Anthropic(api_key='clawgap-loopback-mock', base_url=endpoint); message=client.messages.create(model='clawgap-environment-probe', max_tokens=32, messages=[{'role':'user','content':'environment probe'}]); assert message.stop_reason == 'end_turn'\"",
+  "readiness_pattern": "Poco environment ready",
+  "source_files": [
+    "backend/app/main.py",
+    "executor/app/main.py",
+    "executor_manager/app/main.py"
+  ],
+  "dependency_files": [
+    "backend/uv.lock",
+    "executor/uv.lock",
+    "executor_manager/uv.lock"
+  ],
+  "fixture_files": [],
+  "provider": {
+    "protocol": "anthropic-messages/v1",
+    "response_mode": "json",
+    "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}",
+    "credential": "clawgap-loopback-mock",
+    "path": "/v1/messages"
+  },
+  "input": {
+    "kind": "http-api",
+    "native_channel": true
+  },
+  "instrumentation": {
+    "loader": "python-sitecustomize",
+    "event_path": "events.raw.jsonl",
+    "anchors": [
+      {
+        "kind": "provider-request",
+        "anchor": "executor/app/core/client_pool.py:1"
+      },
+      {
+        "kind": "pre-effect",
+        "anchor": "executor/app/api/v1/task.py:1"
+      }
+    ]
+  },
+  "effect_interceptors": [
+    "process",
+    "browser",
+    "database",
+    "http"
+  ]
+}

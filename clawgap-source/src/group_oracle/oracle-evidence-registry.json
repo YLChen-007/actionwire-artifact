@@ -1,0 +1,122 @@
+{
+  "schema_version": "oracle-evidence-registry/v1",
+  "evidence": [
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-af72e7eeddd90792"], "sink_type_ids": ["ST-e02ed71b8c27e312"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=exec-allow-pattern-shell-chain]",
+      "exact_quote": "A raw regex prefix match does not authorize every executable component interpreted by a shell command sink.",
+      "supported_claim": "A raw regex prefix match does not authorize every executable component interpreted by a shell command sink."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-af72e7eeddd90792"], "sink_type_ids": ["ST-e02ed71b8c27e312"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=exec-comment-tail-and-workspace-semantics]",
+      "exact_quote": "Shell authorization and workspace confinement must account for comments, expansions, substitutions, and the effective executed command domain.",
+      "supported_claim": "Shell authorization and workspace confinement must account for comments, expansions, substitutions, and the effective executed command domain."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-af72e7eeddd90792"], "sink_type_ids": ["ST-e02ed71b8c27e312"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=exec-wrapper-prefix-allowlist]",
+      "exact_quote": "Authorization of a shell command must cover the complete parsed command rather than only a wrapper prefix.",
+      "supported_claim": "Authorization of a shell command must cover the complete parsed command rather than only a wrapper prefix."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-af72e7eeddd90792"], "sink_type_ids": ["ST-e02ed71b8c27e312"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=shell-jq-env-guard-gap]",
+      "exact_quote": "A shell-command credential policy that restricts environment access must cover jq environment-object access, not only procfs, system calls, and file flags.",
+      "supported_claim": "A shell-command credential policy that restricts environment access must cover jq environment-object access, not only procfs, system calls, and file flags."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-af72e7eeddd90792"], "sink_type_ids": ["ST-e02ed71b8c27e312"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=request-context-tool-guard-bypass]",
+      "exact_quote": "Bypassing a command guard requires trusted, authenticated request-context provenance rather than an untrusted external context marker.",
+      "supported_claim": "Bypassing a command guard requires trusted, authenticated request-context provenance rather than an untrusted external context marker."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-4ed26ca19433a28f"], "sink_type_ids": ["ST-e02ed71b8c27e312"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=managed-cdp-local-control]",
+      "exact_quote": "A model-controlled local CDP endpoint that launches a browser process requires peer authentication or an equivalently restrictive access boundary.",
+      "supported_claim": "A model-controlled local CDP endpoint that launches a browser process requires peer authentication or an equivalently restrictive access boundary."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-af72e7eeddd90792"], "sink_type_ids": ["ST-e02ed71b8c27e312"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=bash-missing-approval]",
+      "exact_quote": "Model-controlled Bash execution requires a mandatory user approval checkpoint before process creation.",
+      "supported_claim": "Model-controlled Bash execution requires a mandatory user approval checkpoint before process creation."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-d6a5ed749a9cb61e"], "sink_type_ids": ["ST-a309d6a7c4c60f83"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=read-procfs-alias]",
+      "exact_quote": "A sensitive-file read policy must reject procfs credential aliases that bypass pathname-only checks.",
+      "supported_claim": "A sensitive-file read policy must reject procfs credential aliases that bypass pathname-only checks."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-d6a5ed749a9cb61e"], "sink_type_ids": ["ST-a309d6a7c4c60f83"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "dimensions[id=workspace-hardlink-alias]",
+      "exact_quote": "Workspace confinement for file reads must validate filesystem-object or inode identity so hardlink aliases cannot escape the allowed object boundary.",
+      "supported_claim": "Workspace confinement for file reads must validate filesystem-object or inode identity so hardlink aliases cannot escape the allowed object boundary."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-fe8c9c8c61a7ddff"], "sink_type_ids": ["ST-6b7146508bb0716d"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "eligible_sink_records[record_id=NCOR-bf5b84f58d2d3bc1].expected_missing",
+      "exact_quote": "A model-controlled file-copy destination must be lstat/realpath-resolved and contained within the permitted target inbox before copying.",
+      "supported_claim": "A model-controlled file-copy destination must be lstat/realpath-resolved and contained within the permitted target inbox before copying."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-fe8c9c8c61a7ddff"], "sink_type_ids": ["ST-6b7146508bb0716d"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "eligible_sink_records[record_id=NCOR-6040ea5ff49cc74d].expected_missing",
+      "exact_quote": "A model-controlled file-copy source must resolve within the permitted workspace or root boundary before copying.",
+      "supported_claim": "A model-controlled file-copy source must resolve within the permitted workspace or root boundary before copying."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-d2066d14084c5c80"], "sink_type_ids": ["ST-83923c85e4a23cd3"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "eligible_sink_records[record_id=OCN-SINK-5b33be4c77c65fba].expected_missing",
+      "exact_quote": "A model-controlled remote-media URL must receive SSRF destination validation before network retrieval.",
+      "supported_claim": "A model-controlled remote-media URL must receive SSRF destination validation before network retrieval."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {"handler_criterion_ids": ["HC-4ed26ca19433a28f"], "sink_type_ids": ["ST-ff4457be1b6efdf7"]},
+      "source_path": "src/group_oracle/evidence/revision-bound-fixed-deltas.md",
+      "sha256": "78cf733f1bec9538a1ba898193fa8683749b0ee09bd382aae80a40ee7c769444",
+      "locator": "eligible_sink_records[record_id=OCN-SINK-900ffc5993b6aeb2].expected_missing",
+      "exact_quote": "After a browser action can navigate, the resulting destination must be revalidated before subsequent browser access.",
+      "supported_claim": "After a browser action can navigate, the resulting destination must be revalidated before subsequent browser access."
+    }
+  ]
+}

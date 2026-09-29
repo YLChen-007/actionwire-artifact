@@ -1,0 +1,7 @@
+# Direct tool dependencies pinned to the inspected environment, not a full transitive lock.
+jsonschema==4.25.1
+PyYAML==6.0.2
+-r src/gate_semantics/requirements.txt
+mcp==1.27.2
+# Optional token estimator (fallback is available when absent):
+# tiktoken==0.8.0

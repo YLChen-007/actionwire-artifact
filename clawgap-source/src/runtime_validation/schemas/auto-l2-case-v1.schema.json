@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClawGap Auto L2 Case v1",
+  "type": "object",
+  "required": ["schema_version", "project", "revision", "case_id", "candidate_binding", "instrumentation_anchors", "forced_tool_calls", "effect_policy", "execution_eligible"],
+  "properties": {
+    "schema_version": {"const": "clawgap-auto-l2-case/v1"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "candidate_binding": {"type": "object"},
+    "instrumentation_anchors": {"type": "array", "minItems": 1},
+    "forced_tool_calls": {"type": "array", "minItems": 2},
+    "effect_policy": {"type": "object"},
+    "execution_eligible": {"type": "boolean"}
+  }
+}

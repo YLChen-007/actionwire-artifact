@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "group_id", "handler_criterion_id", "sink_type_id", "seed_chain_ref", "selection_policy", "policy_atoms", "candidate_requirements"],
+  "properties": {
+    "schema_version": {"const": "group-oracle-seed-profile/v1"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+    "seed_chain_ref": {"$ref": "#/$defs/ref"},
+    "selection_policy": {"enum": ["nanobot-complete-lexicographic", "complete-lexicographic", "partial-lexicographic"]},
+    "policy_atoms": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["policy_atom_id", "subject_role", "operation", "dimension", "effect", "timing", "scope", "failure_behavior", "source_gate_ids"],
+      "properties": {
+        "policy_atom_id": {"type": "string", "pattern": "^PA-[0-9a-f]{16}$"},
+        "subject_role": {"$ref": "#/$defs/slug"}, "operation": {"$ref": "#/$defs/slug"},
+        "dimension": {"$ref": "#/$defs/slug"}, "effect": {"$ref": "#/$defs/slug"},
+        "timing": {"$ref": "#/$defs/slug"}, "scope": {"$ref": "#/$defs/slug"},
+        "failure_behavior": {"$ref": "#/$defs/slug"},
+        "source_gate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"}}
+      }}},
+    "candidate_requirements": {"type": "array", "items": {"$ref": "#/$defs/candidate"}}
+  },
+  "$defs": {
+    "slug": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+    "ref": {"type": "object", "additionalProperties": false, "required": ["project", "revision", "chain_id"],
+      "properties": {"project": {"type": "string", "minLength": 1}, "revision": {"type": "string", "minLength": 1}, "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"}}},
+    "candidate": {"type": "object", "additionalProperties": false,
+      "required": ["dimension", "rule", "applicability", "origin_gate_ids", "reason"],
+      "properties": {"dimension": {"$ref": "#/$defs/slug"}, "rule": {"type": "string", "minLength": 1}, "applicability": {"type": "string", "minLength": 1}, "origin_gate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"}}, "reason": {"type": "string", "minLength": 1}}
+    }
+  }
+}

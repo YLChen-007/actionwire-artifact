@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "handler_sink_group_id", "group_scope",
+    "handler_criterion_id", "sink_type_id", "downstream_oracle_eligible",
+    "chain_count", "chain_refs", "projects", "handler_ids", "handler_names",
+    "sink_refs", "sink_names", "reason"
+  ],
+  "properties": {
+    "schema_version": {"const": "handler-sink-group/v1"},
+    "handler_sink_group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "group_scope": {"enum": ["security", "no-security-impact"]},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": ["string", "null"], "pattern": "^ST-[0-9a-f]{16}$"},
+    "downstream_oracle_eligible": {"type": "boolean"},
+    "chain_count": {"type": "integer", "minimum": 1},
+    "chain_refs": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["project", "chain_id"],
+        "properties": {
+          "project": {"type": "string", "minLength": 1},
+          "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"}
+        }
+      }
+    },
+    "projects": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "handler_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^H-[0-9a-f]{16}$"}},
+    "handler_names": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "sink_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "sink_names": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "reason": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"group_scope": {"const": "security"}}},
+      "then": {
+        "properties": {
+          "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+          "downstream_oracle_eligible": {"const": true}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"group_scope": {"const": "no-security-impact"}}},
+      "then": {
+        "properties": {
+          "sink_type_id": {"type": "null"},
+          "downstream_oracle_eligible": {"const": false}
+        }
+      }
+    }
+  ]
+}

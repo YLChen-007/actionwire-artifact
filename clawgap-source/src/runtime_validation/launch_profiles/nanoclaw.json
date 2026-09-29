@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "nanoclaw",
+  "revision": "36cbf17e107fd0f8daea4ceb2ac523d9f0d88915",
+  "runtime": "pnpm",
+  "entrypoint": {"build_command": ["pnpm", "run", "build"], "command": ["node", "dist/index.js"], "delivery_command": ["pnpm", "run", "chat", "${CLAWGAP_L2_PROMPT}"], "cwd": ".", "readiness": {"kind": "unix-socket", "timeout_seconds": 30, "pattern": "cli.sock"}},
+  "provider": {"mode": "project-provider-shim", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock", "shim_anchor": "container/agent-runner/src/providers/factory.ts:1"},
+  "input_transport": {"kind": "unix-socket", "path": "data/cli.sock", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["src/index.ts", "scripts/chat.ts", "container/agent-runner/src/providers/factory.ts"], "dependency_files": ["package.json", "pnpm-lock.yaml"], "disposable_roots": ["data"], "environment": {}},
+  "instrumentation": {"loader": "node-import", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "container/agent-runner/src/providers/factory.ts:1"}, {"kind": "dispatch", "anchor": "container/agent-runner/src/mcp-tools/core.ts:1"}, {"kind": "handler", "anchor": "container/agent-runner/src/mcp-tools/core.ts:1"}, {"kind": "sink", "anchor": "container/agent-runner/src/mcp-tools/core.ts:1"}, {"kind": "pre-effect", "anchor": "container/agent-runner/src/mcp-tools/core.ts:1"}]},
+  "effect_interceptors": ["filesystem", "messaging"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["NanoClaw disposable session database and Unix-socket launcher are not yet implemented"]}
+}

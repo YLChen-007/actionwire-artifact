@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": [
+    "schema_version", "requirement_source", "group_id", "handler_criterion_id",
+    "sink_type_id", "project", "revision", "chain_id", "requirement_id",
+    "applicability", "decision", "capability_evidence", "call_shape_facts",
+    "gate_ids", "covered_semantics", "gap", "uncertainty", "action",
+    "policy_basis", "controlled_facet", "enforcement_stage", "state_lifetime",
+    "protected_asset", "security_effect", "source_evidence", "refines_requirement_ids"
+  ],
+  "properties": {
+    "schema_version": {"const": "coverage-source-requirement-assessment/v7"},
+    "requirement_source": {"const": "source-derived"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "requirement_id": {"type": "string", "pattern": "^SR-[0-9a-f]{16}$"},
+    "applicability": {"enum": ["applicable", "not-applicable", "unknown"]},
+    "decision": {"enum": ["covered", "wrong-check", "missing-check", "not-applicable", "unknown"]},
+    "capability_evidence": {"type": "array", "uniqueItems": true, "items": {"type": "object"}},
+    "call_shape_facts": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "gate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"}},
+    "covered_semantics": {"type": ["string", "null"], "minLength": 1},
+    "gap": {"type": ["string", "null"], "minLength": 1},
+    "uncertainty": {"type": ["string", "null"], "minLength": 1},
+    "action": {"enum": ["add", "refine", "reassess"]},
+    "policy_basis": {"enum": ["explicit-source-policy", "fixed-delta", "inherent-security-boundary"]},
+    "controlled_facet": {"type": "string", "minLength": 1},
+    "enforcement_stage": {"enum": ["pre-transform", "post-transform", "pre-persist", "post-action", "cross-call"]},
+    "state_lifetime": {"enum": ["single-call", "cross-call", "persistent"]},
+    "protected_asset": {"type": "string", "minLength": 1},
+    "security_effect": {"type": "string", "minLength": 1},
+    "source_evidence": {"type": "array", "uniqueItems": true, "items": {"type": "object"}},
+    "refines_requirement_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^R-[0-9a-f]{16}$"}}
+  }
+}

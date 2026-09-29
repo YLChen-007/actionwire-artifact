@@ -1,0 +1,16 @@
+{
+  "schema_version": "clawgap-runtime-l2-environment-plan/v1",
+  "project": "droidclaw",
+  "revision": "c7c991933e4a0c03cec6044aa7fb9067d391f4d4",
+  "runtime": "bun",
+  "setup_command": "bun install",
+  "launch_command": "mkdir -p \"$HOME/bin\" && cp ../../../src/runtime_validation/environment_fixtures/droidclaw/screen-dump.xml \"$HOME/screen-dump.xml\" && cp ../../../src/runtime_validation/environment_fixtures/droidclaw/adb \"$HOME/bin/adb\" && chmod 0700 \"$HOME/bin/adb\" && export CLAWGAP_FAKE_SCREEN_XML=\"$HOME/screen-dump.xml\" PATH=\"$HOME/bin:$PATH\" && printf 'environment probe\\n' | LLM_PROVIDER=ollama OLLAMA_BASE_URL=http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}/v1 bun --preload ../../../src/runtime_validation/l2_instrumentation/bun/preload.ts src/kernel.ts",
+  "readiness_pattern": "Scanning screen...",
+  "source_files": ["package.json", "src/kernel.ts", "src/config.ts"],
+  "dependency_files": ["package.json"],
+  "fixture_files": ["src/runtime_validation/environment_fixtures/droidclaw/screen-dump.xml", "src/runtime_validation/environment_fixtures/droidclaw/adb"],
+  "provider": {"protocol": "openai-chat-completions/v1", "response_mode": "sse", "base_url": "http://127.0.0.1:${CLAWGAP_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "path": "/v1/chat/completions"},
+  "input": {"kind": "stdin", "native_channel": true},
+  "instrumentation": {"loader": "bun-preload", "event_path": "events.raw.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/llm-providers.ts:1"}, {"kind": "pre-effect", "anchor": "src/actions.ts:703"}]},
+  "effect_interceptors": ["process", "adb"]
+}

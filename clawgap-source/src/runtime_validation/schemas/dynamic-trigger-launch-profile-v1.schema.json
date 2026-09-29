@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawgap-dynamic-trigger-launch-profile-v1.schema.json",
+  "title": "ClawGap L2 dynamic-trigger launch profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project",
+    "revision",
+    "runtime",
+    "entrypoint",
+    "provider",
+    "input_transport",
+    "state",
+    "instrumentation",
+    "effect_interceptors",
+    "cleanup",
+    "qualification"
+  ],
+  "properties": {
+    "schema_version": {"const": "clawgap-dynamic-trigger-launch-profile/v1"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "runtime": {"enum": ["python", "node", "bun", "npm", "pnpm"]},
+    "entrypoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "cwd", "readiness"],
+      "properties": {
+        "build_command": {"type": "array", "items": {"type": "string"}},
+        "delivery_command": {"type": "array", "items": {"type": "string"}},
+        "command": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "cwd": {"type": "string", "minLength": 1},
+        "stdin_prompt": {"type": "boolean"},
+        "readiness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "timeout_seconds"],
+          "properties": {
+            "kind": {"enum": ["process-exit", "stdio-line", "tcp-port", "unix-socket", "none"]},
+            "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 300},
+            "pattern": {"type": "string"}
+          }
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "protocol", "base_url", "credential"],
+      "properties": {
+        "mode": {"enum": ["native-openai-compatible", "project-provider-shim"]},
+        "protocol": {"enum": ["openai-chat-completions/v1", "letta-api/v1"]},
+        "base_url": {"enum": ["http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}"]},
+        "credential": {"const": "clawgap-loopback-mock"},
+        "config_path": {"type": "string"},
+        "shim_anchor": {"type": "string", "pattern": "^[^:]+:[0-9]+$"}
+      }
+    },
+    "input_transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["stdin", "pty", "http-api", "unix-socket", "native-test-channel", "mock-channel-bridge"]},
+        "path": {"type": "string"},
+        "prompt_template": {"type": "string"}
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_files", "dependency_files", "disposable_roots", "environment"],
+      "properties": {
+        "source_files": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "dependency_files": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "disposable_roots": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "environment": {"type": "object", "additionalProperties": {"type": "string"}}
+      }
+    },
+    "instrumentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["loader", "event_path", "anchors"],
+      "properties": {
+        "loader": {"enum": ["python-sitecustomize", "node-import", "bun-preload", "none"]},
+        "event_path": {"type": "string"},
+        "anchors": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "anchor"],
+            "properties": {
+              "kind": {"enum": ["provider-request", "dispatch", "handler", "gate", "sink", "pre-effect"]},
+              "anchor": {"type": "string", "pattern": "^[^:]+:[0-9]+$"}
+            }
+          }
+        }
+      }
+    },
+    "effect_interceptors": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["process", "filesystem", "http", "browser", "messaging", "adb", "subagent"]}
+    },
+    "cleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["process_group", "disposable_root", "canary"],
+      "properties": {
+        "process_group": {"const": true},
+        "disposable_root": {"const": true},
+        "canary": {"type": "string", "minLength": 1}
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "blockers"],
+      "properties": {
+        "status": {"enum": ["ready", "blocked"]},
+        "blockers": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

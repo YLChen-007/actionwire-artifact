@@ -1,0 +1,949 @@
+[
+  {
+    "sample_id": "G06",
+    "group": {
+      "chain_count": 2,
+      "chain_refs": [
+        {
+          "chain_id": "C-2aa79d9ca43d",
+          "project": "hermes-agent"
+        },
+        {
+          "chain_id": "C-46727898f25d",
+          "project": "hermes-agent"
+        }
+      ],
+      "downstream_oracle_eligible": true,
+      "group_scope": "security",
+      "handler_criterion_id": "HC-d960df59f247179e",
+      "handler_ids": [
+        "H-c249110fb20436ac"
+      ],
+      "handler_names": [
+        "web_extract"
+      ],
+      "handler_sink_group_id": "HSG-2a9409f6633c1b6a",
+      "projects": [
+        "hermes-agent"
+      ],
+      "reason": "Security-relevant chains share the same global HC/ST oracle key.",
+      "schema_version": "handler-sink-group/v1",
+      "sink_names": [
+        "Exa.get_contents",
+        "parallel.beta.extract"
+      ],
+      "sink_refs": [
+        "hermes-agent:S-12088812d20ac550",
+        "hermes-agent:S-65686427c963ccca"
+      ],
+      "sink_type_id": "ST-74a1648d8e88dead"
+    },
+    "handler_criterion": {
+      "handler_criterion_id": "HC-d960df59f247179e",
+      "canonical_label": "Read web (observe)",
+      "operation_family": "read",
+      "resource_family": "web",
+      "effect": "observe",
+      "child_type_ids": [
+        "HT-c7e9ad8361c8941d"
+      ],
+      "representative_handler": "chatgpt-on-wechat:H-d6038130088d84cb",
+      "members": [
+        "chatgpt-on-wechat:H-d6038130088d84cb",
+        "hermes-agent:H-c249110fb20436ac",
+        "mercury-agent:H-73554ee88ddcd535",
+        "nanobot:H-488b70b0f7529245",
+        "openclaw-cn:H-bd0cf4368743f4cd",
+        "openclaw:H-8ed8399dd1d6603c"
+      ]
+    },
+    "sink_type": {
+      "sink_type_id": "ST-74a1648d8e88dead",
+      "origin": "external-global",
+      "criterion": {
+        "capability_family": "network-egress",
+        "call_shape_family": "remote-content-fetch",
+        "capability_facets": [
+          "content-retrieval",
+          "destination-control",
+          "service-mediated"
+        ],
+        "controlled_parameter_roles": [
+          "urls"
+        ],
+        "implicit_default_facets": [
+          "service-credentials",
+          "service-fetch-policy"
+        ],
+        "canonical_label": "remote content retrieval via service",
+        "compatibility_rule": "same capability type when another sink retrieves content from model-selected URLs via an external service",
+        "distinguishing_rule": "differs from direct HTTP client by delegating fetch to an external service with its own credentials and policies"
+      },
+      "representative_sink": "hermes-agent:S-12088812d20ac550",
+      "members": [
+        "hermes-agent:HC-d960df59f247179e:S-12088812d20ac550",
+        "hermes-agent:HC-d960df59f247179e:S-65686427c963ccca"
+      ],
+      "associated_handler_criterion_ids": [
+        "HC-d960df59f247179e"
+      ]
+    },
+    "fixture_source": {
+      "path": "design/paperdata/group-oracle-review-30pct/groups/G06.json",
+      "sha256": "e9ef7ea3dd282a14456074a74bb53c37a24f47fa481de141543f3cbf7a40366a",
+      "scope": "Exact four member identities and original semantic records reduced to four reviewed URL policy targets plus the WeChat scheme-only negative attribution control; unrelated gates omitted."
+    },
+    "members": [
+      {
+        "chain_id": "C-2aa79d9ca43d",
+        "gates": [
+          {
+            "callsite": "tools/web_tools.py:1297:12",
+            "gate_name": "search",
+            "gate_number": 14,
+            "gate_uid": "GUfa8fbd80e924f0481119",
+            "semantic": {
+              "default": "On no-match, the or short-circuits to the sibling operand _PREFIX_RE.search(unquote(_url)); only when that also misses does execution continue past the guard into the rest of web_extract_tool.",
+              "gate_id": "G0c0638a1b8ca24b6",
+              "input": "Ve92a998fae36: _url, a URL string element bound from web_extract_tool's urls list parameter, scanned for secret-like tokens",
+              "mode": "predicate",
+              "on_error": "No try/except wraps the search guard; any raised error is unhandled at this site. The regex is compiled unconditionally at import and is not gated by any configuration switch.",
+              "output": "Da55d22a9a42e: boolean branch decision, truthiness of re.search result (Match object vs None); _url unchanged",
+              "status": "complete",
+              "steps": [
+                {
+                  "id": "S1",
+                  "op": "derive",
+                  "rule": "Bind _url to each element of the web_extract_tool urls list parameter via for _url in urls."
+                },
+                {
+                  "id": "S2",
+                  "op": "block-if",
+                  "rule": "Block when _PREFIX_RE.search(_url) returns a truthy match, meaning a secret-prefix token appears in _url at non-word boundaries; caller returns blocked error JSON.",
+                  "source_rules": [
+                    "_PREFIX_PATTERNS = [\n    r\"sk-[A-Za-z0-9_-]{10,}\",           # OpenAI / OpenRouter / Anthropic (sk-ant-*)\n    r\"ghp_[A-Za-z0-9]{10,}\",            # GitHub PAT (classic)\n    r\"github_pat_[A-Za-z0-9_]{10,}\",    # GitHub PAT (fine-grained)\n    r\"gho_[A-Za-z0-9]{10,}\",            # GitHub OAuth access token\n    r\"ghu_[A-Za-z0-9]{10,}\",            # GitHub user-to-server token\n    r\"ghs_[A-Za-z0-9]{10,}\",            # GitHub server-to-server token\n    r\"ghr_[A-Za-z0-9]{10,}\",            # GitHub refresh token\n    r\"xox[baprs]-[A-Za-z0-9-]{10,}\",    # Slack tokens\n    r\"AIza[A-Za-z0-9_-]{30,}\",          # Google API keys\n    r\"pplx-[A-Za-z0-9]{10,}\",           # Perplexity\n    r\"fal_[A-Za-z0-9_-]{10,}\",          # Fal.ai\n    r\"fc-[A-Za-z0-9]{10,}\",             # Firecrawl\n    r\"bb_live_[A-Za-z0-9_-]{10,}\",      # BrowserBase\n    r\"gAAAA[A-Za-z0-9_=-]{20,}\",        # Codex encrypted tokens\n    r\"AKIA[A-Z0-9]{16}\",                # AWS Access Key ID\n    r\"sk_live_[A-Za-z0-9]{10,}\",        # Stripe secret key (live)\n    r\"sk_test_[A-Za-z0-9]{10,}\",        # Stripe secret key (test)\n    r\"rk_live_[A-Za-z0-9]{10,}\",        # Stripe restricted key\n    r\"SG\\.[A-Za-z0-9_-]{10,}\",          # SendGrid API key\n    r\"hf_[A-Za-z0-9]{10,}\",             # HuggingFace token\n    r\"r8_[A-Za-z0-9]{10,}\",             # Replicate API token\n    r\"npm_[A-Za-z0-9]{10,}\",            # npm access token\n    r\"pypi-[A-Za-z0-9_-]{10,}\",         # PyPI API token\n    r\"dop_v1_[A-Za-z0-9]{10,}\",         # DigitalOcean PAT\n    r\"doo_v1_[A-Za-z0-9]{10,}\",         # DigitalOcean OAuth\n    r\"am_[A-Za-z0-9_-]{10,}\",           # AgentMail API key\n    r\"sk_[A-Za-z0-9_]{10,}\",            # ElevenLabs TTS key (sk_ underscore, not sk- dash)\n    r\"tvly-[A-Za-z0-9]{10,}\",           # Tavily search API key\n    r\"exa_[A-Za-z0-9]{10,}\",            # Exa search API key\n    r\"gsk_[A-Za-z0-9]{10,}\",            # Groq Cloud API key\n    r\"syt_[A-Za-z0-9]{10,}\",            # Matrix access token\n    r\"retaindb_[A-Za-z0-9]{10,}\",       # RetainDB API key\n    r\"hsk-[A-Za-z0-9]{10,}\",            # Hindsight API key\n    r\"mem0_[A-Za-z0-9]{10,}\",           # Mem0 Platform API key\n    r\"brv_[A-Za-z0-9]{10,}\",            # ByteRover API key\n]",
+                    "_PREFIX_RE = re.compile(\n    r\"(?<![A-Za-z0-9_-])(\" + \"|\".join(_PREFIX_PATTERNS) + r\")(?![A-Za-z0-9_-])\"\n)"
+                  ]
+                }
+              ],
+              "summary": "Predicate gate blocks a URL when the compiled secret-prefix regex finds a known API-key/token pattern anywhere in the raw URL; a miss falls through to the URL-decoded sibling check."
+            },
+            "static_verdict": "confirmed"
+          },
+          {
+            "callsite": "tools/web_tools.py:1328:20",
+            "gate_name": "is_safe_url",
+            "gate_number": 264,
+            "gate_uid": "GU1ed6874487204858ee3a",
+            "semantic": {
+              "default": "Returning False (not safe) makes the caller run the if-branch and append url to ssrf_blocked; returning True runs the else-branch and appends url to safe_urls, then dispatch reads safe_urls.",
+              "gate_id": "Gebd7888a1a8188ad",
+              "input": "V40ffe7cce26d: url string taken from web_extract_tool's urls list (for url in urls loop)",
+              "mode": "filter",
+              "on_error": "Outer except Exception returns False (fail closed), routing the URL to ssrf_blocked; socket.gaierror in S4 likewise returns False.",
+              "output": "V00ad310cfaeb: boolean is_safe_url result; True admits to safe_urls, False routes to ssrf_blocked",
+              "status": "complete",
+              "steps": [
+                {
+                  "id": "S1",
+                  "op": "derive",
+                  "rule": "Parse url with urlparse, strip/lowercase hostname, drop trailing dot, lowercase scheme."
+                },
+                {
+                  "id": "S2",
+                  "op": "block-if",
+                  "rule": "Return False when the parsed hostname is empty or in _BLOCKED_HOSTNAMES.",
+                  "source_rules": [
+                    "_BLOCKED_HOSTNAMES = frozenset({\n    \"metadata.google.internal\",\n    \"metadata.goog\",\n})"
+                  ]
+                },
+                {
+                  "id": "S3",
+                  "op": "derive",
+                  "rule": "Resolve cached allow_all_private from HERMES_ALLOW_PRIVATE_URLS env then config security/browser allow_private_urls; default False.",
+                  "source_rules": [
+                    "env_val = os.getenv(\"HERMES_ALLOW_PRIVATE_URLS\", \"\").strip().lower()",
+                    "if env_val in (\"true\", \"1\", \"yes\"):",
+                    "if env_val in (\"false\", \"0\", \"no\"):",
+                    "TRUTHY_STRINGS = frozenset({\"1\", \"true\", \"yes\", \"on\"})",
+                    "if isinstance(sec, dict) and is_truthy_value(\n            sec.get(\"allow_private_urls\"), default=False\n        ):",
+                    "if isinstance(browser, dict) and is_truthy_value(\n            browser.get(\"allow_private_urls\"), default=False\n        ):"
+                  ]
+                },
+                {
+                  "id": "S4",
+                  "op": "constrain",
+                  "rule": "Resolve hostname via socket.getaddrinfo(AF_UNSPEC, SOCK_STREAM); on socket.gaierror return False."
+                },
+                {
+                  "id": "S5",
+                  "op": "derive",
+                  "rule": "Parse each resolved sockaddr IP via ipaddress.ip_address; skip entries raising ValueError."
+                },
+                {
+                  "id": "S6",
+                  "op": "block-if",
+                  "rule": "Return False when resolved IP is in _ALWAYS_BLOCKED_IPS or any _ALWAYS_BLOCKED_NETWORKS.",
+                  "source_rules": [
+                    "_ALWAYS_BLOCKED_IPS = frozenset({\n    ipaddress.ip_address(\"169.254.169.254\"),  # AWS/GCP/Azure/DO/Oracle metadata\n    ipaddress.ip_address(\"169.254.170.2\"),     # AWS ECS task metadata (task IAM creds)\n    ipaddress.ip_address(\"169.254.169.253\"),   # Azure IMDS wire server\n    ipaddress.ip_address(\"fd00:ec2::254\"),     # AWS metadata (IPv6)\n    ipaddress.ip_address(\"100.100.100.200\"),   # Alibaba Cloud metadata\n})",
+                    "_ALWAYS_BLOCKED_NETWORKS = (\n    ipaddress.ip_network(\"169.254.0.0/16\"),    # Entire link-local range (no legit agent target)\n)"
+                  ]
+                },
+                {
+                  "id": "S7",
+                  "op": "block-if",
+                  "rule": "Return False when IP is private/internal unless allow_all_private or trusted HTTPS host; otherwise continue.",
+                  "source_rules": [
+                    "_TRUSTED_PRIVATE_IP_HOSTS = frozenset({\n    \"multimedia.nt.qq.com.cn\",\n})",
+                    "_CGNAT_NETWORK = ipaddress.ip_network(\"100.64.0.0/10\")",
+                    "def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:\n    \"\"\"Return True if the IP should be blocked for SSRF protection.\"\"\"\n    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:\n        return True\n    if ip.is_multicast or ip.is_unspecified:\n        return True\n    # CGNAT range not covered by is_private\n    if ip in _CGNAT_NETWORK:\n        return True\n    return False",
+                    "def _allows_private_ip_resolution(hostname: str, scheme: str) -> bool:\n    \"\"\"Return True when a trusted HTTPS hostname may bypass IP-class blocking.\"\"\"\n    return scheme == \"https\" and hostname in _TRUSTED_PRIVATE_IP_HOSTS"
+                  ]
+                },
+                {
+                  "id": "S8",
+                  "op": "admit-if",
+                  "rule": "When the resolution loop completes with no blocking, return True (admit)."
+                }
+              ],
+              "summary": "Blocks URLs with missing/blocked hostnames or that resolve to metadata, private, or internal IPs; fails closed on DNS or parse errors; config toggle can skip private-IP blocking."
+            },
+            "static_verdict": "confirmed"
+          }
+        ],
+        "handler": {
+          "location": "tools/web_tools.py:1263",
+          "qualified_name": "web_extract_tool",
+          "source_parameter": "format;min_length;model;urls;use_llm_processing",
+          "tool_name": "web_extract_tool"
+        },
+        "project": {
+          "id": "hermes-agent",
+          "revision": "04439ac77f08915b4886bc3c79165a9538af6219"
+        },
+        "schema_version": "call-chain-semantic-ir/v3",
+        "sink": {
+          "boundary": "invocation",
+          "label": "_get_exa_client().get_contents",
+          "location": "tools/web_tools.py:1020:16",
+          "sink_id": "S-12088812d20ac550"
+        },
+        "sink_constraint": {
+          "call_shape": "_get_exa_client().get_contents( urls, text=True, )",
+          "capability_card": {
+            "path": "src/sink_capacity/sink-capability-cards/exa.get_contents.md",
+            "sha256": "780ff6d3973f45d12daf554390109a598222d48a6f857d2b03a5fe04b57bc6a5"
+          },
+          "capability_class": "network-egress",
+          "constraint_id": "SC-12088812d20ac550",
+          "controlled_argument": "urls",
+          "location": "tools/web_tools.py:1020:16",
+          "sink_api": "Exa.get_contents",
+          "sink_id": "S-12088812d20ac550"
+        },
+        "status": "complete",
+        "summary": "Collects 2 detected gate semantics in call-chain order before _get_exa_client().get_contents; the terminal sink point is the capability constraint.",
+        "unresolved": [],
+        "values": [
+          {
+            "gate_bindings": [
+              {
+                "gate_id": "G0c0638a1b8ca24b6"
+              },
+              {
+                "gate_id": "Gebd7888a1a8188ad"
+              }
+            ],
+            "id": "CV-73073d68c65f",
+            "sink_binding": "urls",
+            "source_parameter": "format;min_length;model;urls;use_llm_processing"
+          }
+        ]
+      },
+      {
+        "chain_id": "C-46727898f25d",
+        "gates": [
+          {
+            "callsite": "tools/web_tools.py:1297:12",
+            "gate_name": "search",
+            "gate_number": 14,
+            "gate_uid": "GUfa8fbd80e924f0481119",
+            "semantic": {
+              "default": "On no-match, the or short-circuits to the sibling operand _PREFIX_RE.search(unquote(_url)); only when that also misses does execution continue past the guard into the rest of web_extract_tool.",
+              "gate_id": "G0c0638a1b8ca24b6",
+              "input": "Ve92a998fae36: _url, a URL string element bound from web_extract_tool's urls list parameter, scanned for secret-like tokens",
+              "mode": "predicate",
+              "on_error": "No try/except wraps the search guard; any raised error is unhandled at this site. The regex is compiled unconditionally at import and is not gated by any configuration switch.",
+              "output": "Da55d22a9a42e: boolean branch decision, truthiness of re.search result (Match object vs None); _url unchanged",
+              "status": "complete",
+              "steps": [
+                {
+                  "id": "S1",
+                  "op": "derive",
+                  "rule": "Bind _url to each element of the web_extract_tool urls list parameter via for _url in urls."
+                },
+                {
+                  "id": "S2",
+                  "op": "block-if",
+                  "rule": "Block when _PREFIX_RE.search(_url) returns a truthy match, meaning a secret-prefix token appears in _url at non-word boundaries; caller returns blocked error JSON.",
+                  "source_rules": [
+                    "_PREFIX_PATTERNS = [\n    r\"sk-[A-Za-z0-9_-]{10,}\",           # OpenAI / OpenRouter / Anthropic (sk-ant-*)\n    r\"ghp_[A-Za-z0-9]{10,}\",            # GitHub PAT (classic)\n    r\"github_pat_[A-Za-z0-9_]{10,}\",    # GitHub PAT (fine-grained)\n    r\"gho_[A-Za-z0-9]{10,}\",            # GitHub OAuth access token\n    r\"ghu_[A-Za-z0-9]{10,}\",            # GitHub user-to-server token\n    r\"ghs_[A-Za-z0-9]{10,}\",            # GitHub server-to-server token\n    r\"ghr_[A-Za-z0-9]{10,}\",            # GitHub refresh token\n    r\"xox[baprs]-[A-Za-z0-9-]{10,}\",    # Slack tokens\n    r\"AIza[A-Za-z0-9_-]{30,}\",          # Google API keys\n    r\"pplx-[A-Za-z0-9]{10,}\",           # Perplexity\n    r\"fal_[A-Za-z0-9_-]{10,}\",          # Fal.ai\n    r\"fc-[A-Za-z0-9]{10,}\",             # Firecrawl\n    r\"bb_live_[A-Za-z0-9_-]{10,}\",      # BrowserBase\n    r\"gAAAA[A-Za-z0-9_=-]{20,}\",        # Codex encrypted tokens\n    r\"AKIA[A-Z0-9]{16}\",                # AWS Access Key ID\n    r\"sk_live_[A-Za-z0-9]{10,}\",        # Stripe secret key (live)\n    r\"sk_test_[A-Za-z0-9]{10,}\",        # Stripe secret key (test)\n    r\"rk_live_[A-Za-z0-9]{10,}\",        # Stripe restricted key\n    r\"SG\\.[A-Za-z0-9_-]{10,}\",          # SendGrid API key\n    r\"hf_[A-Za-z0-9]{10,}\",             # HuggingFace token\n    r\"r8_[A-Za-z0-9]{10,}\",             # Replicate API token\n    r\"npm_[A-Za-z0-9]{10,}\",            # npm access token\n    r\"pypi-[A-Za-z0-9_-]{10,}\",         # PyPI API token\n    r\"dop_v1_[A-Za-z0-9]{10,}\",         # DigitalOcean PAT\n    r\"doo_v1_[A-Za-z0-9]{10,}\",         # DigitalOcean OAuth\n    r\"am_[A-Za-z0-9_-]{10,}\",           # AgentMail API key\n    r\"sk_[A-Za-z0-9_]{10,}\",            # ElevenLabs TTS key (sk_ underscore, not sk- dash)\n    r\"tvly-[A-Za-z0-9]{10,}\",           # Tavily search API key\n    r\"exa_[A-Za-z0-9]{10,}\",            # Exa search API key\n    r\"gsk_[A-Za-z0-9]{10,}\",            # Groq Cloud API key\n    r\"syt_[A-Za-z0-9]{10,}\",            # Matrix access token\n    r\"retaindb_[A-Za-z0-9]{10,}\",       # RetainDB API key\n    r\"hsk-[A-Za-z0-9]{10,}\",            # Hindsight API key\n    r\"mem0_[A-Za-z0-9]{10,}\",           # Mem0 Platform API key\n    r\"brv_[A-Za-z0-9]{10,}\",            # ByteRover API key\n]",
+                    "_PREFIX_RE = re.compile(\n    r\"(?<![A-Za-z0-9_-])(\" + \"|\".join(_PREFIX_PATTERNS) + r\")(?![A-Za-z0-9_-])\"\n)"
+                  ]
+                }
+              ],
+              "summary": "Predicate gate blocks a URL when the compiled secret-prefix regex finds a known API-key/token pattern anywhere in the raw URL; a miss falls through to the URL-decoded sibling check."
+            },
+            "static_verdict": "confirmed"
+          },
+          {
+            "callsite": "tools/web_tools.py:1328:20",
+            "gate_name": "is_safe_url",
+            "gate_number": 264,
+            "gate_uid": "GU1ed6874487204858ee3a",
+            "semantic": {
+              "default": "Returning False (not safe) makes the caller run the if-branch and append url to ssrf_blocked; returning True runs the else-branch and appends url to safe_urls, then dispatch reads safe_urls.",
+              "gate_id": "Gebd7888a1a8188ad",
+              "input": "V40ffe7cce26d: url string taken from web_extract_tool's urls list (for url in urls loop)",
+              "mode": "filter",
+              "on_error": "Outer except Exception returns False (fail closed), routing the URL to ssrf_blocked; socket.gaierror in S4 likewise returns False.",
+              "output": "V00ad310cfaeb: boolean is_safe_url result; True admits to safe_urls, False routes to ssrf_blocked",
+              "status": "complete",
+              "steps": [
+                {
+                  "id": "S1",
+                  "op": "derive",
+                  "rule": "Parse url with urlparse, strip/lowercase hostname, drop trailing dot, lowercase scheme."
+                },
+                {
+                  "id": "S2",
+                  "op": "block-if",
+                  "rule": "Return False when the parsed hostname is empty or in _BLOCKED_HOSTNAMES.",
+                  "source_rules": [
+                    "_BLOCKED_HOSTNAMES = frozenset({\n    \"metadata.google.internal\",\n    \"metadata.goog\",\n})"
+                  ]
+                },
+                {
+                  "id": "S3",
+                  "op": "derive",
+                  "rule": "Resolve cached allow_all_private from HERMES_ALLOW_PRIVATE_URLS env then config security/browser allow_private_urls; default False.",
+                  "source_rules": [
+                    "env_val = os.getenv(\"HERMES_ALLOW_PRIVATE_URLS\", \"\").strip().lower()",
+                    "if env_val in (\"true\", \"1\", \"yes\"):",
+                    "if env_val in (\"false\", \"0\", \"no\"):",
+                    "TRUTHY_STRINGS = frozenset({\"1\", \"true\", \"yes\", \"on\"})",
+                    "if isinstance(sec, dict) and is_truthy_value(\n            sec.get(\"allow_private_urls\"), default=False\n        ):",
+                    "if isinstance(browser, dict) and is_truthy_value(\n            browser.get(\"allow_private_urls\"), default=False\n        ):"
+                  ]
+                },
+                {
+                  "id": "S4",
+                  "op": "constrain",
+                  "rule": "Resolve hostname via socket.getaddrinfo(AF_UNSPEC, SOCK_STREAM); on socket.gaierror return False."
+                },
+                {
+                  "id": "S5",
+                  "op": "derive",
+                  "rule": "Parse each resolved sockaddr IP via ipaddress.ip_address; skip entries raising ValueError."
+                },
+                {
+                  "id": "S6",
+                  "op": "block-if",
+                  "rule": "Return False when resolved IP is in _ALWAYS_BLOCKED_IPS or any _ALWAYS_BLOCKED_NETWORKS.",
+                  "source_rules": [
+                    "_ALWAYS_BLOCKED_IPS = frozenset({\n    ipaddress.ip_address(\"169.254.169.254\"),  # AWS/GCP/Azure/DO/Oracle metadata\n    ipaddress.ip_address(\"169.254.170.2\"),     # AWS ECS task metadata (task IAM creds)\n    ipaddress.ip_address(\"169.254.169.253\"),   # Azure IMDS wire server\n    ipaddress.ip_address(\"fd00:ec2::254\"),     # AWS metadata (IPv6)\n    ipaddress.ip_address(\"100.100.100.200\"),   # Alibaba Cloud metadata\n})",
+                    "_ALWAYS_BLOCKED_NETWORKS = (\n    ipaddress.ip_network(\"169.254.0.0/16\"),    # Entire link-local range (no legit agent target)\n)"
+                  ]
+                },
+                {
+                  "id": "S7",
+                  "op": "block-if",
+                  "rule": "Return False when IP is private/internal unless allow_all_private or trusted HTTPS host; otherwise continue.",
+                  "source_rules": [
+                    "_TRUSTED_PRIVATE_IP_HOSTS = frozenset({\n    \"multimedia.nt.qq.com.cn\",\n})",
+                    "_CGNAT_NETWORK = ipaddress.ip_network(\"100.64.0.0/10\")",
+                    "def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:\n    \"\"\"Return True if the IP should be blocked for SSRF protection.\"\"\"\n    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:\n        return True\n    if ip.is_multicast or ip.is_unspecified:\n        return True\n    # CGNAT range not covered by is_private\n    if ip in _CGNAT_NETWORK:\n        return True\n    return False",
+                    "def _allows_private_ip_resolution(hostname: str, scheme: str) -> bool:\n    \"\"\"Return True when a trusted HTTPS hostname may bypass IP-class blocking.\"\"\"\n    return scheme == \"https\" and hostname in _TRUSTED_PRIVATE_IP_HOSTS"
+                  ]
+                },
+                {
+                  "id": "S8",
+                  "op": "admit-if",
+                  "rule": "When the resolution loop completes with no blocking, return True (admit)."
+                }
+              ],
+              "summary": "Blocks URLs with missing/blocked hostnames or that resolve to metadata, private, or internal IPs; fails closed on DNS or parse errors; config toggle can skip private-IP blocking."
+            },
+            "static_verdict": "confirmed"
+          }
+        ],
+        "handler": {
+          "location": "tools/web_tools.py:1263",
+          "qualified_name": "web_extract_tool",
+          "source_parameter": "format;min_length;model;urls;use_llm_processing",
+          "tool_name": "web_extract_tool"
+        },
+        "project": {
+          "id": "hermes-agent",
+          "revision": "04439ac77f08915b4886bc3c79165a9538af6219"
+        },
+        "schema_version": "call-chain-semantic-ir/v3",
+        "sink": {
+          "boundary": "invocation",
+          "label": "Attribute.extract",
+          "location": "tools/web_tools.py:1085:22",
+          "sink_id": "S-65686427c963ccca"
+        },
+        "sink_constraint": {
+          "call_shape": "_get_async_parallel_client().beta.extract( urls=urls, full_content=True, )",
+          "capability_card": {
+            "path": "src/sink_capacity/sink-capability-cards/parallel.beta.extract.md",
+            "sha256": "013365411077a3f86f102543ca2139dbdf1c999e8ab5cfe92c2eb144b3a83fef"
+          },
+          "capability_class": "network-egress",
+          "constraint_id": "SC-65686427c963ccca",
+          "controlled_argument": "urls",
+          "location": "tools/web_tools.py:1085:22",
+          "sink_api": "parallel.beta.extract",
+          "sink_id": "S-65686427c963ccca"
+        },
+        "status": "complete",
+        "summary": "Collects 2 detected gate semantics in call-chain order before Attribute.extract; the terminal sink point is the capability constraint.",
+        "unresolved": [],
+        "values": [
+          {
+            "gate_bindings": [
+              {
+                "gate_id": "G0c0638a1b8ca24b6"
+              },
+              {
+                "gate_id": "Gebd7888a1a8188ad"
+              }
+            ],
+            "id": "CV-ad913e91a4dd",
+            "sink_binding": "urls",
+            "source_parameter": "format;min_length;model;urls;use_llm_processing"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "sample_id": "G25",
+    "group": {
+      "chain_count": 2,
+      "chain_refs": [
+        {
+          "chain_id": "C-cc8199b82f91",
+          "project": "chatgpt-on-wechat"
+        },
+        {
+          "chain_id": "C-806a548b73e2",
+          "project": "hermes-agent"
+        }
+      ],
+      "downstream_oracle_eligible": true,
+      "group_scope": "security",
+      "handler_criterion_id": "HC-2ba850024be5b542",
+      "handler_ids": [
+        "H-509a25b9661cbb94",
+        "H-776f77450f05f4bc"
+      ],
+      "handler_names": [
+        "vision",
+        "vision_analyze"
+      ],
+      "handler_sink_group_id": "HSG-3209832c56152666",
+      "projects": [
+        "chatgpt-on-wechat",
+        "hermes-agent"
+      ],
+      "reason": "Security-relevant chains share the same global HC/ST oracle key.",
+      "schema_version": "handler-sink-group/v1",
+      "sink_names": [
+        "client.get",
+        "requests.get"
+      ],
+      "sink_refs": [
+        "chatgpt-on-wechat:S-db7ba70fe3632ff0",
+        "hermes-agent:S-d7ee8fde79e1a2c6"
+      ],
+      "sink_type_id": "ST-83923c85e4a23cd3"
+    },
+    "handler_criterion": {
+      "handler_criterion_id": "HC-2ba850024be5b542",
+      "canonical_label": "Analyze image (observe)",
+      "operation_family": "analyze",
+      "resource_family": "image",
+      "effect": "observe",
+      "child_type_ids": [
+        "HT-745def2daf0f3057"
+      ],
+      "representative_handler": "chatgpt-on-wechat:H-776f77450f05f4bc",
+      "members": [
+        "chatgpt-on-wechat:H-776f77450f05f4bc",
+        "hermes-agent:H-509a25b9661cbb94",
+        "openclaw-cn:H-8ee717c881d6c519",
+        "openclaw:H-1bcc2de1393070e5"
+      ]
+    },
+    "sink_type": {
+      "sink_type_id": "ST-83923c85e4a23cd3",
+      "origin": "nanobot-seed",
+      "criterion": {
+        "capability_family": "network-egress",
+        "call_shape_family": "http-client-request",
+        "capability_facets": [
+          "data-exfiltration",
+          "http-request",
+          "internal-network-access",
+          "metadata-exfiltration",
+          "ssrf"
+        ],
+        "controlled_parameter_roles": [
+          "body",
+          "headers",
+          "method",
+          "params",
+          "url"
+        ],
+        "implicit_default_facets": [
+          "dns-resolution-at-connect",
+          "follow-redirects-default-false",
+          "timeout-default-5s",
+          "tls-verify-default-true",
+          "trust-env"
+        ],
+        "canonical_label": "HTTP client request",
+        "compatibility_rule": "Same capability type when another sink makes outbound HTTP/HTTPS requests to a model-controlled URL, including SSRF and network egress.",
+        "distinguishing_rule": "Distinct from file or process sinks because it performs network communication, not local file or process operations."
+      },
+      "representative_sink": "chatgpt-on-wechat:S-a0253a1b335c9ba6",
+      "members": [
+        "chatgpt-on-wechat:HC-2ba850024be5b542:S-db7ba70fe3632ff0",
+        "chatgpt-on-wechat:HC-d960df59f247179e:S-a0253a1b335c9ba6",
+        "chatgpt-on-wechat:HC-d960df59f247179e:S-c2d7cbccf7cee229",
+        "hermes-agent:HC-22ab2139fc290edc:S-6e3154a095e49165",
+        "hermes-agent:HC-2ba850024be5b542:S-d7ee8fde79e1a2c6",
+        "hermes-agent:HC-4e2d43b153137049:S-0c0e1ee6ff9a23e1",
+        "hermes-agent:HC-4e2d43b153137049:S-2f05cf4aca502b46",
+        "hermes-agent:HC-4ed26ca19433a28f:S-0c0e1ee6ff9a23e1",
+        "hermes-agent:HC-4ed26ca19433a28f:S-2d926f3506ccee25",
+        "hermes-agent:HC-50b953739747c723:S-a779c7f6aff4633e",
+        "hermes-agent:HC-5afd4fc3bb452de5:S-78e9f9f7395ac151",
+        "hermes-agent:HC-910272b83888c18a:S-a779c7f6aff4633e",
+        "hermes-agent:HC-9f87ffb48d21dcf9:S-a779c7f6aff4633e",
+        "hermes-agent:HC-af72e7eeddd90792:S-a779c7f6aff4633e",
+        "hermes-agent:HC-d6a5ed749a9cb61e:S-a779c7f6aff4633e",
+        "hermes-agent:HC-d960df59f247179e:S-fa0cc1bbb22fcec0",
+        "hermes-agent:HC-f7ef9e259b7e800b:S-0c0e1ee6ff9a23e1",
+        "hermes-agent:HC-f7ef9e259b7e800b:S-2f05cf4aca502b46",
+        "mercury-agent:HC-2d9cc8f18c59fd41:S-e1384631024e3acd",
+        "mercury-agent:HC-41965de4fcfbe6c9:S-9865b5ce4bc62018",
+        "mercury-agent:HC-d960df59f247179e:S-b4d5f5d0c080a6f6",
+        "nanobot:HC-c9a9e622cb2029dc:S-40fdd9c405333b31",
+        "nanobot:HC-c9a9e622cb2029dc:S-5a8fa3d7050c04c5",
+        "nanobot:HC-c9a9e622cb2029dc:S-bccb132b7b49bd21",
+        "nanobot:HC-d960df59f247179e:S-766f8be20b0a3140",
+        "nanobot:HC-d960df59f247179e:S-b52a05950bc13ad6",
+        "openclaw-cn:HC-c9a9e622cb2029dc:S-5b0322ba4a3b5156",
+        "openclaw-cn:HC-d2066d14084c5c80:S-2f146cbed07ead59",
+        "openclaw:HC-c9a9e622cb2029dc:S-e722a134eb096467",
+        "openclaw:HC-d960df59f247179e:S-6b1a528ad782e1d1",
+        "poco-agent:HC-09bc9bd74acc4698:S-329c7203f88db8f3",
+        "poco-agent:HC-1b49649c03a87531:S-329c7203f88db8f3",
+        "poco-agent:HC-60316eebc702f407:S-1e33de3dbf15b812",
+        "poco-agent:HC-637edf8a7a4f6b53:S-329c7203f88db8f3",
+        "poco-agent:HC-668bbef664993a39:S-97b9d06b7edd9c36",
+        "poco-agent:HC-67b46d9035315184:S-329c7203f88db8f3",
+        "poco-agent:HC-68c3dcc78c77a575:S-1e33de3dbf15b812",
+        "poco-agent:HC-6cc123916e5c8919:S-1e33de3dbf15b812",
+        "poco-agent:HC-bc574d529a2d209c:S-329c7203f88db8f3",
+        "poco-agent:HC-bea0f995e27054d4:S-329c7203f88db8f3",
+        "poco-agent:HC-d6a5ed749a9cb61e:S-329c7203f88db8f3",
+        "poco-agent:HC-ed63a4c1a0c73549:S-1e33de3dbf15b812",
+        "poco-agent:HC-fcda6fca08fd542e:S-329c7203f88db8f3"
+      ],
+      "associated_handler_criterion_ids": [
+        "HC-09bc9bd74acc4698",
+        "HC-1b49649c03a87531",
+        "HC-22ab2139fc290edc",
+        "HC-2ba850024be5b542",
+        "HC-2d9cc8f18c59fd41",
+        "HC-41965de4fcfbe6c9",
+        "HC-4e2d43b153137049",
+        "HC-4ed26ca19433a28f",
+        "HC-50b953739747c723",
+        "HC-5afd4fc3bb452de5",
+        "HC-60316eebc702f407",
+        "HC-637edf8a7a4f6b53",
+        "HC-668bbef664993a39",
+        "HC-67b46d9035315184",
+        "HC-68c3dcc78c77a575",
+        "HC-6cc123916e5c8919",
+        "HC-910272b83888c18a",
+        "HC-9f87ffb48d21dcf9",
+        "HC-af72e7eeddd90792",
+        "HC-bc574d529a2d209c",
+        "HC-bea0f995e27054d4",
+        "HC-c9a9e622cb2029dc",
+        "HC-d2066d14084c5c80",
+        "HC-d6a5ed749a9cb61e",
+        "HC-d960df59f247179e",
+        "HC-ed63a4c1a0c73549",
+        "HC-f7ef9e259b7e800b",
+        "HC-fcda6fca08fd542e"
+      ]
+    },
+    "fixture_source": {
+      "path": "design/paperdata/group-oracle-review-30pct/groups/G25.json",
+      "sha256": "3202bb765b5ec1e3a0a0a2155304012acf4ca44484e9f38edf8c8b42a36bb9c8",
+      "scope": "Exact four member identities and original semantic records reduced to four reviewed URL policy targets plus the WeChat scheme-only negative attribution control; unrelated gates omitted."
+    },
+    "members": [
+      {
+        "chain_id": "C-cc8199b82f91",
+        "gates": [
+          {
+            "callsite": "agent/tools/vision/vision.py:572:12",
+            "gate_name": "startswith",
+            "gate_number": 12,
+            "gate_uid": "GUb6fd39b96570f9649480",
+            "semantic": {
+              "default": "When startswith returns false, the calling loop continues to the next image item without download.",
+              "gate_id": "G2a9d50ed351fe715",
+              "input": "V5150458988cd: image value (likely a string or bytes-like) being checked for an HTTP(S) prefix",
+              "mode": "predicate",
+              "on_error": "If image lacks a startswith method or startswith raises (e.g., wrong type), the exception propagates; branch result is not produced.",
+              "output": "D1edb1b6a26b8: boolean result of image.startswith((\"http://\", \"https://\"))",
+              "status": "complete",
+              "steps": [
+                {
+                  "id": "S1",
+                  "op": "allow-if",
+                  "rule": "If image string starts with http:// or https://, branch true and call _download_to_data_url.",
+                  "source_rules": [
+                    "if image.startswith((\"http://\", \"https://\")):"
+                  ]
+                }
+              ],
+              "summary": "Returns true when image starts with either http:// or https://, routing such inputs to download-to-data-url handling."
+            },
+            "static_verdict": "confirmed"
+          }
+        ],
+        "handler": {
+          "location": "agent/tools/vision/vision.py:130",
+          "qualified_name": "Vision.execute",
+          "source_parameter": "args",
+          "tool_name": "vision"
+        },
+        "project": {
+          "id": "chatgpt-on-wechat",
+          "revision": "55aaf60a57ea6e9f4b8a54797572d98f65e88d2f"
+        },
+        "schema_version": "call-chain-semantic-ir/v3",
+        "sink": {
+          "boundary": "invocation",
+          "label": "requests.get",
+          "location": "agent/tools/vision/vision.py:600:16",
+          "sink_id": "S-db7ba70fe3632ff0"
+        },
+        "sink_constraint": {
+          "call_shape": "requests.get(url, timeout=30)",
+          "capability_card": {
+            "path": "src/sink_capacity/sink-capability-cards/requests.get-post-request.md",
+            "sha256": "988e304db2fe6b569610e886c906998b850fb44542f1c8f14d40d272c70a3730"
+          },
+          "capability_class": "network-egress",
+          "constraint_id": "SC-db7ba70fe3632ff0",
+          "controlled_argument": "url",
+          "location": "agent/tools/vision/vision.py:600:16",
+          "sink_api": "requests.get",
+          "sink_id": "S-db7ba70fe3632ff0"
+        },
+        "status": "complete",
+        "summary": "Collects 5 detected gate semantics in call-chain order before requests.get; the terminal sink point is the capability constraint.",
+        "unresolved": [],
+        "values": [
+          {
+            "gate_bindings": [
+              {
+                "gate_id": "Gc35b40281f2bfd62"
+              },
+              {
+                "gate_id": "G9f1da9f69f29dbfb"
+              },
+              {
+                "gate_id": "G55192b9cf8c7b7bb"
+              },
+              {
+                "gate_id": "G9f2f19efc1643adb"
+              },
+              {
+                "gate_id": "G2a9d50ed351fe715"
+              }
+            ],
+            "id": "CV-a0c3118d58f2",
+            "sink_binding": "url",
+            "source_parameter": "args"
+          }
+        ]
+      },
+      {
+        "chain_id": "C-806a548b73e2",
+        "gates": [
+          {
+            "callsite": "tools/vision_tools.py:483:14",
+            "gate_name": "_validate_image_url",
+            "gate_number": 195,
+            "gate_uid": "GUd41b18fdd81044c24697",
+            "semantic": {
+              "default": "True result returns to callsite line 483, whose true branch runs check_website_access(image_url) next; False result makes the caller raise ValueError (lines 493-496).",
+              "gate_id": "Gacfd39ce52aed8f2",
+              "input": "V25e78edc13db: image_url, attacker-controlled URL string derived from args",
+              "mode": "predicate",
+              "on_error": "is_safe_url catches all unexpected exceptions and returns False (fail-closed); the outer gate raises nothing after the type guard.",
+              "output": "D66caad1900a2: boolean verdict; true admits remote-URL branch, false routes caller to ValueError",
+              "status": "complete",
+              "steps": [
+                {
+                  "id": "S1",
+                  "op": "block-if",
+                  "rule": "Empty, falsy, or non-string URL rejected before parsing."
+                },
+                {
+                  "id": "S2",
+                  "op": "block-if",
+                  "rule": "URL must start with http:// or https://, else rejected.",
+                  "source_rules": [
+                    "if not url.startswith((\"http://\", \"https://\")):"
+                  ]
+                },
+                {
+                  "id": "S3",
+                  "op": "block-if",
+                  "rule": "Parsed URL must have non-empty netloc network location, else rejected."
+                },
+                {
+                  "id": "S4",
+                  "op": "block-if",
+                  "rule": "Hostname must be present and not in always-blocked metadata hostnames, else rejected.",
+                  "source_rules": [
+                    "_BLOCKED_HOSTNAMES = frozenset({\n    \"metadata.google.internal\",\n    \"metadata.goog\",\n})"
+                  ]
+                },
+                {
+                  "id": "S5",
+                  "op": "derive",
+                  "rule": "Load cached private-URL toggle from env or config; trusted HTTPS hostname may bypass IP-class blocking.",
+                  "source_rules": [
+                    "env_val = os.getenv(\"HERMES_ALLOW_PRIVATE_URLS\", \"\").strip().lower()",
+                    "if env_val in (\"true\", \"1\", \"yes\"):",
+                    "TRUTHY_STRINGS = frozenset({\"1\", \"true\", \"yes\", \"on\"})",
+                    "_TRUSTED_PRIVATE_IP_HOSTS = frozenset({\n    \"multimedia.nt.qq.com.cn\",\n})"
+                  ]
+                },
+                {
+                  "id": "S6",
+                  "op": "block-if",
+                  "rule": "DNS resolution failure (gaierror) fails closed, rejecting the URL."
+                },
+                {
+                  "id": "S7",
+                  "op": "block-if",
+                  "rule": "Any resolved IP in always-blocked metadata/link-local set rejects URL regardless of toggle.",
+                  "source_rules": [
+                    "_ALWAYS_BLOCKED_IPS = frozenset({\n    ipaddress.ip_address(\"169.254.169.254\"),  # AWS/GCP/Azure/DO/Oracle metadata\n    ipaddress.ip_address(\"169.254.170.2\"),     # AWS ECS task metadata (task IAM creds)\n    ipaddress.ip_address(\"169.254.169.253\"),   # Azure IMDS wire server\n    ipaddress.ip_address(\"fd00:ec2::254\"),     # AWS metadata (IPv6)\n    ipaddress.ip_address(\"100.100.100.200\"),   # Alibaba Cloud metadata\n})",
+                    "_ALWAYS_BLOCKED_NETWORKS = (\n    ipaddress.ip_network(\"169.254.0.0/16\"),    # Entire link-local range (no legit agent target)\n)"
+                  ]
+                },
+                {
+                  "id": "S8",
+                  "op": "allow-if",
+                  "rule": "Admit when no resolved IP is private, loopback, link-local, reserved, multicast, unspecified, or CGNAT, unless toggle or trusted host; exceptions reject.",
+                  "source_rules": [
+                    "_CGNAT_NETWORK = ipaddress.ip_network(\"100.64.0.0/10\")",
+                    "def _is_blocked_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:\n    \"\"\"Return True if the IP should be blocked for SSRF protection.\"\"\"\n    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:\n        return True\n    if ip.is_multicast or ip.is_unspecified:\n        return True\n    # CGNAT range not covered by is_private\n    if ip in _CGNAT_NETWORK:\n        return True\n    return False"
+                  ]
+                }
+              ],
+              "summary": "Rejects non-HTTP(S) or SSRF-unsafe image URLs, fail-closed on DNS errors, with configurable private-IP opt-out."
+            },
+            "static_verdict": "confirmed"
+          },
+          {
+            "callsite": "tools/vision_tools.py:485:23",
+            "gate_name": "check_website_access",
+            "gate_number": 45,
+            "gate_uid": "GU1228344ddaf94b9b1c88",
+            "semantic": {
+              "default": "No rule matched: gate returns None, caller's `if blocked` is false and image download proceeds.",
+              "gate_id": "G286a536ec63f7a93",
+              "input": "V2494094fa9fc: image_url (args-derived URL) bound to check_website_access.url formal",
+              "mode": "predicate",
+              "on_error": "At this callsite config_path is None so WebsitePolicyError and unexpected exceptions are caught and return None (fail-open); only an explicit config_path re-raises WebsitePolicyError.",
+              "output": "Dc3af62f5a12d: boolean branch decision; truthy block dict means blocked, falsy None means allowed",
+              "status": "complete",
+              "steps": [
+                {
+                  "id": "S1",
+                  "op": "allow-if",
+                  "rule": "If no explicit config path and cached policy is present and disabled, return None (allow)."
+                },
+                {
+                  "id": "S2",
+                  "op": "derive",
+                  "rule": "Extract host via urlparse hostname else netloc, normalize strip/lower/rstrip-dot, with schemeless '//' fallback."
+                },
+                {
+                  "id": "S3",
+                  "op": "allow-if",
+                  "rule": "If extracted host is empty, return None (allow)."
+                },
+                {
+                  "id": "S4",
+                  "op": "derive",
+                  "rule": "Load policy from config path (default HERMES_HOME/config.yaml) with 30s TTL cache; missing config or PyYAML yields disabled default; build deduplicated normalized rules.",
+                  "source_rules": [
+                    "_DEFAULT_WEBSITE_BLOCKLIST = {\n    \"enabled\": False,\n    \"domains\": [],\n    \"shared_files\": [],\n}"
+                  ]
+                },
+                {
+                  "id": "S5",
+                  "op": "allow-if",
+                  "rule": "On WebsitePolicyError, log warning and allow for default path, re-raise for explicit config_path; any other exception logs and allows."
+                },
+                {
+                  "id": "S6",
+                  "op": "allow-if",
+                  "rule": "If loaded policy enabled is false, return None (allow)."
+                },
+                {
+                  "id": "S7",
+                  "op": "block-if",
+                  "rule": "For each rule pattern, block when host matches via equality, '.pattern' suffix, or fnmatch for '*.', returning block dict.",
+                  "source_rules": [
+                    "def _match_host_against_rule(host: str, pattern: str) -> bool:\n    if not host or not pattern:\n        return False\n    if pattern.startswith(\"*.\"):\n        return fnmatch.fnmatch(host, pattern)\n    return host == pattern or host.endswith(f\".{pattern}\")"
+                  ]
+                }
+              ],
+              "summary": "Rejects URLs whose normalized host matches an enabled website blocklist rule by returning a block dict; returns None to allow. Fails open on policy config errors."
+            },
+            "static_verdict": "confirmed"
+          },
+          {
+            "callsite": "tools/vision_tools.py:486:16",
+            "gate_name": "inline-condition",
+            "gate_number": 277,
+            "gate_uid": "GUb5d69a74580bb70abd74",
+            "semantic": {
+              "default": "Falsy blocked (None) leaves the branch untaken; execution proceeds to logger.info and the temporary-file image download path, with no additional format or type validation of blocked.",
+              "gate_id": "Gf96eb3a8c343ed9a",
+              "input": "V01c8d9c74e49: blocked, the return of check_website_access(image_url); None when allowed or a block-metadata dict when blocked",
+              "mode": "predicate",
+              "on_error": "An exception raised while evaluating the condition (reading the local variable blocked) propagates before the raise/continue branch effect takes place.",
+              "output": "D7b809c146bb1: boolean branch decision (raise PermissionError vs continue); input value unchanged",
+              "status": "complete",
+              "steps": [
+                {
+                  "id": "S1",
+                  "op": "derive",
+                  "rule": "blocked = check_website_access(image_url) yields a non-empty dict when the extracted, normalized host matches a blocklist rule pattern.",
+                  "source_rules": [
+                    "def _match_host_against_rule(host: str, pattern: str) -> bool:\n    if not host or not pattern:\n        return False\n    if pattern.startswith(\"*.\"):\n        return fnmatch.fnmatch(host, pattern)\n    return host == pattern or host.endswith(f\".{pattern}\")",
+                    "    for rule in policy.get(\"rules\", []):\n        pattern = rule.get(\"pattern\", \"\")\n        if _match_host_against_rule(host, pattern):\n            logger.info(\"Blocked URL %s — matched rule '%s' from %s\",\n                        url, pattern, rule.get(\"source\", \"config\"))\n            return {\n                \"url\": url,\n                \"host\": host,\n                \"rule\": pattern,\n                \"source\": rule.get(\"source\", \"config\"),\n                \"message\": (\n                    f\"Blocked by website policy: '{host}' matched rule '{pattern}'\"\n                    f\" from {rule.get('source', 'config')}\"\n                ),\n            }"
+                  ]
+                },
+                {
+                  "id": "S2",
+                  "op": "derive",
+                  "rule": "check_website_access returns None when the policy is disabled, no host is extracted, policy loading fails open, or no rule matches.",
+                  "source_rules": [
+                    "    if config_path is None:\n        with _cache_lock:\n            if _cached_policy is not None and not _cached_policy.get(\"enabled\"):\n                return None",
+                    "def _normalize_host(host: str) -> str:\n    return (host or \"\").strip().lower().rstrip(\".\")",
+                    "def _extract_host_from_urlish(url: str) -> str:\n    parsed = urlparse(url)\n    host = _normalize_host(parsed.hostname or parsed.netloc)\n    if host:\n        return host\n\n    if \"://\" not in url:\n        schemeless = urlparse(f\"//{url}\")\n        host = _normalize_host(schemeless.hostname or schemeless.netloc)\n        if host:\n            return host\n\n    return \"\"",
+                    "    except WebsitePolicyError as exc:\n        if config_path is not None:\n            raise  # Tests pass explicit paths — let errors propagate\n        logger.warning(\"Website policy config error (failing open): %s\", exc)\n        return None\n    except Exception as exc:\n        logger.warning(\"Unexpected error loading website policy (failing open): %s\", exc)\n        return None",
+                    "    if not policy.get(\"enabled\"):\n        return None",
+                    "def _normalize_rule(rule: Any) -> Optional[str]:\n    if not isinstance(rule, str):\n        return None\n    value = rule.strip().lower()\n    if not value or value.startswith(\"#\"):\n        return None\n    if \"://\" in value:\n        parsed = urlparse(value)\n        value = parsed.netloc or parsed.path\n    value = value.split(\"/\", 1)[0].strip().rstrip(\".\")\n    if value.startswith(\"www.\"):\n        value = value[4:]\n    return value or None",
+                    "    try:\n        raw = path.read_text(encoding=\"utf-8\")\n    except FileNotFoundError:\n        logger.warning(\"Shared blocklist file not found (skipping): %s\", path)\n        return []\n    except (OSError, UnicodeDecodeError) as exc:\n        logger.warning(\"Failed to read shared blocklist file %s (skipping): %s\", path, exc)\n        return []"
+                  ]
+                },
+                {
+                  "id": "S3",
+                  "op": "block-if",
+                  "rule": "Truthy blocked raises PermissionError(blocked['message']); falsy None skips the raise and continues.",
+                  "source_rules": [
+                    "if blocked:\n                raise PermissionError(blocked[\"message\"])"
+                  ]
+                }
+              ],
+              "summary": "Predicate gate that raises PermissionError when the website blocklist policy marks the image URL host as blocked."
+            },
+            "static_verdict": "confirmed"
+          }
+        ],
+        "handler": {
+          "location": "tools/vision_tools.py:786",
+          "qualified_name": "_handle_vision_analyze",
+          "source_parameter": "args",
+          "tool_name": "_handle_vision_analyze"
+        },
+        "project": {
+          "id": "hermes-agent",
+          "revision": "04439ac77f08915b4886bc3c79165a9538af6219"
+        },
+        "schema_version": "call-chain-semantic-ir/v3",
+        "sink": {
+          "boundary": "invocation",
+          "label": "client.get",
+          "location": "tools/vision_tools.py:180:34",
+          "sink_id": "S-d7ee8fde79e1a2c6"
+        },
+        "sink_constraint": {
+          "call_shape": "client.get( image_url, headers={ \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36\", \"Accept\": \"image/*,*/*;q=0.8\", }, )",
+          "capability_card": {
+            "path": "src/sink_capacity/sink-capability-cards/http.session.request-get.md",
+            "sha256": "da5c31d3e0c5c774c29d55c7db2ebfb0e05cad56f1bb7ab58eccb8b3953bfde9"
+          },
+          "capability_class": "network-egress",
+          "constraint_id": "SC-d7ee8fde79e1a2c6",
+          "controlled_argument": "image_url",
+          "location": "tools/vision_tools.py:180:34",
+          "sink_api": "client.get",
+          "sink_id": "S-d7ee8fde79e1a2c6"
+        },
+        "status": "complete",
+        "summary": "Collects 6 detected gate semantics in call-chain order before client.get; the terminal sink point is the capability constraint.",
+        "unresolved": [],
+        "values": [
+          {
+            "gate_bindings": [
+              {
+                "gate_id": "Gd0101a810279bcdc"
+              },
+              {
+                "gate_id": "Gacfd39ce52aed8f2"
+              },
+              {
+                "gate_id": "G286a536ec63f7a93"
+              },
+              {
+                "gate_id": "Gf96eb3a8c343ed9a"
+              },
+              {
+                "gate_id": "G773462785e177f06"
+              },
+              {
+                "gate_id": "G1c6d52056dbda053"
+              }
+            ],
+            "id": "CV-afc2e1e5a918",
+            "sink_binding": "image_url",
+            "source_parameter": "args"
+          }
+        ]
+      }
+    ]
+  }
+]

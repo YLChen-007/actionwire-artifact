@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "requirement_source", "group_id", "handler_criterion_id",
+    "sink_type_id", "project", "revision", "chain_id", "requirement_id",
+    "pattern_key", "controlled_value_id", "origin_witness_ids", "controlled_facet",
+    "effective_sink_facet", "applicability", "decision", "capability_evidence",
+    "call_shape_facts", "gate_ids", "covered_semantics", "gap", "uncertainty",
+    "transform_or_policy_delta", "security_effect", "policy_basis"
+  ],
+  "properties": {
+    "schema_version": {"const": "coverage-learned-assessment/v7"},
+    "requirement_source": {"const": "learned-invariant"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "requirement_id": {"type": "string", "pattern": "^LIR-[0-9a-f]{16}$"},
+    "pattern_key": {"type": "string", "minLength": 1},
+    "controlled_value_id": {"type": ["string", "null"], "minLength": 1},
+    "origin_witness_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^ORIGIN-[0-9a-f]{16}$"}},
+    "controlled_facet": {"type": ["string", "null"], "minLength": 1},
+    "effective_sink_facet": {"type": ["string", "null"], "minLength": 1},
+    "applicability": {"enum": ["applicable", "not-applicable", "unknown"]},
+    "decision": {"enum": ["covered", "wrong-check", "missing-check", "not-applicable", "unknown"]},
+    "capability_evidence": {"type": "array", "items": {"type": "object"}},
+    "call_shape_facts": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "gate_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^GU[0-9a-f]{20}$"}},
+    "covered_semantics": {"type": ["string", "null"]},
+    "gap": {"type": ["string", "null"]},
+    "uncertainty": {"type": ["string", "null"]},
+    "transform_or_policy_delta": {"type": ["string", "null"]},
+    "security_effect": {"type": ["string", "null"], "minLength": 1},
+    "policy_basis": {"const": "learned-security-invariant"}
+  }
+}

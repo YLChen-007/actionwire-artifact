@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "group_id", "handler_criterion_id", "sink_type_id",
+    "project", "revision", "chain_id", "handler_id", "sink_id",
+    "sink_constraint_id", "group_oracle_status", "semantic_ir_status", "status",
+    "capability_card", "controlled_argument", "values", "call_shape",
+    "applicable_defaults", "requirements"
+  ],
+  "properties": {
+    "schema_version": {"const": "coverage-comparison/v7"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "handler_id": {"type": "string", "pattern": "^H-[0-9a-f]{16}$"},
+    "sink_id": {"type": "string", "pattern": "^S-[0-9a-f]{16}$"},
+    "sink_constraint_id": {"type": "string", "pattern": "^SC-[0-9a-f]{16}$"},
+    "group_oracle_status": {"enum": ["complete", "partial"]},
+    "semantic_ir_status": {"enum": ["complete", "partial"]},
+    "status": {"enum": ["complete", "partial", "inconclusive"]},
+    "capability_card": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "controlled_argument": {"type": "string"},
+    "values": {"type": "array", "items": {"type": "object"}},
+    "call_shape": {"type": "string", "minLength": 1},
+    "applicable_defaults": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "requirements": {"type": "array", "items": {"type": "object"}}
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawgap-runtime-evidence-event-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event_id", "sequence", "campaign_id", "case_id", "pair_id", "attempt", "side", "correlation_id", "source_binding_sha256", "value_id", "stage", "relation", "details"],
+  "properties": {
+    "schema_version": {"const": "clawgap-runtime-evidence-event/v1"},
+    "event_id": {"type": "string", "pattern": "^RVQE-[0-9a-f]{32}$"},
+    "sequence": {"type": "integer", "minimum": 1},
+    "campaign_id": {"type": "string", "minLength": 1},
+    "case_id": {"type": "string", "pattern": "^RVQ-[0-9a-f]{16}$"},
+    "pair_id": {"type": "string", "minLength": 1},
+    "attempt": {"type": "integer", "minimum": 1},
+    "side": {"enum": ["exploit", "control"]},
+    "correlation_id": {"type": "string", "minLength": 1},
+    "source_binding_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "value_id": {"type": "string", "pattern": "^RVQV-[0-9a-f]{16}$"},
+    "stage": {"type": "string", "minLength": 1},
+    "relation": {"type": "string", "minLength": 1},
+    "details": {"type": "object"}
+  }
+}

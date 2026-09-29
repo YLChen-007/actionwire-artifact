@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "project", "revision", "chain_id", "target_id", "sink_id", "handler_id", "handler_criterion_id", "handler_type_id", "decision", "sink_type_id", "reference_sink", "matched_on", "reason", "evidence"],
+  "properties": {
+    "schema_version": {"const": "sink-type-mapping/v1"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "target_id": {"type": "string", "pattern": "^SA-[0-9a-f]{16}$"},
+    "sink_id": {"type": "string", "pattern": "^S-[0-9a-f]{16}$"},
+    "handler_id": {"type": "string", "pattern": "^H-[0-9a-f]{16}$"},
+    "handler_criterion_id": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"},
+    "handler_type_id": {"type": "string", "pattern": "^HT-[0-9a-f]{16}$"},
+    "decision": {"enum": ["matched", "new-type"]},
+    "sink_type_id": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"},
+    "reference_sink": {"type": "string", "minLength": 1},
+    "matched_on": {"type": "array", "uniqueItems": true, "items": {"enum": ["capability", "controlled_parameter", "defaults", "call_shape"]}},
+    "reason": {"type": "string", "minLength": 1},
+    "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

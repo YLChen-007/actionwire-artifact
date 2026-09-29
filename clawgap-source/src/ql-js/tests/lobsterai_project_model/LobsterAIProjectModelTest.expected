@@ -1,0 +1,15 @@
+| adapter | LobsterAI | lobsterai-ts |
+| chain | browser | browserOpenTab |
+| chain | browser | page.goto |
+| handler | AskUserQuestion | openclaw-extensions/ask-user-question/index.ts |
+| handler | browser | vendor-source/openclaw-v2026.4.14/extensions/browser/src/browser-tool.ts |
+| handler | lobsterai_image_generate | openclaw-extensions/lobster-media-generation/index.ts |
+| handler | lobsterai_video_generate | openclaw-extensions/lobster-media-generation/index.ts |
+| negative | legacy-dynamic-mcp-excluded | absent |
+| negative | ordinary-execute-excluded | absent |
+| sink | browserOpenTab | vendor-source/openclaw-v2026.4.14/extensions/browser/src/browser-tool.ts |
+| sink | page.goto | vendor-source/openclaw-v2026.4.14/extensions/browser/src/browser/pw-session.ts |
+| source | AskUserQuestion | params |
+| source | browser | args |
+| source | lobsterai_image_generate | params |
+| source | lobsterai_video_generate | params |

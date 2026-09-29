@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawgap-dynamic-trigger-case-v1.schema.json",
+  "title": "ClawGap universal dynamic-trigger case v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "case_id",
+    "candidate_binding",
+    "project",
+    "revision",
+    "launch_profile",
+    "provider_mode",
+    "prompts",
+    "forced_tool_calls",
+    "fixture",
+    "handler",
+    "failure_mode",
+    "controlled_value",
+    "gates",
+    "sink",
+    "observations",
+    "unsafe_relation",
+    "control_policy",
+    "effect_policy",
+    "source_binding",
+    "native_case"
+  ],
+  "properties": {
+    "schema_version": {"const": "clawgap-dynamic-trigger-case/v1"},
+    "case_id": {"type": "string", "pattern": "^DTC-[0-9a-f]{16}$"},
+    "candidate_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_id", "row_sha256", "comparison_sha256", "semantic_ir_sha256", "origin_audit_sha256"],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^CAND-[0-9a-f]{16}$"},
+        "row_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "comparison_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "semantic_ir_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "origin_audit_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "launch_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "toolset", "runtime", "entrypoint_tier"],
+      "properties": {
+        "adapter": {"type": "string", "minLength": 1},
+        "toolset": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "runtime": {"enum": ["python", "typescript"]},
+        "entrypoint_tier": {"enum": ["native-dispatch", "forced-provider"]}
+      }
+    },
+    "provider_mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "base_url_policy", "credential_policy"],
+      "properties": {
+        "mode": {"enum": ["forced-tool", "native-only"]},
+        "base_url_policy": {"enum": ["loopback-only", "not-applicable"]},
+        "credential_policy": {"const": "fake-only"}
+      }
+    },
+    "prompts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reproduction"],
+      "properties": {"reproduction": {"type": "string", "minLength": 1}}
+    },
+    "forced_tool_calls": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "arguments"],
+        "properties": {
+          "role": {"enum": ["exploit", "control"]},
+          "arguments": {"type": "object"}
+        }
+      }
+    },
+    "fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "state"],
+      "properties": {
+        "family": {"type": "string", "minLength": 1},
+        "state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["exploit", "control"],
+          "properties": {"exploit": {"type": "object"}, "control": {"type": "object"}}
+        }
+      }
+    },
+    "handler": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "tool_name", "argument_path"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "tool_name": {"type": "string", "minLength": 1},
+        "argument_path": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    },
+    "failure_mode": {"enum": ["wrong-check", "missing-check"]},
+    "controlled_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "exploit", "control"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "exploit": {},
+        "control": {}
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "expected_outcome"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "expected_outcome": {"enum": ["admits-exploit", "blocks-exploit"]}
+        }
+      }
+    },
+    "sink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "family", "payload_role"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "family": {"type": "string", "minLength": 1},
+        "payload_role": {"type": "string", "minLength": 1}
+      }
+    },
+    "observations": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["order", "kind", "source_anchor", "expected"],
+        "properties": {
+          "order": {"type": "integer", "minimum": 1},
+          "kind": {"enum": ["handler", "gate", "sink", "pre-effect-interception"]},
+          "source_anchor": {"type": "string", "pattern": "^[^:]+:[0-9]+$"},
+          "expected": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "unsafe_relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relation", "argument_path", "exploit_value", "control_value"],
+      "properties": {
+        "relation": {"enum": ["equals", "contains", "json-subset", "normalized-equals", "path-resolves-to", "command-segment", "url-host-class"]},
+        "argument_path": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "exploit_value": {},
+        "control_value": {}
+      }
+    },
+    "control_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paired_attempts", "must_remain_healthy", "must_not_satisfy_unsafe_relation"],
+      "properties": {
+        "paired_attempts": {"const": 3},
+        "must_remain_healthy": {"const": true},
+        "must_not_satisfy_unsafe_relation": {"const": true}
+      }
+    },
+    "effect_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intercept_before_execution", "allow_network", "allow_host_write", "cleanup"],
+      "properties": {
+        "intercept_before_execution": {"const": true},
+        "allow_network": {"enum": ["loopback-only", "none"]},
+        "allow_host_write": {"const": false},
+        "cleanup": {"enum": ["disposable-root", "subprocess-session"]}
+      }
+    },
+    "source_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_root", "files"],
+      "properties": {
+        "source_root": {"type": "string", "minLength": 1},
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
+    "native_case": {"type": "object"}
+  }
+}

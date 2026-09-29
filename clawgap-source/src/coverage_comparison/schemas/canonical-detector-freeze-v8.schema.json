@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "analysis_mode", "implementation_commit",
+    "cr_normalization", "router", "learned_catalog", "prompts", "ql",
+    "project_revisions", "coverage_inputs", "training_ground_truth"
+  ],
+  "properties": {
+    "schema_version": {"const": "canonical-detector-freeze/v8"},
+    "analysis_mode": {"const": "canonical-trained-detector/v8"},
+    "implementation_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "cr_normalization": {"$ref": "#/$defs/pathDigest"},
+    "router": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["config", "config_sha256"],
+      "properties": {
+        "config": {"type": "object"},
+        "config_sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "learned_catalog": {"$ref": "#/$defs/pathDigest"},
+    "prompts": {"$ref": "#/$defs/digestMap"},
+    "ql": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "tree_sha256"],
+      "properties": {
+        "files": {"$ref": "#/$defs/digestMap"},
+        "tree_sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "project_revisions": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "coverage_inputs": {"type": "object"},
+    "training_ground_truth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workbook", "selection", "eligible_reports", "report_ids_sha256"],
+      "properties": {
+        "workbook": {"$ref": "#/$defs/pathDigest"},
+        "selection": {"$ref": "#/$defs/pathDigest"},
+        "eligible_reports": {"const": 43},
+        "report_ids_sha256": {"$ref": "#/$defs/digest"}
+      }
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "pathDigest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "digestMap": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"$ref": "#/$defs/digest"}
+    }
+  }
+}

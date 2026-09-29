@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "lettabot",
+  "revision": "99c3b5dd73550fe0a4eac2ee31b1c3229ca9e550",
+  "runtime": "npm",
+  "entrypoint": {"build_command": ["npm", "run", "build"], "command": ["node", "dist/main.js"], "cwd": ".", "readiness": {"kind": "none", "timeout_seconds": 30}},
+  "provider": {"mode": "project-provider-shim", "protocol": "letta-api/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}", "credential": "clawgap-loopback-mock", "shim_anchor": "node_modules/@letta-ai/letta-code/letta.js:72729"},
+  "input_transport": {"kind": "mock-channel-bridge", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["src/main.ts", "src/config/types.ts", "src/channels/factory.ts", "src/test/mock-channel.ts", "vendor-source/letta-code-v0.19.5/src/tools/impl/Task.ts", "vendor-source/letta-code-v0.19.5/src/agent/subagents/manager.ts", "vendor-source/letta-code-v0.19.5/src/agent/subagents/builtin/reflection.md", "vendor-source/letta-code-v0.19.5/src/agent/subagents/builtin/explore.md", "vendor-source/letta-code-v0.19.5/src/agent/subagents/builtin/history-analyzer.md"], "dependency_files": ["package.json", "package-lock.json"], "disposable_roots": ["home", "data", "workspace"], "environment": {"LETTA_API_KEY": "clawgap-loopback-mock", "LETTA_BASE_URL": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}", "LETTA_CODE_TELEM": "0"}},
+  "instrumentation": {"loader": "node-import", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "node_modules/@letta-ai/letta-code/letta.js:72729"}, {"kind": "dispatch", "anchor": "node_modules/@letta-ai/letta-code/letta.js:67944"}, {"kind": "handler", "anchor": "vendor-source/letta-code-v0.19.5/src/tools/impl/Task.ts:410"}, {"kind": "sink", "anchor": "vendor-source/letta-code-v0.19.5/src/agent/subagents/manager.ts:685"}, {"kind": "pre-effect", "anchor": "node_modules/@letta-ai/letta-code/letta.js:62488"}]},
+  "effect_interceptors": ["process", "subagent"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["LettaBot targeted L2 runner is separate; the all-candidate qualification runner does not yet consume its ready evidence"]}
+}

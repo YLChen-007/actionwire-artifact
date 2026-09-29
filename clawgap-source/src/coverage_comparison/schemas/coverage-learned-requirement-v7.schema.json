@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "requirement_source", "requirement_id", "pattern_key", "title",
+    "project", "revision", "chain_id", "group_id", "projects",
+    "handler_criterion_ids", "sink_type_ids", "capability_classes",
+    "controlled_facet", "rule", "applicability", "security_effect", "policy_basis",
+    "positive_example", "negative_example", "training_report_ids"
+  ],
+  "properties": {
+    "schema_version": {"const": "coverage-learned-requirement/v7"},
+    "requirement_source": {"const": "learned-invariant"},
+    "requirement_id": {"type": "string", "pattern": "^LIR-[0-9a-f]{16}$"},
+    "pattern_key": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"type": "string", "minLength": 1},
+    "chain_id": {"type": "string", "pattern": "^C-[0-9a-f]{12}$"},
+    "group_id": {"type": "string", "pattern": "^HSG-[0-9a-f]{16}$"},
+    "projects": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "handler_criterion_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^HC-[0-9a-f]{16}$"}},
+    "sink_type_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^ST-[0-9a-f]{16}$"}},
+    "capability_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "controlled_facet": {"type": "string", "minLength": 1},
+    "rule": {"type": "string", "minLength": 1},
+    "applicability": {"type": "string", "minLength": 1},
+    "security_effect": {"type": "string", "minLength": 1},
+    "policy_basis": {"const": "learned-security-invariant"},
+    "positive_example": {"type": "string", "minLength": 1},
+    "negative_example": {"type": "string", "minLength": 1},
+    "training_report_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^GT-[0-9a-f]{16}$"}}
+  }
+}

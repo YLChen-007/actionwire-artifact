@@ -1,0 +1,267 @@
+{
+  "schema_version": "oracle-evidence-registry/v2",
+  "post_hoc_ground_truth_informed": true,
+  "base_registry": "src/group_oracle/oracle-evidence-registry.json",
+  "base_sha256": "f499fad715bfd31c34648d806327fd1cdc6ea2a216332a45038ef9ef6aa3a3ae",
+  "evidence": [
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-9f87ffb48d21dcf9",
+          "HC-e5261aea1b56670d"
+        ],
+        "sink_type_ids": [
+          "ST-b56ba5981b78c108"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "astrbot-write-root-permission-separation",
+      "exact_quote": "A restricted file-write or file-edit authorization policy must use roots that grant write permission and must not reuse read-only plugin-skill roots merely because their paths are contained.",
+      "supported_claim": "Restricted write and edit authorization must separate write-permitted roots from read-only plugin-skill roots."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-5afd4fc3bb452de5"
+        ],
+        "sink_type_ids": [
+          "ST-1552e8cb544535b8",
+          "ST-bb143a84cb3c9008"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "broadcast-mention-neutralization",
+      "exact_quote": "Untrusted outbound message content must neutralize platform broadcast mentions and must disable mention interpretation when the delivery API exposes such a companion capability.",
+      "supported_claim": "Outbound delivery must neutralize broadcast mentions and disable mention interpretation where supported."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-4e2d43b153137049"
+        ],
+        "sink_type_ids": [
+          "ST-e02ed71b8c27e312"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "browser-eval-post-navigation-policy",
+      "exact_quote": "Browser evaluation that can change the main-frame location must validate the expression-derived or resulting destination against the same scheme, hostname, and IP policy required for direct navigation.",
+      "supported_claim": "Browser evaluation navigation requires destination validation equivalent to direct navigation."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-af72e7eeddd90792"
+        ],
+        "sink_type_ids": [
+          "ST-9ba88b26bf31d99b"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "code-execution-action-approval",
+      "exact_quote": "Model-controlled source code that is written and launched as a host process must pass a code-dependent action-approval decision before process creation.",
+      "supported_claim": "Host code execution requires a code-dependent approval before process creation."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-af72e7eeddd90792"
+        ],
+        "sink_type_ids": [
+          "ST-9ba88b26bf31d99b"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "dangerous-command-class-completeness",
+      "exact_quote": "A dangerous-command gate must cover every source-supported destructive command class before auto-approval; an incomplete pattern table must not be treated as complete authorization.",
+      "supported_claim": "Dangerous-command auto-approval requires complete source-supported pattern coverage."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-1b49649c03a87531"
+        ],
+        "sink_type_ids": [
+          "ST-c1e221bc5659e53d"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "delegated-subagent-capability-congruence",
+      "exact_quote": "A subagent type may be auto-approved as read-only only when the selected configuration's tool surface and permission mode are actually read-only and do not exceed the parent approval envelope.",
+      "supported_claim": "Auto-approved subagent types require tool and permission capability congruence."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-d6a5ed749a9cb61e"
+        ],
+        "sink_type_ids": [
+          "ST-e02ed71b8c27e312"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "device-path-canonicalization",
+      "exact_quote": "A blocking-device denylist must canonicalize user-controlled paths, including home expansion and dot-segment normalization, before comparing device identities.",
+      "supported_claim": "Blocking-device checks require canonical path identity before denylist comparison."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-af72e7eeddd90792"
+        ],
+        "sink_type_ids": [
+          "ST-4d1af6e725607dd6"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "droidclaw-shell-action-approval",
+      "exact_quote": "A model-selected adb shell action must require explicit user approval or a deny-by-default command policy before execution; a non-empty command check alone is not authorization.",
+      "supported_claim": "Model-selected adb shell actions require approval or deny-by-default command authorization."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-af72e7eeddd90792"
+        ],
+        "sink_type_ids": [
+          "ST-e02ed71b8c27e312"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "durable-approval-inner-payload-binding",
+      "exact_quote": "A durable allow-always approval for a shell wrapper must bind the complete normalized inner payload and must not persist trust for only the wrapper executable path.",
+      "supported_claim": "Durable shell-wrapper approvals must bind the normalized inner payload."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-47050698a0d2d6e6"
+        ],
+        "sink_type_ids": [
+          "ST-e02ed71b8c27e312"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "jq-environment-builtin-semantics",
+      "exact_quote": "A jq safe-bin policy must reject jq programs that access the environment through `env` or `$ENV` before auto-approval.",
+      "supported_claim": "jq safe-bin auto-approval must reject environment builtins."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-af72e7eeddd90792"
+        ],
+        "sink_type_ids": [
+          "ST-e02ed71b8c27e312"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "jq-module-directive-semantics",
+      "exact_quote": "A jq safe-bin policy must reject or safely resolve include and import module directives before jq is auto-approved for host execution.",
+      "supported_claim": "jq safe-bin auto-approval must validate include and import directives."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-5afd4fc3bb452de5"
+        ],
+        "sink_type_ids": [
+          "ST-cfe8c4497bec6581"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "matrix-html-all-route-sanitization",
+      "exact_quote": "Every route that emits Matrix custom HTML must neutralize raw HTML, event attributes, and dangerous URI schemes on the primary path, not only on an error fallback.",
+      "supported_claim": "All primary Matrix custom-HTML routes require complete HTML and URI neutralization."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-af72e7eeddd90792"
+        ],
+        "sink_type_ids": [
+          "ST-9ba88b26bf31d99b"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "noninteractive-approval-routing",
+      "exact_quote": "A noninteractive batch or scheduled execution context must fail closed or route model-controlled dangerous commands through an explicit approval policy instead of defaulting to approved.",
+      "supported_claim": "Noninteractive dangerous-command routing must fail closed or use explicit approval."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-4ed26ca19433a28f"
+        ],
+        "sink_type_ids": [
+          "ST-555355c736f5f589",
+          "ST-88b6ea632280b963"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "post-interaction-navigation-validation",
+      "exact_quote": "After a browser click, double-click, or evaluated page action can navigate, the resulting destination must be revalidated before later browser access.",
+      "supported_claim": "Browser interactions with navigation side effects require post-action destination validation."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-af72e7eeddd90792"
+        ],
+        "sink_type_ids": [
+          "ST-e02ed71b8c27e312"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "shell-wrapper-flag-normalization",
+      "exact_quote": "Inline-command extraction must recognize every supported cmd and PowerShell wrapper flag spelling before allowlist or durable-approval evaluation.",
+      "supported_claim": "Shell-wrapper inline-command extraction must normalize every supported flag spelling."
+    },
+    {
+      "kind": "fixed-delta",
+      "applicability": {
+        "handler_criterion_ids": [
+          "HC-af72e7eeddd90792"
+        ],
+        "sink_type_ids": [
+          "ST-e02ed71b8c27e312"
+        ]
+      },
+      "source_path": "src/group_oracle/evidence/missed-report-corrections-v2.md",
+      "sha256": "661eeb88c97b70caff9d46d623bced339631e275dff1f25c9bf3f8e501691637",
+      "locator": "subprocess-messaging-credential-isolation",
+      "exact_quote": "A restricted child-process environment must remove messaging and provider credential names from the inherited environment before launching model-controlled commands.",
+      "supported_claim": "Restricted child environments must remove messaging and provider credentials."
+    }
+  ]
+}

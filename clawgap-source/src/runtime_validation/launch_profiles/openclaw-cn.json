@@ -1,0 +1,14 @@
+{
+  "schema_version": "clawgap-dynamic-trigger-launch-profile/v1",
+  "project": "openclaw-cn",
+  "revision": "558f272e6c90e7e0c37644e505e161b91ef738f0",
+  "runtime": "pnpm",
+  "entrypoint": {"build_command": ["pnpm", "run", "build"], "command": ["node", "dist/entry.js", "tui"], "cwd": ".", "stdin_prompt": true, "readiness": {"kind": "none", "timeout_seconds": 30}},
+  "provider": {"mode": "project-provider-shim", "protocol": "openai-chat-completions/v1", "base_url": "http://127.0.0.1:${CLAWGAP_L2_PROVIDER_PORT}/v1", "credential": "clawgap-loopback-mock", "shim_anchor": "src/agents/bash-tools.exec.ts:1"},
+  "input_transport": {"kind": "pty", "prompt_template": "${CLAWGAP_L2_PROMPT}"},
+  "state": {"source_files": ["src/entry.ts", "src/agents/tools/message-tool.ts"], "dependency_files": ["package.json", "pnpm-lock.yaml"], "disposable_roots": [".openclaw-cn", ".clawdbot", "data"], "environment": {"CLAWDBOT_SKIP_CHANNELS": "1"}},
+  "instrumentation": {"loader": "node-import", "event_path": "clawgap-l2-events.jsonl", "anchors": [{"kind": "provider-request", "anchor": "src/agents/tools/message-tool.ts:1"}, {"kind": "dispatch", "anchor": "src/agents/bash-tools.exec.ts:1"}, {"kind": "handler", "anchor": "src/agents/tools/message-tool.ts:1"}, {"kind": "sink", "anchor": "src/agents/tools/message-tool.ts:1"}, {"kind": "pre-effect", "anchor": "src/agents/tools/message-tool.ts:1"}]},
+  "effect_interceptors": ["process", "filesystem", "browser", "http", "messaging"],
+  "cleanup": {"process_group": true, "disposable_root": true, "canary": "host-effect-canary.txt"},
+  "qualification": {"status": "blocked", "blockers": ["OpenClaw CN disposable TUI/Feishu fixture and Node import instrumentation are not yet implemented"]}
+}

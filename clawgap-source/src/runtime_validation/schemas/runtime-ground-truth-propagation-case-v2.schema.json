@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "clawgap-runtime-ground-truth-propagation-case-v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "case_id", "report_id", "report_name", "project", "revision", "selection_mode", "claim", "effect_execution", "live_prompt_triggerability", "orchestrator", "report_bindings", "source_bindings", "values", "value_ids", "prompts", "prompt_bindings", "tool_calls", "provider_transcript_policy", "stages", "sink_policy", "review"],
+  "properties": {
+    "schema_version": {"const": "clawgap-runtime-ground-truth-case/v2"},
+    "case_id": {"type": "string", "pattern": "^RVGTP-[0-9a-f]{16}$"},
+    "report_id": {"const": "GT-0464a079af99599a"},
+    "report_name": {"const": "CVE-2026-Device-Blocking-Expanduser-Bypass"},
+    "project": {"const": "hermes-agent"},
+    "revision": {"pattern": "^[0-9a-f]{40}$"},
+    "selection_mode": {"const": "mocked-provider-forced-tool-call"},
+    "claim": {"const": "prompt-to-sink-propagation"},
+    "effect_execution": {"const": "not-tested"},
+    "live_prompt_triggerability": {"const": "not-tested"},
+    "orchestrator": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "version", "model", "base_url", "max_turns", "timeout_seconds", "authority"],
+      "properties": {
+        "kind": {"const": "claude-code"}, "version": {"type": "string"}, "model": {"const": "deepseek-v4-pro"},
+        "base_url": {"type": "string"}, "max_turns": {"type": "integer", "minimum": 1, "maximum": 40},
+        "timeout_seconds": {"type": "integer", "minimum": 60},
+        "authority": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
+    "report_bindings": {"$ref": "#/$defs/fileList"},
+    "source_bindings": {"$ref": "#/$defs/fileList"},
+    "values": {"type": "object", "additionalProperties": false, "required": ["exploit", "control"], "properties": {"exploit": {"const": "/dev/./zero"}, "control": {"const": "/dev/zero"}}},
+    "value_ids": {"type": "object", "additionalProperties": false, "required": ["exploit", "control"], "properties": {"exploit": {"type": "string"}, "control": {"type": "string"}}},
+    "prompts": {"type": "object", "additionalProperties": false, "required": ["exploit", "control"], "properties": {"exploit": {"type": "string"}, "control": {"type": "string"}}},
+    "prompt_bindings": {
+      "type": "object", "additionalProperties": false, "required": ["exploit", "control"],
+      "properties": {
+        "exploit": {"$ref": "#/$defs/textBinding"},
+        "control": {"$ref": "#/$defs/textBinding"}
+      }
+    },
+    "tool_calls": {"type": "object", "additionalProperties": false, "required": ["exploit", "control"], "properties": {"exploit": {"$ref": "#/$defs/toolCall"}, "control": {"$ref": "#/$defs/toolCall"}}},
+    "provider_transcript_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protocol", "path_pattern", "prompt_sha256", "tool_call_sha256"],
+      "properties": {
+        "protocol": {"const": "openai-chat-completions-sse"},
+        "path_pattern": {"const": "attempts/e2e/attempt-{attempt}/{role}/provider-transcript.jsonl"},
+        "prompt_sha256": {"$ref": "#/$defs/roleHashes"},
+        "tool_call_sha256": {"$ref": "#/$defs/roleHashes"}
+      }
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "kind", "file", "function", "relation"],
+        "properties": {
+          "stage": {"type": "string"},
+          "kind": {"enum": ["prompt", "provider-request", "provider-tool-call", "dispatch", "handler", "gate-input", "gate-return", "propagation", "sink", "sink-intercepted"]},
+          "file": {"type": ["string", "null"]},
+          "function": {"type": ["string", "null"]},
+          "line": {"type": ["integer", "null"]},
+          "relation": {"enum": ["equals", "contains-shell-quoted-value", "gate-return"]}
+        }
+      }
+    },
+    "sink_policy": {"const": "intercept-before-effect"},
+    "review": {"type": "object", "additionalProperties": false, "required": ["status", "plan_sha256", "case_sha256", "reason"], "properties": {"status": {"enum": ["pending", "approved", "rejected"]}, "plan_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}, "case_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}, "reason": {"type": "string"}}}
+  },
+  "$defs": {
+    "file": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    "fileList": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/file"}},
+    "textBinding": {"type": "object", "additionalProperties": false, "required": ["sha256", "encoding"], "properties": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "encoding": {"const": "utf-8"}}},
+    "roleHashes": {"type": "object", "additionalProperties": false, "required": ["exploit", "control"], "properties": {"exploit": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "control": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    "toolCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "arguments"],
+      "properties": {
+        "name": {"const": "read_file"},
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "offset", "limit"],
+          "properties": {
+            "path": {"type": "string"},
+            "offset": {"const": 1},
+            "limit": {"const": 500}
+          }
+        }
+      }
+    }
+  }
+}

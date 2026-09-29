@@ -1,0 +1,12 @@
+| exclusion | map-key-not-value | absent |
+| exclusion | missing-explicit-bridge | absent |
+| exclusion | operator-config | absent |
+| exclusion | provider-response | absent |
+| exclusion | same-name-no-dataflow | absent |
+| exclusion | selector-not-selected-content | absent |
+| exclusion | sibling-argument | absent |
+| exclusion | whole-object-does-not-imply-property | absent |
+| witness | command | rpc:explicit-bridge |
+| witness | path | path:direct |
+| witness | timeout | timeout:direct |
+| witness | url | url:interprocedural |
