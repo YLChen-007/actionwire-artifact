@@ -1,8 +1,8 @@
-# Running the ClawGap Source Artifact
+# Running the ActionWire Source Artifact
 
-This guide accompanies `clawgap-source.tar.gz`. ClawGap combines CodeQL analysis,
-tool-interface extraction, and LLM-assisted analysis of security checks in agent
-software.
+This guide accompanies `actionwire-source.tar.gz`. ActionWire combines CodeQL
+analysis, tool-interface extraction, and LLM-assisted analysis of security
+checks in agent software.
 
 The archive contains the current tool source, configuration, capability cards,
 selected specifications, and tests. Target repositories, CodeQL databases and
@@ -12,23 +12,22 @@ this archive alone. Running analysis stages requires the additional inputs liste
 later in this guide.
 
 The commands below assume **Linux and Bash**. Except for the initial extraction
-commands, run them from the extracted `clawgap-source/` directory.
+commands, run them from the extracted `actionwire-source/` directory.
 
 ## 1. Extract and verify the archive
 
-Place the archive and `clawgap-source.tar.gz.sha256` in the same directory:
+Place the archive and `actionwire-source.tar.gz.sha256` in the same directory:
 
 ```bash
-sha256sum -c clawgap-source.tar.gz.sha256
-tar -xzf clawgap-source.tar.gz
-cd clawgap-source
+sha256sum -c actionwire-source.tar.gz.sha256
+tar -xzf actionwire-source.tar.gz
+cd actionwire-source
 sha256sum -c SHA256SUMS
 ```
 
 Both checks should report `OK`. Verify the contents before installing dependencies
-or modifying files. The companion `clawgap-source.files.txt` lists the packaged
-files; `clawgap-source.manifest.json` records their origin and hashes. The package
-includes the same information in `FILES.txt` and `SOURCE-MANIFEST.json`.
+or modifying files. `FILES.txt` lists the packaged files; `SOURCE-MANIFEST.json`
+records their origin and hashes.
 
 ## 2. Install the tool dependencies
 
@@ -102,7 +101,7 @@ environment has not been validated as part of this release.
 ### Install CodeQL
 
 Install [CodeQL CLI 2.22.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.22.1)
-for your platform. ClawGap expects the executable at `bin/codeql` inside the
+for your platform. ActionWire expects the executable at `bin/codeql` inside the
 extracted source directory. Replace the example installation path below:
 
 ```bash
@@ -320,7 +319,7 @@ target environments and are outside the setup example in this guide.
 
 | Symptom | Check |
 |---|---|
-| `No module named src` | Run from the extracted `clawgap-source/` directory. |
+| `No module named src` | Run from the extracted `actionwire-source/` directory. |
 | Missing `jsonschema`, `yaml`, or SDK module | Activate the virtual environment and install `requirements-artifact.txt`. |
 | Missing TypeScript compiler or language server | Run `npm ci --prefix src/gate_semantics/lsp`. |
 | Missing `bin/codeql` | Create the expected executable link; setting `PATH` alone is insufficient. |
@@ -339,7 +338,7 @@ validating this source release.
 ## Package layout
 
 ```text
-clawgap-source/
+actionwire-source/
 ├── README.md                      # Original packaged release notes
 ├── requirements-artifact.txt
 ├── ENVIRONMENT.json
