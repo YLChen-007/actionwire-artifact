@@ -1,32 +1,31 @@
 # Running the ActionWire Source Artifact
 
-This guide accompanies `actionwire-source.tar.gz`. ActionWire combines CodeQL
+This guide describes the ActionWire source artifact. ActionWire combines CodeQL
 analysis, tool-interface extraction, and LLM-assisted analysis of security
 checks in agent software.
 
-The archive contains the current tool source, configuration, capability cards,
-selected specifications, and tests. Target repositories, CodeQL databases and
-binaries, research results, ground-truth datasets, and real API keys are supplied
-separately. You can install the tool dependencies and run the checks below using
-this archive alone. Running analysis stages requires the additional inputs listed
-later in this guide.
+The `actionwire-source/` directory holds the current tool source, configuration,
+capability cards, selected specifications, and tests. Target repositories, CodeQL
+databases and binaries, research results, ground-truth datasets, and real API keys
+are supplied separately. You can install the tool dependencies and run the checks
+below using this source tree alone. Running analysis stages requires the
+additional inputs listed later in this guide.
 
-The commands below assume **Linux and Bash**. Except for the initial extraction
-commands, run them from the extracted `actionwire-source/` directory.
+The commands below assume **Linux and Bash** and run from the
+`actionwire-source/` directory.
 
-## 1. Extract and verify the archive
+## 1. Verify the checkout
 
-Place the archive and `actionwire-source.tar.gz.sha256` in the same directory:
+The source tree is committed directly in this repository, so no archive needs to
+be unpacked. Verify the file contents before installing dependencies or modifying
+files:
 
 ```bash
-sha256sum -c actionwire-source.tar.gz.sha256
-tar -xzf actionwire-source.tar.gz
 cd actionwire-source
 sha256sum -c SHA256SUMS
 ```
 
-Both checks should report `OK`. Verify the contents before installing dependencies
-or modifying files. `FILES.txt` lists the packaged files; `SOURCE-MANIFEST.json`
+Every entry should report `OK`. `FILES.txt` lists the files; `SOURCE-MANIFEST.json`
 records their origin and hashes.
 
 ## 2. Install the tool dependencies
@@ -102,7 +101,7 @@ environment has not been validated as part of this release.
 
 Install [CodeQL CLI 2.22.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.22.1)
 for your platform. ActionWire expects the executable at `bin/codeql` inside the
-extracted source directory. Replace the example installation path below:
+`actionwire-source/` directory. Replace the example installation path below:
 
 ```bash
 mkdir -p bin
@@ -240,9 +239,10 @@ timeout is not a total campaign budget.
 The pipeline command above uses an OpenAI-compatible HTTP client. The standalone
 `src.gate_semantics.main` and `src.sink_capacity.main` interfaces use different
 agent backends and configuration. In particular, capability-card generation uses
-the Claude CLI and an Anthropic-compatible endpoint. The archive already contains
-capability cards; regenerating them is not required for the example above. Consult
-the relevant module README and `--help` before using those interfaces.
+the Claude CLI and an Anthropic-compatible endpoint. The source tree already
+contains capability cards; regenerating them is not required for the example
+above. Consult the relevant module README and `--help` before using those
+interfaces.
 
 To remove the key from the current shell after use:
 
@@ -261,7 +261,7 @@ and this file:
 output/nanobot/handler-impact/handler-impact.jsonl
 ```
 
-The source archive does not include the research handler-impact dataset, and the
+The source tree does not include the research handler-impact dataset, and the
 current packaged CLI has no `infer-handler-impact` subcommand. Obtain compatible
 handler-impact records separately before running:
 
@@ -275,7 +275,7 @@ chains being assembled. Results are written under
 
 `python -m src.pipeline --project nanobot all` only sequences the four pipeline
 stages. It does not generate handler specifications or handler-impact records,
-so it is not a complete first-run setup command for this archive. It includes
+so it is not a complete first-run setup command for this source tree. It includes
 `infer-gate-semantics`, which can send source context and consume API credits
 before the final stage reports missing downstream inputs.
 
@@ -319,14 +319,14 @@ target environments and are outside the setup example in this guide.
 
 | Symptom | Check |
 |---|---|
-| `No module named src` | Run from the extracted `actionwire-source/` directory. |
+| `No module named src` | Run from the `actionwire-source/` directory. |
 | Missing `jsonschema`, `yaml`, or SDK module | Activate the virtual environment and install `requirements-artifact.txt`. |
 | Missing TypeScript compiler or language server | Run `npm ci --prefix src/gate_semantics/lsp`. |
 | Missing `bin/codeql` | Create the expected executable link; setting `PATH` alone is insufficient. |
 | CodeQL database missing or language/adapter mismatch | Use a finalized database for the selected registered project and matching source tree. |
 | Missing gate CSVs or gate index | Complete `infer-gates` with the same output-root configuration first. |
 | Missing `handler-impact.jsonl` | Supply the compatible external dataset; there is no packaged generator CLI for this step. |
-| `canonical coverage manifest is missing` | Supply the frozen coverage dataset; it is deliberately absent from the source archive. |
+| `canonical coverage manifest is missing` | Supply the frozen coverage dataset; it is deliberately absent from this source tree. |
 | Repository-wide tests fail on missing GT/baseline/output files | Those are integration tests. Use the self-contained checks in section 3 for this source-only package. |
 
 `python scripts/test_ql.py`, including `--unit-only`, includes tests that require
@@ -335,24 +335,30 @@ the minimal installation check. Full CodeQL regressions, live LLM requests, targ
 runtime campaigns, and end-to-end paper reproduction were not performed when
 validating this source release.
 
-## Package layout
+## Repository layout
 
 ```text
-actionwire-source/
-├── README.md                      # Original packaged release notes
-├── requirements-artifact.txt
-├── ENVIRONMENT.json
-├── FILES.txt
-├── SHA256SUMS
-├── SOURCE-MANIFEST.json
-├── docs-map.yaml
-├── src/                           # Tool implementation, resources, and tests
-├── scripts/                       # Selected test and maintenance helpers
-└── design/                        # Selected specifications, inputs, and helpers
+.
+├── README.md                      # This guide
+└── actionwire-source/             # The source tree (browse directly; no unpacking)
+    ├── README.md                  # Original packaged release notes
+    ├── requirements-artifact.txt
+    ├── ENVIRONMENT.json
+    ├── FILES.txt
+    ├── SHA256SUMS
+    ├── SOURCE-MANIFEST.json
+    ├── docs-map.yaml
+    ├── src/                       # Tool implementation, resources, and tests
+    ├── scripts/                   # Selected test and maintenance helpers
+    └── design/                    # Selected specifications, inputs, and helpers
 ```
 
-This companion guide does not change the archive. Versioned implementation files
-such as `v8.py`, `v14.py`, and `v15.py` remain because the current code imports
-them. Do not remove files based solely on version numbers. Some retained research
-documents link to excluded datasets or mention original-machine paths; use the
-input requirements and explicit path options described above.
+The source tree is served as ordinary files, so it can be browsed, cloned, or
+downloaded directly from this repository. `actionwire-source/README.md` are the
+package's original release notes, preserved unchanged.
+
+This companion guide does not change the source tree. Versioned implementation
+files such as `v8.py`, `v14.py`, and `v15.py` remain because the current code
+imports them. Do not remove files based solely on version numbers. Some retained
+research documents link to excluded datasets or mention original-machine paths;
+use the input requirements and explicit path options described above.
