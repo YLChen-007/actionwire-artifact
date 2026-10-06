@@ -340,6 +340,8 @@ validating this source release.
 ```text
 .
 ├── README.md                      # This guide
+├── study/                         # Study dataset for the paper's empirical study
+│   └── study-paper-data.xlsx      # One vulnerability per row (97 records) + field guide
 └── actionwire-source/             # The source tree (browse directly; no unpacking)
     ├── README.md                  # Original packaged release notes
     ├── requirements-artifact.txt
@@ -356,6 +358,15 @@ validating this source release.
 The source tree is served as ordinary files, so it can be browsed, cloned, or
 downloaded directly from this repository. `actionwire-source/README.md` are the
 package's original release notes, preserved unchanged.
+
+## Study dataset
+
+`study/study-paper-data.xlsx` is the dataset behind the paper's empirical study.
+It has one vulnerability per row (97 records) and a `Field guide` sheet defining
+every column. It is a derived, paper-facing extract: evidence, parameter details,
+and the underlying per-record raw JSON are not included, and gate annotations are
+represented as counts. `FILES.txt`, `SHA256SUMS`, and `SOURCE-MANIFEST.json` under
+`actionwire-source/` describe the source tree only; they do not cover this file.
 
 This companion guide does not change the source tree. Versioned implementation
 files such as `v8.py`, `v14.py`, and `v15.py` remain because the current code
